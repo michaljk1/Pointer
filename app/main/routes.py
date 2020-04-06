@@ -1,10 +1,10 @@
 import os
 from flask import render_template, url_for, flash, request
-from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import logout_user, login_required
 from app.main import bp
-from app.main.forms import UploadForm, CourseForm, TemplateForm
+from app.main.forms import UploadForm, CourseForm, TemplateForm, LessonForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, ExerciseTemplate
+from app.models import Course, ExerciseTemplate, Lesson
 from app import db
 
 
@@ -21,7 +21,7 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-@bp.route('/course', methods=['GET', 'POST'])
+@bp.route('/addcourse', methods=['GET', 'POST'])
 def add_course():
     form = CourseForm()
     if request.method == 'POST':
@@ -30,13 +30,39 @@ def add_course():
             db.session.add(new_course)
             db.session.commit()
             return redirect(url_for('main.courses'))
-    return render_template('addcourse.html', form=form)
+    return render_template('add_course.html', form=form)
 
 
-@bp.route('/course/<string:course_name>', methods=['GET', 'POST'])
+@bp.route('/course/<string:course_name>')
 def course(course_name):
     course = Course.query.filter_by(name=course_name).first()
     return render_template('course.html', course=course)
+
+
+@bp.route('/course/<int:lesson_id>')
+def lesson(lesson_id):
+    lesson = Lesson.query.filter_by(id=lesson_id).first()
+    course = Course.query.filter_by(id=lesson.course_id).first()
+    return render_template('lesson.html', lesson=lesson, course=course)
+
+
+@bp.route('/add_lesson/<string:course_name>', methods=['GET', 'POST'])
+def add_lesso(course_name):
+    form = LessonForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            course = Course.query.filter_by(name=course_name).first()
+            new_lesson = Lesson(name=form.name.data, raw_text=form.text_content.data)
+            course.lessons.append(new_lesson)
+            db.session.commit()
+            return redirect(url_for('main.courses'))
+    return render_template('add_lesson.html', form=form)
+
+
+@bp.route('/template/<int:template_id>', methods=['GET', 'POST'])
+def template(template_id):
+    template = ExerciseTemplate.query.filter_by(id=template_id).first()
+    return render_template('template.html', template=template)
 
 
 @bp.route('/courses', methods=['GET'])
@@ -45,17 +71,20 @@ def courses():
     return render_template('courses.html', courses=courses)
 
 
-@bp.route('/<string:course_name>/template', methods=['GET', 'POST'])
-def add_exercise(course_name):
+@bp.route('/<string:course_name>/<string:lesson_name>/template', methods=['GET', 'POST'])
+def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
     if course is None:
         return redirect(url_for('auth.login'))
     form = TemplateForm()
     if form.validate_on_submit():
-        exercise_template = ExerciseTemplate(content=form.content.data, course_id=course.id)
-        db.session.add(exercise_template)
-        db.session.commit()
-    return render_template('template.html', form=form)
+        lesson = Lesson.query.filter_by(name=lesson_name).first()
+        if lesson is not None:
+            exercise_template = ExerciseTemplate(content=form.content.data, lesson_id=lesson.id)
+            lesson.exercise_templates.append(exercise_template)
+            db.session.commit()
+            return redirect(url_for('main.lesson', lesson_id=lesson.id))
+    return render_template('add_template.html', form=form)
 
 
 @bp.route('/upload', methods=['GET', 'POST'])

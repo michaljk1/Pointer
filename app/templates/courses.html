@@ -2,6 +2,6 @@
 
 {% block content %}
     {% for course in courses %}
-    <div><p><a href="{{ url_for('main.course_view', course_name = course.name ) }}">{{ course.name }}</a></p></div>
+    <div><p><a href="{{ url_for('main.course', course_name = course.name ) }}">{{ course.name }}</a></p></div>
     {% endfor %}
 {% endblock %}

@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
-    {{ form.content }}
-    {{ form.end_date }}
-    <input type="submit">
-</form>
+    <div><p>{{ template.id }}</p></div>
+    <div><p>{{ template.content }}</p></div>
 {% endblock %}
