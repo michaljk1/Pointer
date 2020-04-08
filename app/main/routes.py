@@ -21,7 +21,25 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-@bp.route('/addcourse', methods=['GET', 'POST'])
+@bp.route('/invite_user')
+def invite_user():
+
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/courses', methods=['GET'])
+def courses():
+    courses = Course.query.all()
+    return render_template('courses.html', courses=courses)
+
+
+@bp.route('/course/<string:course_name>')
+def course(course_name):
+    course = Course.query.filter_by(name=course_name).first()
+    return render_template('course.html', course=course)
+
+
+@bp.route('/add_course', methods=['GET', 'POST'])
 def add_course():
     form = CourseForm()
     if request.method == 'POST':
@@ -33,21 +51,15 @@ def add_course():
     return render_template('add_course.html', form=form)
 
 
-@bp.route('/course/<string:course_name>')
-def course(course_name):
-    course = Course.query.filter_by(name=course_name).first()
-    return render_template('course.html', course=course)
-
-
-@bp.route('/course/<int:lesson_id>')
-def lesson(lesson_id):
+@bp.route('/<string:course_name>/<int:lesson_id>')
+def lesson(course_name, lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
-    course = Course.query.filter_by(id=lesson.course_id).first()
+    course = Course.query.filter_by(name=course_name).first()
     return render_template('lesson.html', lesson=lesson, course=course)
 
 
-@bp.route('/add_lesson/<string:course_name>', methods=['GET', 'POST'])
-def add_lesso(course_name):
+@bp.route('/<string:course_name>/add_lesson', methods=['GET', 'POST'])
+def add_lesson(course_name):
     form = LessonForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -55,23 +67,17 @@ def add_lesso(course_name):
             new_lesson = Lesson(name=form.name.data, raw_text=form.text_content.data)
             course.lessons.append(new_lesson)
             db.session.commit()
-            return redirect(url_for('main.courses'))
+            return redirect(url_for('main.lesson', lesson_id=new_lesson.id))
     return render_template('add_lesson.html', form=form)
 
 
-@bp.route('/template/<int:template_id>', methods=['GET', 'POST'])
-def template(template_id):
-    template = ExerciseTemplate.query.filter_by(id=template_id).first()
-    return render_template('template.html', template=template)
+@bp.route('/<string:course_name>/<string:lesson_name>/exercise/<int:template_id>', methods=['GET', 'POST'])
+def exercise(course_name, lesson_name, template_id):
+    exercise = ExerciseTemplate.query.filter_by(id=template_id).first()
+    return render_template('exercise.html', template=exercise)
 
 
-@bp.route('/courses', methods=['GET'])
-def courses():
-    courses = Course.query.all()
-    return render_template('courses.html', courses=courses)
-
-
-@bp.route('/<string:course_name>/<string:lesson_name>/template', methods=['GET', 'POST'])
+@bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
     if course is None:
@@ -83,7 +89,7 @@ def add_exercise(course_name, lesson_name):
             exercise_template = ExerciseTemplate(content=form.content.data, lesson_id=lesson.id)
             lesson.exercise_templates.append(exercise_template)
             db.session.commit()
-            return redirect(url_for('main.lesson', lesson_id=lesson.id))
+            return redirect(url_for('main.lesson', course_name=course.name, lesson_id=lesson.id))
     return render_template('add_template.html', form=form)
 
 

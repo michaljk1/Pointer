@@ -60,6 +60,7 @@ class Lesson(db.Model):
 
 class ExerciseTemplate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
     content = db.Column(db.String(500))
     points = db.Column(db.Float)

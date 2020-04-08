@@ -6,10 +6,12 @@ from wtforms.fields.html5 import DateField
 
 class UploadForm(FlaskForm):
     file = FileField('Select File')
+    submit_button = SubmitField('Submit Form')
 
 
 class CourseForm(FlaskForm):
     name = StringField('Course name')
+    submit_button = SubmitField('Add course')
 
 
 class LessonForm(FlaskForm):
@@ -17,9 +19,10 @@ class LessonForm(FlaskForm):
     text_content = StringField('Content')
     pdf_content = FileField('Select File')
     url_content = StringField('Url')
+    submit_button = SubmitField('Add Lesson')
 
 
 class TemplateForm(FlaskForm):
     content = StringField('content')
-    end_date = DateField('DatePicker', format='%Y-%m-%d')
-
+    end_date = DateField('End date', format='%Y-%m-%d')
+    submit_button = SubmitField('Add template')
