@@ -8,7 +8,6 @@ from werkzeug.urls import url_parse
 from flask_user import roles_required
 from app.models import User
 from app import db
-from app import user_manager
 
 
 @bp.route('/')
