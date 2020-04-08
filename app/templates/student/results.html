@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for exercise in current_user.user_exercises %}
+    <div><p><a href="{{ url_for('student.course', course_name = course.name ) }}">{{ course.name }}</a></p></div>
+    {% endfor %}
+{% endblock %}
