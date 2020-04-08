@@ -2,10 +2,11 @@ import os
 from flask import render_template, url_for, flash, request
 from flask_login import logout_user, login_required
 from app.main import bp
-from app.main.forms import UploadForm, CourseForm, TemplateForm, LessonForm
+from app.main.forms import UploadForm, CourseForm, TemplateForm, LessonForm, CreateAccountRequestForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, ExerciseTemplate, Lesson
+from app.models import Course, ExerciseTemplate, Lesson, User
 from app import db
+from app.main.email import send_create_account_email
 
 
 @bp.route('/')
@@ -21,10 +22,19 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-@bp.route('/invite_user')
-def invite_user():
+@bp.route('/create_account_request', methods=['GET', 'POST'])
+def create_account_request():
+    form = CreateAccountRequestForm()
+    if form.validate_on_submit():
+        send_create_account_email(form.email.data)
+        flash('Check your email for the instructions to create account')
+        return redirect(url_for('main.index'))
+    return render_template('email/create_account_request.html', form=form)
 
-    return redirect(url_for('main.index'))
+
+@bp.route('/create_account/<token>', methods=['GET', 'POST'])
+def create_account(token):
+    return render_template('create_account.html')
 
 
 @bp.route('/courses', methods=['GET'])
@@ -67,7 +77,7 @@ def add_lesson(course_name):
             new_lesson = Lesson(name=form.name.data, raw_text=form.text_content.data)
             course.lessons.append(new_lesson)
             db.session.commit()
-            return redirect(url_for('main.lesson', lesson_id=new_lesson.id))
+            return redirect(url_for('main.lesson', lesson_id=new_lesson.id, course_name=course.name))
     return render_template('add_lesson.html', form=form)
 
 
@@ -86,7 +96,7 @@ def add_exercise(course_name, lesson_name):
     if form.validate_on_submit():
         lesson = Lesson.query.filter_by(name=lesson_name).first()
         if lesson is not None:
-            exercise_template = ExerciseTemplate(content=form.content.data, lesson_id=lesson.id)
+            exercise_template = ExerciseTemplate(name=form.content.data, content=form.content.data, lesson_id=lesson.id)
             lesson.exercise_templates.append(exercise_template)
             db.session.commit()
             return redirect(url_for('main.lesson', course_name=course.name, lesson_id=lesson.id))

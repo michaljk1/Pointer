@@ -2,6 +2,7 @@ from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.fields.html5 import DateField
+from wtforms.validators import DataRequired, Email
 
 
 class UploadForm(FlaskForm):
@@ -23,6 +24,12 @@ class LessonForm(FlaskForm):
 
 
 class TemplateForm(FlaskForm):
+    name = StringField('Nazwa')
     content = StringField('content')
     end_date = DateField('End date', format='%Y-%m-%d')
     submit_button = SubmitField('Add template')
+
+
+class CreateAccountRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
