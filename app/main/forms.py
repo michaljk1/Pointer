@@ -1,6 +1,6 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Email
 
@@ -26,6 +26,8 @@ class LessonForm(FlaskForm):
 class TemplateForm(FlaskForm):
     name = StringField('Nazwa')
     content = StringField('content')
+    max_attempts = IntegerField('Liczba prób')
+    points = FloatField('Liczba punktów')
     end_date = DateField('End date', format='%Y-%m-%d')
     submit_button = SubmitField('Add template')
 
