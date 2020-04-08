@@ -30,8 +30,11 @@ def create_app():
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
-    from app.main import bp as main_bp
-    app.register_blueprint(main_bp, url_prefix='/main')
+    from app.admin import bp as main_bp
+    app.register_blueprint(main_bp, url_prefix='/admin')
+
+    from app.student import bp as student_bp
+    app.register_blueprint(student_bp, url_prefix='/student')
 
     return app
 

@@ -26,7 +26,7 @@ class LessonForm(FlaskForm):
 class TemplateForm(FlaskForm):
     name = StringField('Nazwa')
     content = StringField('content')
-    max_attempts = IntegerField('Liczba prób')
+    max_attempts = IntegerField('Liczba prób', default=3)
     points = FloatField('Liczba punktów')
     end_date = DateField('End date', format='%Y-%m-%d')
     submit_button = SubmitField('Add template')

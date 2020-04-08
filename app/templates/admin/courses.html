@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for course in courses %}
+    <div><p><a href="{{ url_for('admin.course', course_name = course.name ) }}">{{ course.name }}</a></p></div>
+    {% endfor %}
+    <div><p><a href="{{ url_for('admin.add_course') }}">Add Course</a></p></div>
+{% endblock %}

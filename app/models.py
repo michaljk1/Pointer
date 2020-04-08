@@ -39,7 +39,7 @@ class UserRoles(db.Model):
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True)
-    lessons = db.relationship('Lesson', backref='lesson', lazy='dynamic')
+    lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
 
 
 class CourseUser(db.Model):
@@ -76,3 +76,6 @@ class UserExercises(db.Model):
     file_path = db.Column(db.String(100))
     attempt = db.Column(db.Integer)
     is_approved = db.Column(db.Boolean, default=True)
+    ip_address = db.Column(db.String(20))
+    browser_info = db.Column(db.String(50))
+    os_info = db.Column(db.String(50))
