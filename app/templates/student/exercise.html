@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <div><p>{{ template.name }}</p></div>
+    <div><p>{{ template.content }}</p></div>
+    <div><p><a href="{{ url_for('student.add_solution', lesson_name = template.template.name ) }}">Dodaj rozwiązanie</a>
+    </p></div>
+{% endblock %}

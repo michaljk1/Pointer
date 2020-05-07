@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <div><p>{{ course.name }}</p></div>
+    {% for lesson in course.lessons %}
+        <div><p><a href="{{ url_for('student.lesson', lesson_id = lesson.id ) }}">{{ lesson.name }}</a></p></div>
+    {% endfor %}
+{% endblock %}

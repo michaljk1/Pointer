@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <div><p>{{ lesson.name }}</p></div>
+    <div><p>{{ lesson.content_url }}</p></div>
+    {% if lesson.content_pdf_path is not none %}
+    <div><p><a
+            href="{{ url_for('student.download', filename = lesson.content_pdf_path) }}" target="_blank">{{ lesson.content_pdf_path }}</a>
+    </p></div>
+    {% endif %}
+    {% for template in lesson.exercise_templates %}
+        <div><p><a
+                href="{{ url_for('student.exercise', course_name = lesson.course.name, lesson_name = lesson.name, template_id = template.id ) }}">{{ template.name }}</a>
+        </p></div>
+    {% endfor %}
+    <div><p><a href="{{ url_for('student.add_solution', lesson_name = lesson.course.name ) }}">Add solution</a></p>
+    </div>
+{% endblock %}

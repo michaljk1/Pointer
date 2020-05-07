@@ -1,30 +1,30 @@
 {% extends 'bootstrap/base.html' %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
 
 {% block title %}
     {% if title %}{{ title }} - Pointer{% else %}Pointer{% endif %}
 {% endblock %}
-
 {% block navbar %}
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{{ url_for('main.index') }}">Pointer</a>
+                <a class="navbar-brand" href="{{ url_for('admin.index') }}">Pointer</a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                    <li><a href="{{ url_for('main.courses') }}">Courses</a></li>
-                    <li><a href="{{ url_for('main.create_account_request') }}">Create account</a></li>
+                    <li><a href="{{ url_for('admin.courses') }}">AdminCourses</a></li>
+                    <li><a href="{{ url_for('student.courses') }}">StudentCourses</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
-                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                        <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    {% endif %}
+                    {% if current_user.is_anonymous == False %}
+                        <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -32,16 +32,17 @@
     </nav>
 {% endblock %}
 
-{% block main_content %}
+{% block content %}
     <div class="container">
         {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
         {% endwith %}
-
-        {% block content %}{% endblock %}
+        <div class="container3">
+            {% block app_content %}{% endblock %}
+        </div>
     </div>
 {% endblock %}
