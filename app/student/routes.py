@@ -1,7 +1,6 @@
 import os
 from flask import render_template, url_for, flash, request, send_from_directory, current_app
 from flask_login import login_required, current_user
-
 from app.student import bp
 from app.admin.forms import UploadForm
 from werkzeug.utils import secure_filename, redirect
