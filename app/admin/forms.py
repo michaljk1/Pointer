@@ -1,6 +1,7 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, FieldList, \
+    SelectField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Email
 
@@ -19,7 +20,7 @@ class LessonForm(FlaskForm):
     name = StringField('Lesson name')
     text_content = StringField('Content')
     pdf_content = FileField('Select File')
-    url_content = StringField('Url')
+    content_url = StringField('Url')
     submit_button = SubmitField('Add Lesson')
 
 
@@ -33,5 +34,5 @@ class TemplateForm(FlaskForm):
 
 
 class CreateAccountRequestForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Request Password Reset')
+    email = SelectField('User', choices=[])
+    submit_button = SubmitField('Request Password Reset')

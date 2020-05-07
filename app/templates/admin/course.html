@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
-{% block content %}
-    <div><p>{{ course.name }}</p></div>
+{% block app_content %}
+    <div><h2>{{ course.name }}</h2></div>
     {% for lesson in course.lessons %}
-    <div><p><a href="{{ url_for('admin.lesson',course_name = course.name, lesson_id = lesson.id ) }}">{{ lesson.name }}</a></p></div>
+        <div><h1><a
+                href="{{ url_for('admin.lesson',course_name = course.name, lesson_id = lesson.id ) }}">{{ lesson.name }}</a>
+        </h1></div>
     {% endfor %}
-    <div><p><a href="{{ url_for('admin.add_lesson', course_name = course.name ) }}">Add lesson</a></p></div>
+    <div><h1><a href="{{ url_for('admin.add_lesson', course_name = course.name ) }}">Add lesson</a></h1></div>
+    <div><h1><a href="{{ url_for('admin.add_student', course_name = course.name ) }}">Add student</a></h1></div>
 {% endblock %}

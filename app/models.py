@@ -1,6 +1,21 @@
+import os
+
+from flask import current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login
+
+user_course_assoc = db.Table(
+    'user_courses',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
+)
+
+
+class Course(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60), unique=True)
+    lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
 
 
 class User(UserMixin, db.Model):
@@ -9,6 +24,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(128))
     roles = db.relationship('Role', secondary='user_roles')
     user_exercises = db.relationship('UserExercises', backref='author', lazy='dynamic')
+    courses = db.relationship('Course', secondary=user_course_assoc, backref='member')
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -36,18 +52,6 @@ class UserRoles(db.Model):
     role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
 
 
-class Course(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60), unique=True)
-    lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
-
-
-class CourseUser(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-
 class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
@@ -56,6 +60,9 @@ class Lesson(db.Model):
     content_url = db.Column(db.String(100))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     exercise_templates = db.relationship('ExerciseTemplate', backref='template', lazy='dynamic')
+
+    def get_lesson_directory(self):
+        return os.path.join(current_app.instance_path, self.course.name, self.name)
 
 
 class ExerciseTemplate(db.Model):

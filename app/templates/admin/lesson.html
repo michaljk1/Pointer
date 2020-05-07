@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
     <div><p>{{ lesson.name }}</p></div>
-    <div><p>{{ lesson.raw_text}}</p></div>
+    <div><p>{{ lesson.raw_text }}</p></div>
+    <div><p><a href="{{ lesson.content_url }}">{{ lesson.content_url }}</a></p></div>
     {% for template in lesson.exercise_templates %}
-    <div><p><a href="{{ url_for('admin.exercise', course_name = course.name, lesson_name = lesson.name, template_id = template.id ) }}">{{ template.name }}</a></p></div>
+        <div><p><a
+                href="{{ url_for('admin.exercise', course_name = course.name, lesson_name = lesson.name, template_id = template.id ) }}">{{ template.name }}</a>
+        </p></div>
     {% endfor %}
     <div><p><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Add exercise</a></p></div>
 {% endblock %}

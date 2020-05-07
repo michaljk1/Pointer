@@ -1,12 +1,11 @@
 import os
-from flask import render_template, url_for, flash, request
-from flask_login import logout_user, login_required
+from flask import render_template, url_for, flash, request, current_app
+from flask_login import logout_user, login_required, current_user
 from app.admin import bp
-from app.admin.forms import UploadForm, CourseForm, TemplateForm, LessonForm, CreateAccountRequestForm
-from werkzeug.utils import secure_filename, redirect
+from app.admin.forms import CourseForm, TemplateForm, LessonForm, CreateAccountRequestForm
+from werkzeug.utils import redirect, secure_filename
 from app.models import Course, ExerciseTemplate, Lesson, User
 from app import db
-from app.admin.email import send_create_account_email
 
 
 @bp.route('/')
@@ -22,13 +21,20 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-@bp.route('/create_account_request', methods=['GET', 'POST'])
-def create_account_request():
+@bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
+def add_student(course_name):
     form = CreateAccountRequestForm()
+    course = Course.query.filter_by(name=course_name).first()
+    users = []
+    for user in User.query.all():
+        data = (user.email, user.email)
+        users.append(data)
+    form.email.choices = users
     if form.validate_on_submit():
-        send_create_account_email(form.email.data)
-        flash('Check your email for the instructions to create account')
-        return redirect(url_for('admin.index'))
+        user = User.query.filter_by(email=form.email.data).first()
+        user.courses.append(course)
+        db.session.commit()
+        flash('Dodano studenta')
     return render_template('email/create_account_request.html', form=form)
 
 
@@ -55,8 +61,9 @@ def add_course():
     if request.method == 'POST':
         if form.validate_on_submit():
             new_course = Course(name=form.name.data)
-            db.session.add(new_course)
+            current_user.courses.append(new_course)
             db.session.commit()
+            flash('Dodano kurs')
             return redirect(url_for('admin.courses'))
     return render_template('admin/add_course.html', form=form)
 
@@ -73,11 +80,29 @@ def add_lesson(course_name):
     if request.method == 'POST':
         if form.validate_on_submit():
             course = Course.query.filter_by(name=course_name).first()
-            new_lesson = Lesson(name=form.name.data, raw_text=form.text_content.data)
+            file = request.files['pdf_content']
+            uploads_dir = os.path.join(current_app.instance_path, 'uploads')
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(uploads_dir, filename))
+            new_lesson = Lesson(name=form.name.data, content_pdf_path=filename, content_url=form.content_url.data,
+                                raw_text=form.text_content.data)
             course.lessons.append(new_lesson)
             db.session.commit()
             return redirect(url_for('admin.lesson', lesson_id=new_lesson.id, course_name=course.name))
     return render_template('admin/add_lesson.html', form=form)
+
+
+# @bp.route('/<string:course_name>/invite_student', methods=['GET', 'POST'])
+# def invite_student(course_name):
+#     form = LessonForm()
+#     if request.method == 'POST':
+#         if form.validate_on_submit():
+#             course = Course.query.filter_by(name=course_name).first()
+#             new_lesson = Lesson(name=form.name.data, content_url=form.url_content.data, raw_text=form.text_content.data)
+#             course.lessons.append(new_lesson)
+#             db.session.commit()
+#             return redirect(url_for('admin.lesson', lesson_id=new_lesson.id, course_name=course.name))
+#     return render_template('admin/add_lesson.html', form=form)
 
 
 @bp.route('/<string:course_name>/<string:lesson_name>/exercise/<int:template_id>', methods=['GET', 'POST'])
@@ -97,5 +122,3 @@ def add_exercise(course_name, lesson_name):
             db.session.commit()
             return redirect(url_for('admin.lesson', course_name=lesson.course.name, lesson_id=lesson.id))
     return render_template('admin/add_template.html', form=form)
-
-
