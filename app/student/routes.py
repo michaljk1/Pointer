@@ -38,22 +38,32 @@ def exercise(template_id):
     return render_template('student/exercise.html', template=exercise)
 
 
-@bp.route('/<string:lesson_name>/add_solution', methods=['GET', 'POST'])
-def add_solution(lesson_name):
+@bp.route('/<string:lesson_name>/<string:exercise_name>/add_solution', methods=['GET', 'POST'])
+def add_solution(lesson_name, exercise_name):
     form = UploadForm()
     lesson = Lesson.query.filter_by(name=lesson_name).first()
+    exercise = ExerciseTemplate.query.filter_by(name=exercise_name).first()
+    attempt = len(UserExercises.query.filter_by(user_id=current_user.id, exercise_template_id=exercise.id).all())
+    if attempt >= exercise.max_attempts:
+        flash('Przekroczono maksymalną liczbę podejść')
+        return render_template('student/add_solution.html', form=form)
     if form.validate_on_submit():
-        # solution = UserExercises(name=form.content.data, content=form.content.data, lesson_id=lesson.id)
         file = request.files['file']
-        file.save(os.path.join("/home/", secure_filename(file.filename)))
-        # current_user.user_exercises.append(solution)
-        # db.session.commit()
+
+        filename = secure_filename(file.filename)
+        solution = UserExercises(user_id=current_user.id, exercise_template_id=exercise.id, file_path=filename,
+                                 os_info=str(request.user_agent), attempt=attempt)
+        directory = os.path.join(exercise.get_directory(), current_user.email, str(attempt))
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        file.save(os.path.join(directory, filename))
+        current_user.user_exercises.append(solution)
+        db.session.commit()
         return redirect(url_for('student.lesson', lesson_id=lesson.id))
     return render_template('student/add_solution.html', form=form)
 
 
-@bp.route('/uploads/<path:filename>', methods=['GET', 'POST'])
-def download(filename):
-    uploads = os.path.join(current_app.instance_path, 'uploads')
-    return send_from_directory(directory=uploads, filename=filename)
-
+@bp.route('/uploads/<int:lesson_id>/<path:filename>', methods=['GET', 'POST'])
+def download(lesson_id, filename):
+    lesson = Lesson.query.filter_by(id=lesson_id).first()
+    return send_from_directory(directory=lesson.get_directory(), filename=filename)

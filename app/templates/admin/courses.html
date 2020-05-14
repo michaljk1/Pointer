@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <div class="container3">
         {% for course in courses %}
             <div>
                 <p><a href="{{ url_for('admin.course', course_name = course.name ) }}">{{ course.name }}</a>
@@ -9,5 +8,4 @@
             </div>
         {% endfor %}
         <div><p><a href="{{ url_for('admin.add_course') }}">Add Course</a></p></div>
-    </div>
 {% endblock %}

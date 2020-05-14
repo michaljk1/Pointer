@@ -6,7 +6,7 @@ from app.auth.forms import LoginForm, RegistrationForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 from flask_user import roles_required
-from app.models import User
+from app.models import User, Course
 from app import db
 
 
@@ -30,7 +30,8 @@ def login():
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('auth.index')
+            #TODO next page based on user role
+            next_page = url_for('admin.index')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
 
@@ -52,3 +53,13 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
+
+
+@bp.route('/<string:link>')
+def append_course(link):
+    course_by_link = Course.query.filter_by(link=link).first()
+    current_user.courses.append(course_by_link)
+    db.session.commit()
+    flash('Przypisano do kursu')
+    # TODO redirect based on current_user role
+    return redirect(url_for('admin.course', course_name=course_by_link.name))
