@@ -16,6 +16,10 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True)
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
+    link = db.Column(db.String(60), unique=True)
+
+    def get_directory(self):
+        return os.path.join(current_app.instance_path, self.name)
 
 
 class User(UserMixin, db.Model):
@@ -59,9 +63,9 @@ class Lesson(db.Model):
     content_pdf_path = db.Column(db.String(100))
     content_url = db.Column(db.String(100))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    exercise_templates = db.relationship('ExerciseTemplate', backref='template', lazy='dynamic')
+    exercise_templates = db.relationship('ExerciseTemplate', backref='lesson', lazy='dynamic')
 
-    def get_lesson_directory(self):
+    def get_directory(self):
         return os.path.join(current_app.instance_path, self.course.name, self.name)
 
 
@@ -70,19 +74,26 @@ class ExerciseTemplate(db.Model):
     name = db.Column(db.String(60))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
     content = db.Column(db.String(500))
-    points = db.Column(db.Float)
+    max_points = db.Column(db.Float)
     end_date = db.Column(db.DATE)
     max_attempts = db.Column(db.Integer, default=3)
     test_path = db.Column(db.String(100))
+    solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
+
+    def get_directory(self):
+        return os.path.join(self.lesson.get_directory(), self.name)
 
 
 class UserExercises(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise_template_id = db.Column(db.ForeignKey('exercise_template.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    points = db.Column(db.Float)
     file_path = db.Column(db.String(100))
     attempt = db.Column(db.Integer)
     is_approved = db.Column(db.Boolean, default=True)
     ip_address = db.Column(db.String(20))
-    browser_info = db.Column(db.String(50))
     os_info = db.Column(db.String(50))
+
+    def get_directory(self):
+        return os.path.join(self.template.get_directory(), self.author.email, self.attempt)
