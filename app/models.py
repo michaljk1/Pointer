@@ -96,4 +96,4 @@ class UserExercises(db.Model):
     os_info = db.Column(db.String(50))
 
     def get_directory(self):
-        return os.path.join(self.template.get_directory(), self.author.email, self.attempt)
+        return os.path.join(self.template.get_directory(), self.author.email.split('@')[0], str(self.attempt))

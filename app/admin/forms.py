@@ -31,6 +31,7 @@ class TemplateForm(FlaskForm):
     max_points = FloatField('Liczba punktów')
     end_date = DateField('End date', format='%Y-%m-%d')
     submit_button = SubmitField('Dodaj ćwiczenie')
+    test_path = FileField('Test')
 
 
 class CreateAccountRequestForm(FlaskForm):
@@ -39,11 +40,14 @@ class CreateAccountRequestForm(FlaskForm):
 
 
 class SolutionForm(FlaskForm):
-    points = StringField('member_id')
-    accept = BooleanField('inbox_share')
-    file = StringField('file')
-    attempt = IntegerField('attempt')
-
+    email = StringField('Student', render_kw={'readonly': True})
+    points = FloatField('Punkty')
+    is_approved = BooleanField('Zaakceptowano')
+    file_path = StringField('file', render_kw={'readonly': True})
+    attempt = IntegerField('attempt', render_kw={'readonly': True})
+    ip_address = StringField('ip address', render_kw={'readonly': True})
+    os_info = StringField('os info', render_kw={'readonly': True})
+    submit = SubmitField('Zapisz')
 
 class SolutionsForm(FlaskForm):
     title = StringField('title')

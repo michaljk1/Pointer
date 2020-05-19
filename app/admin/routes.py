@@ -145,9 +145,30 @@ def add_exercise(course_name, lesson_name):
     if form.validate_on_submit():
         lesson = Lesson.query.filter_by(name=lesson_name).first()
         if lesson is not None:
-            exercise_template = ExerciseTemplate(name=form.name.data, content=form.content.data, lesson_id=lesson.id,
-                                                 max_attempts=form.max_attempts.data, max_points=form.max_points.data)
+            file = request.files['test_path']
+            filename = secure_filename(file.filename)
+            exercise_name = form.name.data
+            exercise_template = ExerciseTemplate(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
+                                                 max_attempts=form.max_attempts.data, max_points=form.max_points.data,
+                                                 test_path=filename)
             lesson.exercise_templates.append(exercise_template)
+            directory = os.path.join(lesson.get_directory(), exercise_name)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            file.save(os.path.join(directory, filename))
             db.session.commit()
             return redirect(url_for('admin.lesson', course_name=lesson.course.name, lesson_id=lesson.id))
     return render_template('admin/add_template.html', form=form)
+
+
+@bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
+def solution(solution_id):
+    solution = UserExercises.query.filter_by(id=solution_id).first()
+    solution_form = SolutionForm(obj=solution, email=solution.author.email)
+    if request.method == 'POST':
+        solution.points = solution_form.points.data
+        solution.is_approved = solution_form.is_approved.data
+        db.session.commit()
+        flash('Zapisano zmiany')
+        return render_template('admin/solution.html', form=solution_form)
+    return render_template('admin/solution.html', form=solution_form)
