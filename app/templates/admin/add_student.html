@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+    <div><h1>{{ url_for('auth.append_course', link = course.link, _external=True) }}</h1></div>
+{% endblock %}
