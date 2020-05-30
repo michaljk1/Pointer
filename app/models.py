@@ -11,7 +11,6 @@ user_course_assoc = db.Table(
     db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
 )
 
-
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True)
@@ -26,7 +25,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(128))
-    roles = db.relationship('Role', secondary='user_roles')
+    role = db.Column(db.String(20), nullable=False)
     user_exercises = db.relationship('UserExercises', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='member')
 
@@ -39,21 +38,18 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    def is_admin(self):
+        return self.role == Role.ADMIN
+
+
+class Role:
+    ADMIN = 'ADMIN'
+    STUDENT = 'STUDENT'
+
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
-
-class Role(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-
-
-class UserRoles(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
 
 
 class Lesson(db.Model):
@@ -77,11 +73,21 @@ class ExerciseTemplate(db.Model):
     max_points = db.Column(db.Float)
     end_date = db.Column(db.DATE)
     max_attempts = db.Column(db.Integer, default=3)
-    test_path = db.Column(db.String(100))
+    tests = db.relationship('Tests', backref='template', lazy='dynamic')
+    output_path = db.Column(db.String(100))
+    input_path = db.Column(db.String(100))
     solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
 
     def get_directory(self):
         return os.path.join(self.lesson.get_directory(), self.name)
+
+
+class Tests(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    exercise_template_id = db.Column(db.ForeignKey('exercise_template.id'))
+    output_path = db.Column(db.String(100))
+    input_path = db.Column(db.String(100))
+    points = db.Column(db.Float)
 
 
 class UserExercises(db.Model):

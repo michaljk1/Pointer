@@ -2,7 +2,7 @@ import os
 import string
 import random
 
-from flask import render_template, url_for, flash, request, current_app
+from flask import render_template, url_for, flash, request, current_app, abort
 from flask_login import logout_user, login_required, current_user
 from app.admin import bp
 from app.admin.forms import CourseForm, TemplateForm, LessonForm, CreateAccountRequestForm, SolutionsForm, SolutionForm
@@ -15,21 +15,27 @@ from app import db
 @bp.route('/index')
 @login_required
 def index():
+    if not current_user.is_admin():
+        abort(404)
     return render_template('admin/index.html')
 
 
 @bp.route('/logout')
 def logout():
+    if not current_user.is_admin():
+        abort(404)
     logout_user()
     return redirect(url_for('auth.login'))
 
 
 @bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
 def add_student(course_name):
+    if not current_user.is_admin():
+        abort(404)
     form = CreateAccountRequestForm()
     course = Course.query.filter_by(name=course_name).first()
     users = []
-    for user in User.query.all():
+    for user in User.query.filter(~User.courses.any(name=course.name)).all():
         data = (user.email, user.email)
         users.append(data)
     form.email.choices = users
@@ -41,24 +47,25 @@ def add_student(course_name):
     return render_template('admin/add_student.html', form=form, course=course)
 
 
-@bp.route('/create_account/<token>', methods=['GET', 'POST'])
-def create_account(token):
-    return render_template('admin/create_account.html')
-
-
 @bp.route('/courses', methods=['GET'])
 def courses():
+    if not current_user.is_admin():
+        abort(404)
     return render_template('admin/courses.html', courses=current_user.courses)
 
 
 @bp.route('/course/<string:course_name>')
 def course(course_name):
+    if not current_user.is_admin():
+        abort(404)
     course = Course.query.filter_by(name=course_name).first()
     return render_template('admin/course.html', course=course)
 
 
 @bp.route('/add_course', methods=['GET', 'POST'])
 def add_course():
+    if not current_user.is_admin():
+        abort(404)
     form = CourseForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -75,12 +82,16 @@ def add_course():
 
 @bp.route('/<string:course_name>/<int:lesson_id>')
 def lesson(course_name, lesson_id):
+    if not current_user.is_admin():
+        abort(404)
     lesson = Lesson.query.filter_by(id=lesson_id).first()
     return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
 
 
 @bp.route('/<string:course_name>/add_lesson', methods=['GET', 'POST'])
 def add_lesson(course_name):
+    if not current_user.is_admin():
+        abort(404)
     form = LessonForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -115,6 +126,8 @@ def add_lesson(course_name):
 
 @bp.route('/exercise/<int:template_id>', methods=['GET', 'POST'])
 def exercise(template_id):
+    if not current_user.is_admin():
+        abort(404)
     form = SolutionsForm()
     solutions = UserExercises.query.filter_by(exercise_template_id=template_id).all()
     exercise = ExerciseTemplate.query.filter_by(id=template_id).first()
@@ -141,21 +154,26 @@ def exercise(template_id):
 
 @bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
 def add_exercise(course_name, lesson_name):
+    if not current_user.is_admin():
+        abort(404)
     form = TemplateForm()
     if form.validate_on_submit():
         lesson = Lesson.query.filter_by(name=lesson_name).first()
         if lesson is not None:
-            file = request.files['test_path']
-            filename = secure_filename(file.filename)
+            input = request.files['input_path']
+            input_name = secure_filename(input.filename)
+            output = request.files['input_path']
+            output_name = secure_filename(output.filename)
             exercise_name = form.name.data
             exercise_template = ExerciseTemplate(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
                                                  max_attempts=form.max_attempts.data, max_points=form.max_points.data,
-                                                 test_path=filename)
+                                                 input_path=input_name, output_path=output_name)
             lesson.exercise_templates.append(exercise_template)
             directory = os.path.join(lesson.get_directory(), exercise_name)
             if not os.path.exists(directory):
                 os.makedirs(directory)
-            file.save(os.path.join(directory, filename))
+            input.save(os.path.join(directory, input_name))
+            output.save(os.path.join(directory, output_name))
             db.session.commit()
             return redirect(url_for('admin.lesson', course_name=lesson.course.name, lesson_id=lesson.id))
     return render_template('admin/add_template.html', form=form)
@@ -163,6 +181,8 @@ def add_exercise(course_name, lesson_name):
 
 @bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
 def solution(solution_id):
+    if not current_user.is_admin():
+        abort(404)
     solution = UserExercises.query.filter_by(id=solution_id).first()
     solution_form = SolutionForm(obj=solution, email=solution.author.email)
     if request.method == 'POST':
