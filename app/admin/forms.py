@@ -31,8 +31,8 @@ class TemplateForm(FlaskForm):
     max_points = FloatField('Liczba punktów')
     end_date = DateField('End date', format='%Y-%m-%d')
     submit_button = SubmitField('Dodaj ćwiczenie')
-    test_path = FileField('Test')
-
+    output = FileField('Output')
+    input = FileField('Input')
 
 class CreateAccountRequestForm(FlaskForm):
     email = SelectField('User', choices=[])

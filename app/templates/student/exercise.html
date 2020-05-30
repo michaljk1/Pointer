@@ -3,7 +3,6 @@
 {% block app_content %}
     <div><p>{{ template.name }}</p></div>
     <div><p>{{ template.content }}</p></div>
-{#    TODO change template backref#}
     <div><p><a href="{{ url_for('student.add_solution', lesson_name = template.lesson.name, exercise_name = template.name) }}">Dodaj rozwiązanie</a>
     </p></div>
 {% endblock %}
