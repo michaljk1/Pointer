@@ -23,7 +23,8 @@ class Course(db.Model):
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), index=True, unique=True)
+    email = db.Column(db.String(70), index=True, unique=True)
+    login = db.Column(db.String(20), index=True, unique=True)
     password = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False)
     user_exercises = db.relationship('UserExercises', backref='author', lazy='dynamic')
@@ -74,8 +75,10 @@ class ExerciseTemplate(db.Model):
     end_date = db.Column(db.DATE)
     max_attempts = db.Column(db.Integer, default=3)
     tests = db.relationship('Tests', backref='template', lazy='dynamic')
-    output_path = db.Column(db.String(100))
-    input_path = db.Column(db.String(100))
+    output_name = db.Column(db.String(100))
+    input_name = db.Column(db.String(100))
+    compile_command = db.Column(db.String(30))
+    run_command = db.Column(db.String(30))
     solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
 
     def get_directory(self):
@@ -102,4 +105,4 @@ class UserExercises(db.Model):
     os_info = db.Column(db.String(50))
 
     def get_directory(self):
-        return os.path.join(self.template.get_directory(), self.author.email.split('@')[0], str(self.attempt))
+        return os.path.join(self.template.get_directory(), self.author.login, str(self.attempt))
