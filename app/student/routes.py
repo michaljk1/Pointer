@@ -1,13 +1,11 @@
 import os
-from flask import render_template, url_for, flash, request, send_from_directory, current_app
+from flask import render_template, url_for, request, send_from_directory
 from flask_login import login_required, current_user
-
-from app.services.FileService import FileService
-from app.services.TestService import UnitTestService
+from app.services.ExerciseService import ExerciseService
 from app.student import bp
 from app.admin.forms import UploadForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, ExerciseTemplate, Lesson, User, UserExercises
+from app.models import Course, ExerciseTemplate, Lesson, UserExercises
 from app import db
 
 
@@ -51,15 +49,18 @@ def add_solution(lesson_name, exercise_name):
         filename = secure_filename(file.filename)
         solution = UserExercises(user_id=current_user.id, exercise_template_id=exercise.id, file_path=filename,
                                  os_info=str(request.user_agent), attempt=attempt)
-        directory = os.path.join(exercise.get_directory(), current_user.email.split('@')[0], str(attempt))
+        directory = os.path.join(exercise.get_directory(), current_user.login, str(attempt))
         if not os.path.exists(directory):
             os.makedirs(directory)
         file.save(os.path.join(directory, filename))
         current_user.user_exercises.append(solution)
         db.session.commit()
-        FileService.prepare_file(solution)
-        UnitTestService.grade(solution)
-        db.session.commit()
+        try:
+            ExerciseService.grade(solution)
+        except:
+            solution.points = 0
+            solution.is_approved = False
+            db.session.commit()
         return redirect(url_for('student.lesson', lesson_id=lesson.id))
     return render_template('student/add_solution.html', form=form)
 

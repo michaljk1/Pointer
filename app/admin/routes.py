@@ -9,6 +9,7 @@ from app.admin.forms import CourseForm, TemplateForm, LessonForm, CreateAccountR
 from werkzeug.utils import redirect, secure_filename
 from app.models import Course, ExerciseTemplate, Lesson, User, UserExercises
 from app import db
+from app.services.ExerciseService import ExerciseService
 
 
 @bp.route('/')
@@ -128,28 +129,9 @@ def add_lesson(course_name):
 def exercise(template_id):
     if not current_user.is_admin():
         abort(404)
-    form = SolutionsForm()
-    solutions = UserExercises.query.filter_by(exercise_template_id=template_id).all()
     exercise = ExerciseTemplate.query.filter_by(id=template_id).first()
-    for solution in solutions:
-        solution_form = SolutionForm()
-        solution_form.accept = solution.is_approved
-        solution_form.points = solution.points
-        solution_form.attempt = solution.attempt
-        solution_form.file = solution.file_path
-        form.solutions.append_entry(solution_form)
-    if request.method == 'POST':
-        for single_form in form.solutions.data:
-            for solution in solutions:
-                if solution.attempt == single_form['attempt'] and solution.file_path == single_form['file'] \
-                        and single_form['csrf_token'] == '':
-                    solution.is_approved = single_form['accept']
-                    solution.points = single_form['points']
-                    break
-        db.session.commit()
-        flash('Zapisano zmiany')
-        return redirect(url_for('admin.exercise', template_id=exercise.id))
-    return render_template('admin/exercise.html', template=exercise, form=form)
+    solutions = UserExercises.query.filter_by(exercise_template_id=template_id, is_approved=True).all()
+    return render_template('admin/exercise.html', template=exercise, solutions=solutions)
 
 
 @bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
@@ -160,14 +142,16 @@ def add_exercise(course_name, lesson_name):
     if form.validate_on_submit():
         lesson = Lesson.query.filter_by(name=lesson_name).first()
         if lesson is not None:
-            input = request.files['input_path']
+            input = request.files['input']
             input_name = secure_filename(input.filename)
-            output = request.files['input_path']
+            output = request.files['output']
             output_name = secure_filename(output.filename)
             exercise_name = form.name.data
             exercise_template = ExerciseTemplate(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
                                                  max_attempts=form.max_attempts.data, max_points=form.max_points.data,
-                                                 input_path=input_name, output_path=output_name)
+                                                 input_name=input_name, output_name=output_name,
+                                                 compile_command=form.compile_command.data,
+                                                 run_command=form.run_command.data)
             lesson.exercise_templates.append(exercise_template)
             directory = os.path.join(lesson.get_directory(), exercise_name)
             if not os.path.exists(directory):
@@ -188,7 +172,12 @@ def solution(solution_id):
     if request.method == 'POST':
         solution.points = solution_form.points.data
         solution.is_approved = solution_form.is_approved.data
+        if solution.is_approved:
+            solution.points = solution_form.points.data
+        else:
+            solution.points = 0
         db.session.commit()
+        ExerciseService.accept_best_solution(solution.user_id, solution.template)
         flash('Zapisano zmiany')
         return render_template('admin/solution.html', form=solution_form)
     return render_template('admin/solution.html', form=solution_form)

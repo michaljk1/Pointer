@@ -47,7 +47,7 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data)
+        user = User(email=form.email.data, login=form.login.data)
         user.set_password(form.password.data)
         user_amount = len(User.query.all())
         if user_amount == 0:
