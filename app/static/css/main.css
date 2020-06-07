@@ -11,6 +11,8 @@ body {
     border-style: solid;
     border-color: grey;
     margin: 0 auto;
+    min-height: 500px;
+    padding: 10px;
 }
 
 div.home {

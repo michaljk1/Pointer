@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, FieldList, \
     SelectField, FormField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, Optional
 
 
 class UploadForm(FlaskForm):
@@ -36,6 +36,7 @@ class TemplateForm(FlaskForm):
     input = FileField('Input')
     submit_button = SubmitField('Dodaj ćwiczenie')
 
+
 class CreateAccountRequestForm(FlaskForm):
     email = SelectField('User', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
@@ -44,15 +45,23 @@ class CreateAccountRequestForm(FlaskForm):
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
     points = FloatField('Punkty')
-    is_approved = BooleanField('Zaakceptowano')
+    admin_refused = BooleanField('Odrzuć zadanie')
     file_path = StringField('file', render_kw={'readonly': True})
     attempt = IntegerField('attempt', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})
     os_info = StringField('os info', render_kw={'readonly': True})
     submit = SubmitField('Zapisz')
 
-class SolutionsForm(FlaskForm):
-    title = StringField('title')
-    solutions = FieldList(FormField(SolutionForm))
-    submit = SubmitField('Zapisz')
+
+class SolutionSearchForm(FlaskForm):
+    name = StringField('Imię')
+    surname = StringField('Nazwisko')
+    course = SelectField('Course', choices=[])
+    lesson = StringField('Lesson')
+    exercise_name = StringField('Ćwiczenie')
+    admin_refused = BooleanField('Odrzucono')
+    is_active = BooleanField('Aktywne')
+    points_from = FloatField('Punkty od', [Optional()])
+    points_to = FloatField('Punkty do', [Optional()])
+    submit = SubmitField('Wyszukaj')
 

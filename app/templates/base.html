@@ -27,10 +27,11 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     {% if not current_user.is_anonymous and current_user.is_admin() %}
-                        <li><a href="{{ url_for('admin.courses') }}">AdminCourses</a></li>
+                        <li><a href="{{ url_for('admin.courses') }}">Kursy</a></li>
+                        <li><a href="{{ url_for('admin.solutions') }}">Rozwiązania</a></li>
                     {% endif %}
                     {% if not current_user.is_anonymous and not current_user.is_admin() %}
-                        <li><a href="{{ url_for('student.courses') }}">StudentCourses</a></li>
+                        <li><a href="{{ url_for('student.courses') }}">Kursy</a></li>
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">

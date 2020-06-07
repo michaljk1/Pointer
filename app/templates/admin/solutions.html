@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+    <table>
+        <thead>
+        <th>Plik</th>
+        <th>Punkty</th>
+        <th>Próba</th>
+        <th>Zaakceptowano</th>
+        </thead>
+        <tbody>
+        {% for solution in solutions %}
+            <tr>
+                <td><p>{{ solution.file_path }}</p></td>
+                <td><p>{{ solution.points }}</p></td>
+                <td><p>{{ solution.attempt }}</p></td>
+                <td><p>{{ solution.accept }}</p></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
