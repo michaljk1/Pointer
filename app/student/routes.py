@@ -59,7 +59,7 @@ def add_solution(lesson_name, exercise_name):
             ExerciseService.grade(solution)
         except:
             solution.points = 0
-            solution.is_approved = False
+            solution.is_active = False
             db.session.commit()
         return redirect(url_for('student.lesson', lesson_id=lesson.id))
     return render_template('student/add_solution.html', form=form)

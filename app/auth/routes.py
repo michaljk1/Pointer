@@ -47,7 +47,7 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data, login=form.login.data)
+        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data)
         user.set_password(form.password.data)
         user_amount = len(User.query.all())
         if user_amount == 0:
@@ -69,9 +69,12 @@ def register():
 @bp.route('/<string:link>')
 def append_course(link):
     course_by_link = Course.query.filter_by(link=link).first()
-    current_user.courses.append(course_by_link)
-    db.session.commit()
-    flash('Przypisano do kursu')
+    if course_by_link not in current_user.courses:
+        current_user.courses.append(course_by_link)
+        db.session.commit()
+        flash('Przypisano do kursu')
+    else:
+        flash('Użytkownik przypisany do kursu')
     if current_user.role == Role.ADMIN:
         return redirect(url_for('admin.course', course_name=course_by_link.name))
     else:

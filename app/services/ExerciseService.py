@@ -12,13 +12,13 @@ class ExerciseService:
         points = 0
         best_solution = None
         for user_exercise in user_exercises:
-            if user_exercise.points >= points:
+            if not user_exercise.admin_refused and user_exercise.points >= points:
                 best_solution = user_exercise
                 points = best_solution.points
-        best_solution.is_approved = True
+        best_solution.is_active = True
         user_exercises.remove(best_solution)
         for user_exercise in user_exercises:
-            user_exercise.is_approved = False
+            user_exercise.is_active = False
         db.session.commit()
 
     @staticmethod

@@ -18,13 +18,15 @@ class Course(db.Model):
     link = db.Column(db.String(60), unique=True)
 
     def get_directory(self):
-        return os.path.join(current_app.instance_path, self.name)
+        return os.path.join(current_app.instance_path, self.name.replace(" ", ""))
 
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
     login = db.Column(db.String(20), index=True, unique=True)
+    name = db.Column(db.String(20), nullable=False)
+    surname = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False)
     user_exercises = db.relationship('UserExercises', backref='author', lazy='dynamic')
@@ -63,7 +65,7 @@ class Lesson(db.Model):
     exercise_templates = db.relationship('ExerciseTemplate', backref='lesson', lazy='dynamic')
 
     def get_directory(self):
-        return os.path.join(current_app.instance_path, self.course.name, self.name)
+        return os.path.join(current_app.instance_path, self.course.name.replace(" ", ""), self.name.replace(" ", ""))
 
 
 class ExerciseTemplate(db.Model):
@@ -74,7 +76,6 @@ class ExerciseTemplate(db.Model):
     max_points = db.Column(db.Float)
     end_date = db.Column(db.DATE)
     max_attempts = db.Column(db.Integer, default=3)
-    tests = db.relationship('Tests', backref='template', lazy='dynamic')
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
     compile_command = db.Column(db.String(30))
@@ -82,15 +83,7 @@ class ExerciseTemplate(db.Model):
     solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
 
     def get_directory(self):
-        return os.path.join(self.lesson.get_directory(), self.name)
-
-
-class Tests(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    exercise_template_id = db.Column(db.ForeignKey('exercise_template.id'))
-    output_path = db.Column(db.String(100))
-    input_path = db.Column(db.String(100))
-    points = db.Column(db.Float)
+        return os.path.join(self.lesson.get_directory(), self.name.replace(" ", ""))
 
 
 class UserExercises(db.Model):
@@ -100,9 +93,10 @@ class UserExercises(db.Model):
     points = db.Column(db.Float)
     file_path = db.Column(db.String(100))
     attempt = db.Column(db.Integer)
-    is_approved = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, default=True)
     ip_address = db.Column(db.String(20))
-    os_info = db.Column(db.String(50))
+    os_info = db.Column(db.String(150))
+    admin_refused = db.Column(db.Boolean, default=False)
 
     def get_directory(self):
         return os.path.join(self.template.get_directory(), self.author.login, str(self.attempt))
