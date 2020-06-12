@@ -11,6 +11,7 @@ user_course_assoc = db.Table(
     db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
 )
 
+
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True)
@@ -18,7 +19,7 @@ class Course(db.Model):
     link = db.Column(db.String(60), unique=True)
 
     def get_directory(self):
-        return os.path.join(current_app.instance_path, self.name.replace(" ", ""))
+        return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
 
 
 class User(UserMixin, db.Model):
@@ -48,6 +49,7 @@ class User(UserMixin, db.Model):
 class Role:
     ADMIN = 'ADMIN'
     STUDENT = 'STUDENT'
+    MODERATOR = 'MODERATOR'
 
 
 @login.user_loader
@@ -65,7 +67,7 @@ class Lesson(db.Model):
     exercise_templates = db.relationship('ExerciseTemplate', backref='lesson', lazy='dynamic')
 
     def get_directory(self):
-        return os.path.join(current_app.instance_path, self.course.name.replace(" ", ""), self.name.replace(" ", ""))
+        return os.path.join(current_app.instance_path, self.course.name.replace(" ", "_"), self.name.replace(" ", "_"))
 
 
 class ExerciseTemplate(db.Model):
@@ -78,12 +80,21 @@ class ExerciseTemplate(db.Model):
     max_attempts = db.Column(db.Integer, default=3)
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
+    program_name = db.Column(db.String(50))
     compile_command = db.Column(db.String(30))
     run_command = db.Column(db.String(30))
     solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
 
     def get_directory(self):
-        return os.path.join(self.lesson.get_directory(), self.name.replace(" ", ""))
+        return os.path.join(self.lesson.get_directory(), self.name.replace(" ", "_"))
+
+    def get_user_solutions(self, user_id):
+        user_solutions = []
+        for solution in self.solutions:
+            if solution.user_id == user_id:
+                user_solutions.append(solution)
+        return user_solutions
+
 
 
 class UserExercises(db.Model):

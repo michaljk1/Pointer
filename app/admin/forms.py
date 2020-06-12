@@ -1,9 +1,8 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, FieldList, \
-    SelectField, FormField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Email, Optional
+from app.student.forms import SolutionStudentSearchForm
 
 
 class UploadForm(FlaskForm):
@@ -34,6 +33,7 @@ class TemplateForm(FlaskForm):
     run_command = StringField('run_command')
     output = FileField('Output')
     input = FileField('Input')
+    program_name = StringField('Nazwa testowanego pliku')
     submit_button = SubmitField('Dodaj ćwiczenie')
 
 
@@ -53,15 +53,7 @@ class SolutionForm(FlaskForm):
     submit = SubmitField('Zapisz')
 
 
-class SolutionSearchForm(FlaskForm):
+class SolutionAdminSearchForm(SolutionStudentSearchForm):
     name = StringField('Imię')
     surname = StringField('Nazwisko')
-    course = SelectField('Course', choices=[])
-    lesson = StringField('Lesson')
-    exercise_name = StringField('Ćwiczenie')
-    admin_refused = BooleanField('Odrzucono')
-    is_active = BooleanField('Aktywne')
-    points_from = FloatField('Punkty od', [Optional()])
-    points_to = FloatField('Punkty do', [Optional()])
-    submit = SubmitField('Wyszukaj')
 
