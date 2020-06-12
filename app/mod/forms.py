@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
+from wtforms import SubmitField, SelectField
+
 
 class RoleForm(FlaskForm):
     email = SelectField('User', choices=[])
-    role = SelectField('Role', choices=[])
+    roles = SelectField('Role', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')

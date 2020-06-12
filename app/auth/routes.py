@@ -23,9 +23,9 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             if current_user.role == Role.ADMIN:
-                next_page = url_for('admin.courses')
+                next_page = url_for('admin.view_courses')
             else:
-                next_page = url_for('student.courses')
+                next_page = url_for('student.view_courses')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
 
@@ -52,9 +52,9 @@ def register():
         flash('Congratulations, you are now a registered user!')
         login_user(user)
         if user_amount == 0:
-            return redirect(url_for('admin.courses'))
+            return redirect(url_for('admin.view_courses'))
         else:
-            return redirect(url_for('student.courses'))
+            return redirect(url_for('student.view_courses'))
     return render_template('auth/register.html', title='Register', form=form)
 
 
@@ -69,7 +69,7 @@ def append_course(link):
     else:
         flash('Użytkownik przypisany do kursu')
     if current_user.role == Role.ADMIN:
-        return redirect(url_for('admin.course', course_name=course_by_link.name))
+        return redirect(url_for('admin.view_course', course_name=course_by_link.name))
     else:
-        return redirect(url_for('student.course', course_name=course_by_link.name))
+        return redirect(url_for('student.view_course', course_name=course_by_link.name))
 

@@ -1,7 +1,10 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
+    ValidationError
 from wtforms.fields.html5 import DateField
+
+from app.models import Course, Lesson
 from app.student.forms import SolutionStudentSearchForm
 
 
@@ -14,6 +17,11 @@ class CourseForm(FlaskForm):
     name = StringField('Course name')
     submit_button = SubmitField('Dodaj kurs')
 
+    def validate_name(self, name):
+        course = Course.query.filter_by(name=name.data).first()
+        if course is not None:
+            raise ValidationError('Please use a different course name.')
+
 
 class LessonForm(FlaskForm):
     name = StringField('Lesson name')
@@ -21,6 +29,11 @@ class LessonForm(FlaskForm):
     pdf_content = FileField('Select File')
     content_url = StringField('Url')
     submit_button = SubmitField('Dodaj lekcję')
+
+    def validate_name(self, name):
+        for lesson in Lesson.query.all():
+            if lesson.name.replace(" ", "_") == name.data.replace(" ", "_"):
+                raise ValidationError('Please use a different lesson name.')
 
 
 class TemplateForm(FlaskForm):
@@ -56,4 +69,3 @@ class SolutionForm(FlaskForm):
 class SolutionAdminSearchForm(SolutionStudentSearchForm):
     name = StringField('Imię')
     surname = StringField('Nazwisko')
-

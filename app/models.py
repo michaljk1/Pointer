@@ -16,10 +16,15 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True)
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
-    link = db.Column(db.String(60), unique=True)
+    link = db.Column(db.String(25), unique=True)
 
     def get_directory(self):
         return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
+
+    def get_lesson_by_name(self, name):
+        for lesson in self.lessons:
+            if lesson.name == name:
+                return lesson
 
 
 class User(UserMixin, db.Model):
@@ -85,6 +90,9 @@ class ExerciseTemplate(db.Model):
     run_command = db.Column(db.String(30))
     solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
 
+    def get_course(self):
+        return self.lesson.course
+
     def get_directory(self):
         return os.path.join(self.lesson.get_directory(), self.name.replace(" ", "_"))
 
@@ -96,18 +104,20 @@ class ExerciseTemplate(db.Model):
         return user_solutions
 
 
-
 class UserExercises(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise_template_id = db.Column(db.ForeignKey('exercise_template.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    points = db.Column(db.Float)
-    file_path = db.Column(db.String(100))
-    attempt = db.Column(db.Integer)
+    points = db.Column(db.Float, nullable=False)
+    file_path = db.Column(db.String(100), nullable=False)
+    attempt = db.Column(db.Integer, nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    ip_address = db.Column(db.String(20))
-    os_info = db.Column(db.String(150))
+    ip_address = db.Column(db.String(20), nullable=False)
+    os_info = db.Column(db.String(150), nullable=False)
     admin_refused = db.Column(db.Boolean, default=False)
+
+    def get_course(self):
+        return self.template.lesson.course
 
     def get_directory(self):
         return os.path.join(self.template.get_directory(), self.author.login, str(self.attempt))

@@ -19,7 +19,7 @@
         </thead>
         <tbody>
         {% for solution in solutions %}
-            <tr class="pointercurs" onclick="window.location='{{ url_for('admin.solution', solution_id = solution.id ) }}';">
+            <tr class="pointercurs" onclick="window.location='{{ url_for('admin.view_solution', solution_id = solution.id ) }}';">
                 <td><p>{{ solution.author.email }}</p></td>
                 <td><p>{{ solution.file_path }}</p></td>
                 <td><p>{{ solution.points }}</p></td>
