@@ -6,7 +6,7 @@
     <div><p><a href="{{ lesson.content_url }}">{{ lesson.content_url }}</a></p></div>
     {% for template in lesson.exercise_templates %}
         <div><p><a
-                href="{{ url_for('admin.exercise', template_id = template.id ) }}">{{ template.name }}</a>
+                href="{{ url_for('admin.view_exercise', template_id = template.id ) }}">{{ template.name }}</a>
         </p></div>
     {% endfor %}
     <div><p><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Add exercise</a></p></div>

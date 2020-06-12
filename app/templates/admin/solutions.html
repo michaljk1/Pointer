@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+    {% if solutions|length > 0 %}
+    <table class="table">
+        <thead>
+        <th>Autor</th>
+        <th>Plik</th>
+        <th>Punkty</th>
+        <th>Próba</th>
+        <th>Odrzucono</th>
+        <th>Aktywne</th>
+        </thead>
+        <tbody>
+        {% for solution in solutions %}
+            <tr class="pointercurs" onclick="window.location='{{ url_for('admin.view_solution', solution_id = solution.id ) }}';">
+                <td><p>{{ solution.author.email }}</p></td>
+                <td><p>{{ solution.file_path }}</p></td>
+                <td><p>{{ solution.points }}</p></td>
+                <td><p>{{ solution.attempt }}</p></td>
+                <td><p>{{ solution.admin_refused }}</p></td>
+                <td><p>{{ solution.is_active }}</p></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endblock %}

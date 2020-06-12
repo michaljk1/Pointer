@@ -1,13 +1,16 @@
 import os
-from flask import render_template, url_for, flash, request, send_from_directory, current_app
-from flask_login import login_required, current_user
+import shutil
+from datetime import datetime
 
-from app.services.FileService import FileService
-from app.services.TestService import UnitTestService
+import pytz
+from flask import render_template, url_for, request, send_from_directory
+from flask_login import login_required, current_user
+from app.services.ExerciseService import ExerciseService
+from app.services.RouteService import RouteService
 from app.student import bp
-from app.admin.forms import UploadForm
+from app.student.forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, ExerciseTemplate, Lesson, User, UserExercises
+from app.models import Course, ExerciseTemplate, Lesson, UserExercises, User, Role
 from app import db
 
 
@@ -19,51 +22,79 @@ def index():
 
 
 @bp.route('/courses', methods=['GET'])
-def courses():
+@login_required
+def view_courses():
     return render_template('student/courses.html', courses=current_user.courses)
 
 
 @bp.route('/course/<string:course_name>')
-def course(course_name):
-    return render_template('student/course.html', course=Course.query.filter_by(name=course_name).first())
+@login_required
+def view_course(course_name):
+    course = Course.query.filter_by(name=course_name).first()
+    #RouteService.validate_role_course(current_user, Role.STUDENT, course)
+    return render_template('student/course.html', course=course)
 
 
 @bp.route('<int:lesson_id>')
-def lesson(lesson_id):
+@login_required
+def view_lesson(lesson_id):
     return render_template('student/lesson.html', lesson=Lesson.query.filter_by(id=lesson_id).first())
 
 
 @bp.route('/exercise/<int:template_id>', methods=['GET', 'POST'])
-def exercise(template_id):
-    return render_template('student/exercise.html', template=ExerciseTemplate.query.filter_by(id=template_id).first())
-
-
-@bp.route('/<string:lesson_name>/<string:exercise_name>/add_solution', methods=['GET', 'POST'])
-def add_solution(lesson_name, exercise_name):
+@login_required
+def view_exercise(template_id):
+    template = ExerciseTemplate.query.filter_by(id=template_id).first()
+    #RouteService.validate_role_course(current_user, Role.STUDENT, template.get_course())
     form = UploadForm()
-    lesson = Lesson.query.filter_by(name=lesson_name).first()
-    exercise = ExerciseTemplate.query.filter_by(name=exercise_name).first()
-    attempt = len(UserExercises.query.filter_by(user_id=current_user.id, exercise_template_id=exercise.id).all())
-
+    lesson = template.lesson
+    attempts = len(UserExercises.query.filter_by(user_id=current_user.id, exercise_template_id=template.id).all())
     if form.validate_on_submit():
         file = request.files['file']
-
         filename = secure_filename(file.filename)
-        solution = UserExercises(user_id=current_user.id, exercise_template_id=exercise.id, file_path=filename,
-                                 os_info=str(request.user_agent), attempt=attempt)
-        directory = os.path.join(exercise.get_directory(), current_user.email.split('@')[0], str(attempt))
+        solution = UserExercises(user_id=current_user.id, exercise_template_id=template.id, file_path=filename,
+                                 os_info=str(request.user_agent), attempt=attempts)
+        directory = os.path.join(template.get_directory(), current_user.login, str(attempts))
         if not os.path.exists(directory):
             os.makedirs(directory)
         file.save(os.path.join(directory, filename))
+        if filename.endswith('.tar.gz') or filename.endswith('.gzip') or filename.endswith('.zip') or filename.endswith(
+                '.tar'):
+            shutil.unpack_archive(os.path.join(directory, filename), directory)
         current_user.user_exercises.append(solution)
         db.session.commit()
-        FileService.prepare_file(solution)
-        UnitTestService.grade(solution)
-        db.session.commit()
-        return redirect(url_for('student.lesson', lesson_id=lesson.id))
-    return render_template('student/add_solution.html', form=form)
+        try:
+            ExerciseService.grade(solution)
+        except:
+            solution.points = 0
+            solution.is_active = False
+            db.session.commit()
+        return redirect(url_for('student.view_lesson', lesson_id=lesson.id))
+    return render_template('student/exercise.html', template=template, form=form, datetime=datetime.utcnow(),
+                           solutions=template.get_user_solutions(current_user.id))
 
 
-@bp.route('/uploads/<int:lesson_id>/<path:filename>', methods=['GET', 'POST'])
-def download(lesson_id, filename):
-    return send_from_directory(directory=Lesson.query.filter_by(id=lesson_id).first().get_directory(), filename=filename)
+@bp.route('/solutions', methods=['GET', 'POST'])
+@login_required
+def view_solutions():
+   # RouteService.validate_role(current_user, Role.STUDENT)
+    form = SolutionStudentSearchForm()
+    form_courses = []
+    for course in current_user.courses:
+        course_data = (course.name, course.name)
+        form_courses.append(course_data)
+    form.course.choices = form_courses
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            solutions = ExerciseService.exercise_query(form, current_user.id).all()
+            return render_template('student/solutions.html', form=form, solutions=solutions)
+    return render_template('student/solutions.html', form=form, solutions=[])
+
+
+@bp.route('/uploads/<int:lesson_id>/', methods=['GET', 'POST'])
+@login_required
+def download_content(lesson_id):
+    lesson = Lesson.query.filter_by(id=lesson_id).first()
+   # RouteService.validate_role_course(current_user, Role.STUDENT, lesson.course)
+    return send_from_directory(directory=lesson.get_directory(),
+                               filename=lesson.content_pdf_path)

@@ -1,9 +1,39 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
     <div><p>{{ template.name }}</p></div>
     <div><p>{{ template.content }}</p></div>
-{#    TODO change template backref#}
-    <div><p><a href="{{ url_for('student.add_solution', lesson_name = template.lesson.name, exercise_name = template.name) }}">Dodaj rozwiązanie</a>
-    </p></div>
+    <div><p>Maksymalna liczba prób: {{ template.max_attempts }}</p></div>
+    <div><p>Termin przesłania zadania: {{ template.end_date }}</p></div>
+    {% if datetime.date() < template.end_date and solutions|length < template.max_attempts %}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+    {% endif %}
+    {% if solutions|length > 0 %}
+        <table class="table">
+            <thead>
+            <th>Plik</th>
+            <th>Punkty</th>
+            <th>Próba</th>
+            <th>Odrzucono</th>
+            <th>Aktywne</th>
+            </thead>
+            <tbody>
+            {% for solution in solutions %}
+                <tr class="pointercurs">
+                    <td><p>{{ solution.file_path }}</p></td>
+                    <td><p>{{ solution.points }}</p></td>
+                    <td><p>{{ solution.attempt }}</p></td>
+                    <td><p>{{ solution.admin_refused }}</p></td>
+                    <td><p>{{ solution.is_active }}</p></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
 {% endblock %}

@@ -19,14 +19,14 @@ def send_email(subject, sender, recipients, text_body, html_body):
     Thread(target=send_async_email, args=(current_app._get_current_object(), msg)).start()
 
 
-def send_create_account_email(email, course_name):
-    token = get_reset_password_token(email)
-    token += '_' + course_name
-    send_email('[Microblog] Reset Your Password',
-               sender=current_app.config['ADMINS'][0],
-               recipients=[email],
-               text_body=render_template('email/create_account_request.txt', token=token),
-               html_body=render_template('admin/create_account.html', token=token))
+# def send_create_account_email(email, course_name):
+#     token = get_reset_password_token(email)
+#     token += '_' + course_name
+#     send_email('[Microblog] Reset Your Password',
+#                sender=current_app.config['ADMINS'][0],
+#                recipients=[email],
+#                text_body=render_template('email/create_account_request.txt', token=token),
+#                html_body=render_template('template', token=token))
 
 
 def get_reset_password_token(email, expires_in=600):

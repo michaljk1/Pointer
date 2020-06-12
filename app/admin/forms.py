@@ -1,9 +1,11 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, FieldList, \
-    SelectField, FormField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
+    ValidationError
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Email
+
+from app.models import Course, Lesson
+from app.student.forms import SolutionStudentSearchForm
 
 
 class UploadForm(FlaskForm):
@@ -15,6 +17,11 @@ class CourseForm(FlaskForm):
     name = StringField('Course name')
     submit_button = SubmitField('Dodaj kurs')
 
+    def validate_name(self, name):
+        course = Course.query.filter_by(name=name.data).first()
+        if course is not None:
+            raise ValidationError('Please use a different course name.')
+
 
 class LessonForm(FlaskForm):
     name = StringField('Lesson name')
@@ -23,6 +30,11 @@ class LessonForm(FlaskForm):
     content_url = StringField('Url')
     submit_button = SubmitField('Dodaj lekcję')
 
+    def validate_name(self, name):
+        for lesson in Lesson.query.all():
+            if lesson.name.replace(" ", "_") == name.data.replace(" ", "_"):
+                raise ValidationError('Please use a different lesson name.')
+
 
 class TemplateForm(FlaskForm):
     name = StringField('Nazwa')
@@ -30,8 +42,12 @@ class TemplateForm(FlaskForm):
     max_attempts = IntegerField('Liczba prób', default=3)
     max_points = FloatField('Liczba punktów')
     end_date = DateField('End date', format='%Y-%m-%d')
+    compile_command = StringField('compile command')
+    run_command = StringField('run_command')
+    output = FileField('Output')
+    input = FileField('Input')
+    program_name = StringField('Nazwa testowanego pliku')
     submit_button = SubmitField('Dodaj ćwiczenie')
-    test_path = FileField('Test')
 
 
 class CreateAccountRequestForm(FlaskForm):
@@ -42,15 +58,14 @@ class CreateAccountRequestForm(FlaskForm):
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
     points = FloatField('Punkty')
-    is_approved = BooleanField('Zaakceptowano')
+    admin_refused = BooleanField('Odrzuć zadanie')
     file_path = StringField('file', render_kw={'readonly': True})
     attempt = IntegerField('attempt', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})
     os_info = StringField('os info', render_kw={'readonly': True})
     submit = SubmitField('Zapisz')
 
-class SolutionsForm(FlaskForm):
-    title = StringField('title')
-    solutions = FieldList(FormField(SolutionForm))
-    submit = SubmitField('Zapisz')
 
+class SolutionAdminSearchForm(SolutionStudentSearchForm):
+    name = StringField('Imię')
+    surname = StringField('Nazwisko')

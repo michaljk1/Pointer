@@ -3,7 +3,6 @@
 {% block app_content %}
     <div><p>{{ template.name }}</p></div>
     <div><p>{{ template.content }}</p></div>
-    <form action="" method="post" novalidate>
         <table>
             <thead>
             <th>Plik</th>
@@ -12,16 +11,14 @@
             <th>Zaakceptowano</th>
             </thead>
             <tbody>
-            {% for solution in form.solutions %}
+            {% for solution in solutions %}
                 <tr>
-                    <td><p>{{ solution.file(readonly=true) }}</p></td>
+                    <td><p>{{ solution.file_path }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
-                    <td><p>{{ solution.attempt(readonly=true) }}</p></td>
+                    <td><p>{{ solution.attempt}}</p></td>
                     <td><p>{{ solution.accept }}</p></td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        <p>{{ form.submit() }}</p>
-    </form>
 {% endblock %}
