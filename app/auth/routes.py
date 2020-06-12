@@ -9,13 +9,6 @@ from app.models import User, Course, Role
 from app import db
 
 
-@bp.route('/')
-@bp.route('/index')
-@login_required
-def index():
-    return render_template('index.html')
-
-
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -65,8 +58,8 @@ def register():
     return render_template('auth/register.html', title='Register', form=form)
 
 
-@login_required
 @bp.route('/<string:link>')
+@login_required
 def append_course(link):
     course_by_link = Course.query.filter_by(link=link).first()
     if course_by_link not in current_user.courses:

@@ -10,7 +10,6 @@
     {% if solutions|length > 0 %}
     <table class="table">
         <thead>
-        <th>Autor</th>
         <th>Plik</th>
         <th>Punkty</th>
         <th>Próba</th>
@@ -19,8 +18,7 @@
         </thead>
         <tbody>
         {% for solution in solutions %}
-            <tr class="pointercurs" onclick="window.location='{{ url_for('admin.solution', solution_id = solution.id ) }}';">
-                <td><p>{{ solution.author.email }}</p></td>
+            <tr class="pointercurs">
                 <td><p>{{ solution.file_path }}</p></td>
                 <td><p>{{ solution.points }}</p></td>
                 <td><p>{{ solution.attempt }}</p></td>

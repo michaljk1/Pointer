@@ -2,11 +2,11 @@ import os
 import string
 import random
 
-from flask import render_template, url_for, flash, request, current_app, abort, session
+from flask import render_template, url_for, flash, request, abort
 from flask_login import logout_user, login_required, current_user
 from app.admin import bp
 from app.admin.forms import CourseForm, TemplateForm, LessonForm, CreateAccountRequestForm, SolutionForm, \
-    SolutionSearchForm
+    SolutionAdminSearchForm
 from werkzeug.utils import redirect, secure_filename
 from app.models import Course, ExerciseTemplate, Lesson, User, UserExercises
 from app import db
@@ -102,7 +102,7 @@ def add_lesson(course_name):
             new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
                                 raw_text=form.text_content.data)
             course = Course.query.filter_by(name=course_name).first()
-            directory = os.path.join(course.get_directory(), lesson_name.replace(" ", ""))
+            directory = os.path.join(course.get_directory(), lesson_name.replace(" ", "_"))
             if not os.path.exists(directory):
                 os.makedirs(directory)
             file.save(os.path.join(directory, filename))
@@ -137,10 +137,10 @@ def add_exercise(course_name, lesson_name):
             exercise_template = ExerciseTemplate(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
                                                  max_attempts=form.max_attempts.data, max_points=form.max_points.data,
                                                  input_name=input_name, output_name=output_name,
-                                                 compile_command=form.compile_command.data,
-                                                 run_command=form.run_command.data)
+                                                 compile_command=form.compile_command.data, end_date=form.end_date.data,
+                                                 run_command=form.run_command.data, program_name=form.program_name.data)
             lesson.exercise_templates.append(exercise_template)
-            directory = os.path.join(lesson.get_directory(), exercise_name.replace(" ", ""))
+            directory = os.path.join(lesson.get_directory(), exercise_name.replace(" ", "_"))
             if not os.path.exists(directory):
                 os.makedirs(directory)
             input.save(os.path.join(directory, input_name))
@@ -154,7 +154,7 @@ def add_exercise(course_name, lesson_name):
 def solutions():
     if not current_user.is_admin():
         abort(404)
-    form = SolutionSearchForm()
+    form = SolutionAdminSearchForm()
     form_courses = []
     for course in current_user.courses:
         course_data = (course.name, course.name)
@@ -162,28 +162,7 @@ def solutions():
     form.course.choices = form_courses
     if request.method == 'POST':
         if form.validate_on_submit():
-            query = db.session.query(UserExercises).select_from(UserExercises, User, Course, Lesson, ExerciseTemplate). \
-                join(User, User.id == UserExercises.user_id).join(ExerciseTemplate, UserExercises.exercise_template_id == ExerciseTemplate.id). \
-                join(Lesson, Lesson.id == ExerciseTemplate.lesson_id).filter(
-                UserExercises.is_active == form.is_active.data,
-                UserExercises.admin_refused == form.admin_refused.data)
-
-            if form.points_from.data is not None:
-                query = query.filter(UserExercises.points >= form.points_from.data)
-            if form.points_to.data is not None:
-                query = query.filter(UserExercises.points <= form.points_to.data)
-            if not len(form.name.data) == 0:
-                query = query.filter(User.name == form.name.data)
-            if not len(form.surname.data) == 0:
-                query = query.filter(User.surname == form.surname.data)
-            if not len(form.course.data) == 0:
-                query = query.filter(Course.name == form.course.data)
-            if not len(form.lesson.data) == 0:
-                query = query.filter(Lesson.name == form.lesson.data)
-            if not len(form.exercise_name.data) == 0:
-                query = query.filter(ExerciseTemplate.name == form.exercise_name.data)
-
-            solutions = query.all()
+            solutions = ExerciseService.exercise_query(form).all()
             return render_template('admin/solutions.html', form=form, solutions=solutions)
     return render_template('admin/solutions.html', form=form, solutions=[])
 
