@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
-
+{% block breadcrumb %}
+    <a href="{{ url_for('admin.view_solutions') }}"> Rozwiązania </a>
+{% endblock %}
 {% block app_content %}
     <form action="" method="post" class="form" role="form">
         {{ form.csrf_token() }}
@@ -25,7 +27,7 @@
         </thead>
         <tbody>
         {% for solution in solutions %}
-            <tr class="pointercurs" onclick="window.location='{{ url_for('admin.view_solution', solution_id = solution.id ) }}';">
+            <tr class="pointercurs" onclick="window.open('{{ url_for('admin.view_solution', solution_id = solution.id ) }}','_blank');">
                 <td><p>{{ solution.author.email }}</p></td>
                 <td><p>{{ solution.file_path }}</p></td>
                 <td><p>{{ solution.points }}</p></td>

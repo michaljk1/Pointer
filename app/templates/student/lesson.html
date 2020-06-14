@@ -1,12 +1,18 @@
 {% extends "base.html" %}
-
+{% block breadcrumb %}
+    <a href="{{ url_for('student.view_courses') }}"> Kursy </a>
+    /
+    <a href="{{ url_for('student.view_course', course_name = lesson.course.name) }}"> {{ lesson.course.name }} </a>
+    /
+    <a href="{{ url_for('student.view_lesson', course_name = lesson.course.name, lesson_id = lesson.id) }}"> {{ lesson.name }} </a>
+{% endblock %}
 {% block app_content %}
-    <div><p>{{ lesson.name }}</p></div>
-    <div><p>{{ lesson.content_url }}</p></div>
+    <div><h2>{{ lesson.name }}</h2></div>
+    <div><h1>{{ lesson.content_url }}</h1></div>
     {% if lesson.content_pdf_path is not none %}
-    <div><p><a
+    <div><h1><a
             href="{{ url_for('student.download_content', lesson_id=lesson.id) }}" target="_blank">{{ lesson.content_pdf_path }}</a>
-    </p></div>
+    </h1></div>
     {% endif %}
     {% for template in lesson.exercise_templates %}
         <div><p><a

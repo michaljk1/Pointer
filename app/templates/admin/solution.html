@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
-
+{% block breadcrumb %}
+    <a href="{{ url_for('admin.view_solutions') }}"> Rozwiązania </a>
+    /
+    <a href="{{ url_for('admin.view_solutions', solution_id=solution_id) }}"> Zadanie </a>
+{% endblock %}
 {% block app_content %}
     <form action="" method="post" class="form" role="form">
         {{ form.csrf_token() }}
