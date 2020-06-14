@@ -18,10 +18,11 @@
                 {% endif %}
                 {% if not current_user.is_anonymous and current_user.is_admin() %}
                     <a class="navbar-brand"
-                       href="{{ url_for('admin.index') }}">Pointer</a>
-                {% endif %}
-                {% if not current_user.is_anonymous and not current_user.is_admin() %}
+                       href="{{ url_for('admin.view_courses') }}">Pointer</a>
+                {% elif not current_user.is_anonymous and current_user.is_student() %}
                     <a class="navbar-brand" href="{{ url_for('student.index') }}">Pointer</a>
+                {% elif not current_user.is_anonymous and current_user.is_moderator() %}
+                    <a class="navbar-brand" href="{{ url_for('mod.index') }}">Pointer</a>
                 {% endif %}
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -29,11 +30,14 @@
                     {% if not current_user.is_anonymous and current_user.is_admin() %}
                         <li><a href="{{ url_for('admin.view_courses') }}">Kursy</a></li>
                         <li><a href="{{ url_for('admin.view_solutions') }}">Rozwiązania</a></li>
-                        <li><a href="{{ url_for('student.view_courses') }}">StudentKursy</a></li>
-                        <li><a href="{{ url_for('student.view_solutions') }}">StudentRozwiązania</a></li>
+{#                        <li><a href="{{ url_for('student.view_courses') }}">StudentKursy</a></li>#}
+{#                        <li><a href="{{ url_for('student.view_solutions') }}">StudentRozwiązania</a></li>#}
                     {% endif %}
-                    {% if not current_user.is_anonymous and not current_user.is_admin() %}
+                    {% if not current_user.is_anonymous and current_user.is_student() %}
                         <li><a href="{{ url_for('student.view_courses') }}">StudentKursy</a></li>
+                    {% endif %}
+                    {% if not current_user.is_anonymous and current_user.is_moderator() %}
+                        <li><a href="{{ url_for('mod.change_role') }}">Użytkownicy</a></li>
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -44,9 +48,10 @@
                     {% if not current_user.is_anonymous %}
                         {% if current_user.is_admin() %}
                             <li><a href="{{ url_for('admin.view_courses') }}">{{ current_user.email }}</a></li>
-                        {% endif %}
-                        {% if not current_user.is_admin() %}
+                        {% elif current_user.is_student() %}
                             <li><a href="{{ url_for('student.view_courses') }}">{{ current_user.email }}</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('mod.change_role') }}">{{ current_user.email }}</a></li>
                         {% endif %}
                         <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
                     {% endif %}
@@ -66,6 +71,8 @@
             {% endif %}
         {% endwith %}
         <div class="container3">
+            {% block breadcrumb %}{% endblock %}
+        <hr>
             {% block app_content %}{% endblock %}
         </div>
     </div>

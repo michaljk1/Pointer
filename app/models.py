@@ -17,6 +17,7 @@ class Course(db.Model):
     name = db.Column(db.String(60), unique=True)
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
     link = db.Column(db.String(25), unique=True)
+    is_open = db.Column(db.Boolean, default=True)
 
     def get_directory(self):
         return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
@@ -35,7 +36,7 @@ class User(UserMixin, db.Model):
     surname = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(128))
     role = db.Column(db.String(20), nullable=False)
-    user_exercises = db.relationship('UserExercises', backref='author', lazy='dynamic')
+    solutions = db.relationship('Solutions', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='member')
 
     def __repr__(self):
@@ -50,11 +51,25 @@ class User(UserMixin, db.Model):
     def is_admin(self):
         return self.role == Role.ADMIN
 
+    def is_moderator(self):
+        return self.role == Role.MODERATOR
+
+    def is_student(self):
+        return self.role == Role.STUDENT
+
+
 
 class Role:
     ADMIN = 'ADMIN'
     STUDENT = 'STUDENT'
     MODERATOR = 'MODERATOR'
+
+
+class SolutionStatus:
+    SEND = 'Oddano'
+    REFUSED = 'Odrzucono'
+    ACTIVE = 'Aktywne'
+    ALL = 'Status'
 
 
 @login.user_loader
@@ -88,7 +103,7 @@ class ExerciseTemplate(db.Model):
     program_name = db.Column(db.String(50))
     compile_command = db.Column(db.String(30))
     run_command = db.Column(db.String(30))
-    solutions = db.relationship('UserExercises', backref='template', lazy='dynamic')
+    solutions = db.relationship('Solutions', backref='template', lazy='dynamic')
 
     def get_course(self):
         return self.lesson.course
@@ -104,10 +119,11 @@ class ExerciseTemplate(db.Model):
         return user_solutions
 
 
-class UserExercises(db.Model):
+class Solutions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise_template_id = db.Column(db.ForeignKey('exercise_template.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    send_date = db.Column(db.DATE)
     points = db.Column(db.Float, nullable=False)
     file_path = db.Column(db.String(100), nullable=False)
     attempt = db.Column(db.Integer, nullable=False)
@@ -115,6 +131,7 @@ class UserExercises(db.Model):
     ip_address = db.Column(db.String(20), nullable=False)
     os_info = db.Column(db.String(150), nullable=False)
     admin_refused = db.Column(db.Boolean, default=False)
+    status = db.Column(db.String(20), nullable=False)
 
     def get_course(self):
         return self.template.lesson.course

@@ -2,11 +2,18 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
-        </div>
-    </div>
+    <form action="" method="post" class="form" role="form">
+        {{ form.csrf_token() }}
+        {{ wtf.form_field(form.name, class='form-control') }}
+        {{ wtf.form_field(form.surname, class='form-control') }}
+        {{ wtf.form_field(form.course, class='form-control') }}
+        {{ wtf.form_field(form.lesson, class='form-control') }}
+        {{ wtf.form_field(form.status, class='form-control') }}
+        {{ wtf.form_field(form.exercise, class='form-control') }}
+        {{ wtf.form_field(form.points_from, class='form-control') }}
+        {{ wtf.form_field(form.points_to, class='form-control') }}
+        <p>{{ form.submit() }}</p>
+    </form>
     {% if solutions|length > 0 %}
     <table class="table">
         <thead>
@@ -14,8 +21,7 @@
         <th>Plik</th>
         <th>Punkty</th>
         <th>Próba</th>
-        <th>Odrzucono</th>
-        <th>Aktywne</th>
+        <th>Status</th>
         </thead>
         <tbody>
         {% for solution in solutions %}
@@ -24,8 +30,7 @@
                 <td><p>{{ solution.file_path }}</p></td>
                 <td><p>{{ solution.points }}</p></td>
                 <td><p>{{ solution.attempt }}</p></td>
-                <td><p>{{ solution.admin_refused }}</p></td>
-                <td><p>{{ solution.is_active }}</p></td>
+                <td><p>{{ solution.status }}</p></td>
             </tr>
         {% endfor %}
         </tbody>

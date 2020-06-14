@@ -1,4 +1,3 @@
-import os
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app.auth import bp
@@ -7,12 +6,13 @@ from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 from app.models import User, Course, Role
 from app import db
+from app.services.RouteService import RouteService
 
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('admin.index'))
+        return redirect(url_for('admin.view_courses'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -24,8 +24,10 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             if current_user.role == Role.ADMIN:
                 next_page = url_for('admin.view_courses')
-            else:
-                next_page = url_for('student.view_courses')
+            elif current_user.role == Role.ADMIN:
+                next_page = url_for('student.index')
+            elif current_user.role == Role.ADMIN:
+                next_page = url_for('mod.index')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
 
@@ -44,7 +46,7 @@ def register():
         user.set_password(form.password.data)
         user_amount = len(User.query.all())
         if user_amount == 0:
-            user.role = Role.ADMIN
+            user.role = Role.MODERATOR
         else:
             user.role = Role.STUDENT
         db.session.add(user)
@@ -57,12 +59,13 @@ def register():
             return redirect(url_for('student.view_courses'))
     return render_template('auth/register.html', title='Register', form=form)
 
-
-@bp.route('/<string:link>')
+#admin moze wstrzymac mozliwosc dolaczenia do kursu
+@bp.route('link/<string:link>')
 @login_required
 def append_course(link):
     course_by_link = Course.query.filter_by(link=link).first()
-    if course_by_link not in current_user.courses:
+    RouteService.validate_exists(course_by_link)
+    if course_by_link not in current_user.courses and course_by_link.is_open:
         current_user.courses.append(course_by_link)
         db.session.commit()
         flash('Przypisano do kursu')

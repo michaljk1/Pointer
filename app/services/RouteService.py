@@ -13,6 +13,11 @@ class RouteService:
             abort(404)
 
     @staticmethod
+    def validate_role_solution(user, role, solution):
+        if user.role != role or solution.author.email != user.email:
+            abort(404)
+
+    @staticmethod
     def validate_exists(my_object):
         if my_object is None:
             abort(404)

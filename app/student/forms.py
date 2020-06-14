@@ -1,21 +1,23 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms import SubmitField, SelectField, StringField, BooleanField, FloatField
+from wtforms import SubmitField, SelectField, StringField, FloatField
 from wtforms.validators import Optional
+
+from app.models import SolutionStatus
 
 
 class UploadForm(FlaskForm):
-    file = FileField('Select File')
-    submit_button = SubmitField('Submit Form')
+    file = FileField('Wybierz plik')
+    submit_button = SubmitField('Zapisz')
 
 
 class SolutionStudentSearchForm(FlaskForm):
-    course = SelectField('Course', choices=[])
-    lesson = StringField('Lesson')
-    exercise_name = StringField('Ćwiczenie')
-    all = BooleanField('Wszystkie')
-    admin_refused = BooleanField('Odrzucone')
-    is_active = BooleanField('Aktywne')
+    course = SelectField('Kurs', choices=[])
+    status = SelectField('Status', choices=[[SolutionStatus.ALL, SolutionStatus.ALL],
+                                            [SolutionStatus.REFUSED, SolutionStatus.REFUSED],
+                                            [SolutionStatus.ACTIVE, SolutionStatus.ACTIVE]])
+    lesson = StringField('Lekcja')
+    exercise = StringField('Ćwiczenie')
     points_from = FloatField('Punkty od', [Optional()])
     points_to = FloatField('Punkty do', [Optional()])
     submit = SubmitField('Wyszukaj')

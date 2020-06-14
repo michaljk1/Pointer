@@ -9,39 +9,39 @@ from app.student.forms import SolutionStudentSearchForm
 
 
 class UploadForm(FlaskForm):
-    file = FileField('Select File')
-    submit_button = SubmitField('Submit Form')
+    file = FileField('Wybierz plik')
+    submit_button = SubmitField('Zapisz')
 
 
 class CourseForm(FlaskForm):
-    name = StringField('Course name')
+    name = StringField('Nazwa kursu')
     submit_button = SubmitField('Dodaj kurs')
 
     def validate_name(self, name):
         course = Course.query.filter_by(name=name.data).first()
         if course is not None:
-            raise ValidationError('Please use a different course name.')
+            raise ValidationError('Podana nazwa kursu jest już zajęta.')
 
 
 class LessonForm(FlaskForm):
-    name = StringField('Lesson name')
-    text_content = StringField('Content')
-    pdf_content = FileField('Select File')
-    content_url = StringField('Url')
+    name = StringField('Nazwa lekcji')
+    text_content = StringField('Treść')
+    pdf_content = FileField('Wybierz plik')
+    content_url = StringField('Link')
     submit_button = SubmitField('Dodaj lekcję')
 
     def validate_name(self, name):
         for lesson in Lesson.query.all():
             if lesson.name.replace(" ", "_") == name.data.replace(" ", "_"):
-                raise ValidationError('Please use a different lesson name.')
+                raise ValidationError('Podana nazwa lekcji jest już zajęta')
 
 
 class TemplateForm(FlaskForm):
     name = StringField('Nazwa')
-    content = StringField('content')
+    content = StringField('Treść')
     max_attempts = IntegerField('Liczba prób', default=3)
     max_points = FloatField('Liczba punktów')
-    end_date = DateField('End date', format='%Y-%m-%d')
+    end_date = DateField('Termin końcowy', format='%Y-%m-%d')
     compile_command = StringField('compile command')
     run_command = StringField('run_command')
     output = FileField('Output')
@@ -51,7 +51,7 @@ class TemplateForm(FlaskForm):
 
 
 class CreateAccountRequestForm(FlaskForm):
-    email = SelectField('User', choices=[])
+    email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
 
 
@@ -59,8 +59,8 @@ class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
     points = FloatField('Punkty')
     admin_refused = BooleanField('Odrzuć zadanie')
-    file_path = StringField('file', render_kw={'readonly': True})
-    attempt = IntegerField('attempt', render_kw={'readonly': True})
+    file_path = StringField('Plik', render_kw={'readonly': True})
+    attempt = IntegerField('Próba', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})
     os_info = StringField('os info', render_kw={'readonly': True})
     submit = SubmitField('Zapisz')

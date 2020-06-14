@@ -2,24 +2,25 @@ import os
 import subprocess
 
 from app import db
-from app.models import UserExercises, User, Course, Lesson, ExerciseTemplate
+from app.models import Solutions, User, Course, Lesson, ExerciseTemplate, SolutionStatus
 
 
 class ExerciseService:
     @staticmethod
     def accept_best_solution(user_id, exercise):
-        user_exercises = UserExercises.query.filter_by(user_id=user_id, exercise_template_id=exercise.id).all()
+        user_exercises = Solutions.query.filter_by(user_id=user_id, exercise_template_id=exercise.id).all()
         points = 0
         best_solution = None
         for user_exercise in user_exercises:
-            if not user_exercise.admin_refused and user_exercise.points >= points:
+            if user_exercise.status != SolutionStatus.REFUSED and user_exercise.points >= points:
                 best_solution = user_exercise
                 points = best_solution.points
         if best_solution is not None:
-            best_solution.is_active = True
+            best_solution.status = SolutionStatus.ACTIVE
             user_exercises.remove(best_solution)
         for user_exercise in user_exercises:
-            user_exercise.is_active = False
+            if user_exercise.status != SolutionStatus.REFUSED:
+                user_exercise.status = SolutionStatus.SEND
         db.session.commit()
 
     @staticmethod
@@ -45,19 +46,18 @@ class ExerciseService:
 
     @staticmethod
     def exercise_query(form, id=None):
-        query = db.session.query(UserExercises).select_from(UserExercises, User, Course, Lesson, ExerciseTemplate). \
-            join(User, User.id == UserExercises.user_id). \
-            join(ExerciseTemplate, UserExercises.exercise_template_id == ExerciseTemplate.id). \
+        query = db.session.query(Solutions).select_from(Solutions, User, Course, Lesson, ExerciseTemplate). \
+            join(User, User.id == Solutions.user_id). \
+            join(ExerciseTemplate, Solutions.exercise_template_id == ExerciseTemplate.id). \
             join(Lesson, Lesson.id == ExerciseTemplate.lesson_id). \
             join(Course, Course.id == Lesson.course_id)
 
-        if not form.all.data:
-            query = query.filter(UserExercises.is_active == form.is_active.data,
-                                 UserExercises.admin_refused == form.admin_refused.data)
+        if form.status.data != SolutionStatus.ALL:
+            query = query.filter(Solutions.status == form.status.data)
         if form.points_from.data is not None:
-            query = query.filter(UserExercises.points >= form.points_from.data)
+            query = query.filter(Solutions.points >= form.points_from.data)
         if form.points_to.data is not None:
-            query = query.filter(UserExercises.points <= form.points_to.data)
+            query = query.filter(Solutions.points <= form.points_to.data)
         if not len(form.course.data) == 0:
             query = query.filter(Course.name == form.course.data)
         if not len(form.lesson.data) == 0:
@@ -71,6 +71,6 @@ class ExerciseService:
                 query = query.filter(User.name == form.name.data)
         else:
             query = query.filter(User.id == id)
-        if not len(form.exercise_name.data) == 0:
-            query = query.filter(ExerciseTemplate.name == form.exercise_name.data)
+        if not len(form.exercise.data) == 0:
+            query = query.filter(ExerciseTemplate.name == form.exercise.data)
         return query

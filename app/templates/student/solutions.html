@@ -10,20 +10,22 @@
     {% if solutions|length > 0 %}
     <table class="table">
         <thead>
-        <th>Plik</th>
-        <th>Punkty</th>
-        <th>Próba</th>
-        <th>Odrzucono</th>
-        <th>Aktywne</th>
+            <th>Plik</th>
+            <th>Data wysłania</th>
+            <th>Status</th>
+            <th>Punkty</th>
         </thead>
         <tbody>
         {% for solution in solutions %}
             <tr class="pointercurs">
-                <td><p>{{ solution.file_path }}</p></td>
-                <td><p>{{ solution.points }}</p></td>
-                <td><p>{{ solution.attempt }}</p></td>
-                <td><p>{{ solution.admin_refused }}</p></td>
-                <td><p>{{ solution.is_active }}</p></td>
+                <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}" target="_blank">{{ solution.file_path }}</a></p></td>
+                     {% if datetime.date() >= template.end_date %}
+                    <td><p>{{ solution.status }}</p></td>
+                    <td><p>{{ solution.points }}</p></td>
+                    {% else %}
+                    <td><p> - </p></td>
+                    <td><p> - </p></td>
+                    {% endif %}
             </tr>
         {% endfor %}
         </tbody>

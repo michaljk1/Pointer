@@ -12,7 +12,7 @@ def index():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
     elif current_user.role == Role.ADMIN:
-        return redirect(url_for('admin.index'))
+        return redirect(url_for('admin.view_courses'))
     elif current_user.role == Role.STUDENT:
         return redirect(url_for('student.index'))
     elif current_user.role == Role.MODERATOR:

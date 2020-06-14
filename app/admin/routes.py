@@ -2,24 +2,16 @@ import os
 import string
 import random
 
-from flask import render_template, url_for, flash, request, abort
+from flask import render_template, url_for, flash, request, abort, send_from_directory
 from flask_login import logout_user, login_required, current_user
 from app.admin import bp
 from app.admin.forms import CourseForm, TemplateForm, LessonForm, CreateAccountRequestForm, SolutionForm, \
     SolutionAdminSearchForm
 from werkzeug.utils import redirect, secure_filename
-from app.models import Course, ExerciseTemplate, Lesson, User, UserExercises, Role
+from app.models import Course, ExerciseTemplate, Lesson, User, Solutions, Role, SolutionStatus
 from app import db
 from app.services.ExerciseService import ExerciseService
 from app.services.RouteService import RouteService
-
-
-@bp.route('/')
-@bp.route('/index')
-@login_required
-def index():
-    RouteService.validate_role(current_user, Role.ADMIN)
-    return render_template('admin/index.html')
 
 
 @bp.route('/logout')
@@ -47,6 +39,8 @@ def add_student(course_name):
     return render_template('admin/add_student.html', form=form, course=course)
 
 
+@bp.route('/')
+@bp.route('/index')
 @bp.route('/courses', methods=['GET'])
 def view_courses():
     RouteService.validate_role(current_user, Role.ADMIN)
@@ -101,14 +95,14 @@ def add_lesson(course_name):
             course.lessons.append(new_lesson)
             db.session.commit()
             return redirect(url_for('admin.view_lesson', lesson_id=new_lesson.id, course_name=course.name))
-    return render_template('admin/add_lesson.html', form=form)
+    return render_template('admin/add_lesson.html', form=form, course=course)
 
 
 @bp.route('/exercise/<int:template_id>', methods=['GET', 'POST'])
 def view_exercise(template_id):
     exercise = ExerciseTemplate.query.filter_by(id=template_id).first()
     RouteService.validate_role_course(current_user, Role.ADMIN, exercise.lesson.course)
-    solutions = UserExercises.query.filter_by(exercise_template_id=template_id, is_active=True).all()
+    solutions = Solutions.query.filter_by(exercise_template_id=template_id, is_active=True).all()
     return render_template('admin/exercise.html', template=exercise, solutions=solutions)
 
 
@@ -138,14 +132,14 @@ def add_exercise(course_name, lesson_name):
         output.save(os.path.join(directory, output_name))
         db.session.commit()
         return redirect(url_for('admin.view_lesson', course_name=lesson.course.name, lesson_id=lesson.id))
-    return render_template('admin/add_template.html', form=form)
+    return render_template('admin/add_template.html', form=form, lesson=lesson)
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])
 def view_solutions():
     RouteService.validate_role(current_user, Role.ADMIN)
     form = SolutionAdminSearchForm()
-    form_courses = []
+    form_courses, form_statuses = [], []
     for course in current_user.courses:
         course_data = (course.name, course.name)
         form_courses.append(course_data)
@@ -159,15 +153,28 @@ def view_solutions():
 
 @bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
 def view_solution(solution_id):
-    solution = UserExercises.query.filter_by(id=solution_id).first()
+    solution = Solutions.query.filter_by(id=solution_id).first()
     RouteService.validate_exists(solution)
     RouteService.validate_role_course(current_user, Role.ADMIN, solution.template.lesson.course)
     solution_form = SolutionForm(obj=solution, email=solution.author.email)
     if request.method == 'POST':
-        solution.admin_refused = solution_form.admin_refused.data
+        if solution_form.admin_refused.data:
+            solution.status = SolutionStatus.REFUSED
+        else:
+            solution.status = SolutionStatus.SEND
         solution.points = solution_form.points.data
         db.session.commit()
         ExerciseService.accept_best_solution(solution.user_id, solution.template)
         flash('Zapisano zmiany')
-        return render_template('admin/solution.html', form=solution_form)
-    return render_template('admin/solution.html', form=solution_form)
+        return render_template('admin/solution.html', form=solution_form, solution_id=solution_id)
+    return render_template('admin/solution.html', form=solution_form, solution_id=solution_id)
+
+
+@bp.route('/uploads/<int:solution_id>/', methods=['GET', 'POST'])
+@login_required
+def download_solution(solution_id):
+    solution = Solutions.query.filter_by(id=solution_id).first()
+   # RouteService.validate_role_course(current_user, Role.STUDENT, lesson.course)
+    return send_from_directory(directory=solution.get_directory(),
+                               filename=solution.file_path)
+
