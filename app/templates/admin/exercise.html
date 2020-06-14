@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}"> Kursy </a>
+    <a href="{{ url_for('admin.view_courses') }}"><pb> Kursy </pb></a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = template.lesson.course.name) }}"> {{ template.lesson.course.name }} </a>
+    <a href="{{ url_for('admin.view_course', course_name = template.lesson.course.name) }}"><pb> {{ template.lesson.course.name }} </pb></a>
     /
-    <a href="{{ url_for('admin.view_lesson', course_name = template.lesson.course.name, lesson_id = template.lesson.id) }}"> {{ template.lesson.name }} </a>
+    <a href="{{ url_for('admin.view_lesson', course_name = template.lesson.course.name, lesson_id = template.lesson.id) }}"><pb> {{ template.lesson.name }} </pb></a>
     /
-    <a href="{{ url_for('admin.view_exercise', template_id = template.id) }}"> {{ template.name }} </a>
+    <a href="{{ url_for('admin.view_exercise', template_id = template.id) }}"><pb> {{ template.name }} </pb></a>
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ template.name }}</h2></div>

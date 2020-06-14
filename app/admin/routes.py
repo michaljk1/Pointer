@@ -166,8 +166,8 @@ def view_solution(solution_id):
         db.session.commit()
         ExerciseService.accept_best_solution(solution.user_id, solution.template)
         flash('Zapisano zmiany')
-        return render_template('admin/solution.html', form=solution_form, solution_id=solution_id)
-    return render_template('admin/solution.html', form=solution_form, solution_id=solution_id)
+        return render_template('admin/solution.html', form=solution_form, solution=solution)
+    return render_template('admin/solution.html', form=solution_form, solution=solution)
 
 
 @bp.route('/uploads/<int:solution_id>/', methods=['GET', 'POST'])
