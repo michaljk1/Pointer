@@ -85,13 +85,16 @@ def add_lesson(course_name):
         if form.validate_on_submit():
             file = request.files['pdf_content']
             filename = secure_filename(file.filename)
+            if filename == '':
+                filename = None
             lesson_name = form.name.data
             new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
                                 raw_text=form.text_content.data)
             directory = os.path.join(course.get_directory(), lesson_name.replace(" ", "_"))
             if not os.path.exists(directory):
                 os.makedirs(directory)
-            file.save(os.path.join(directory, filename))
+            if filename is not None:
+                file.save(os.path.join(directory, filename))
             course.lessons.append(new_lesson)
             db.session.commit()
             return redirect(url_for('admin.view_lesson', lesson_id=new_lesson.id, course_name=course.name))

@@ -50,8 +50,7 @@ def view_exercise(template_id):
     template = ExerciseTemplate.query.filter_by(id=template_id).first()
     RouteService.validate_role_course(current_user, Role.STUDENT, template.get_course())
     form = UploadForm()
-    lesson = template.lesson
-    attempts = len(Solutions.query.filter_by(user_id=current_user.id, exercise_template_id=template.id).all())
+    attempts = len(template.get_user_solutions(current_user.id))
     if form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
@@ -73,7 +72,7 @@ def view_exercise(template_id):
             solution.points = 0
             solution.is_active = False
             db.session.commit()
-        return redirect(url_for('student.view_lesson', lesson_id=lesson.id))
+        return redirect(url_for('student.view_lesson', lesson_id=template.lesson.id))
     return render_template('student/exercise.html', template=template, form=form, datetime=datetime.utcnow(),
                            solutions=template.get_user_solutions(current_user.id))
 

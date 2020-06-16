@@ -58,7 +58,6 @@ class User(UserMixin, db.Model):
         return self.role == Role.STUDENT
 
 
-
 class Role:
     ADMIN = 'ADMIN'
     STUDENT = 'STUDENT'

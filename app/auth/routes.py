@@ -24,9 +24,9 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             if current_user.role == Role.ADMIN:
                 next_page = url_for('admin.view_courses')
-            elif current_user.role == Role.ADMIN:
-                next_page = url_for('student.index')
-            elif current_user.role == Role.ADMIN:
+            elif current_user.role == Role.STUDENT:
+                next_page = url_for('student.view_courses')
+            elif current_user.role == Role.MODERATOR:
                 next_page = url_for('mod.index')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
