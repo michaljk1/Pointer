@@ -33,21 +33,21 @@ def grade(solution):
     exercise = solution.exercise
     program_name = solution.file_path
     run_command = exercise.run_command
-    input_name = exercise.get_directory() + '/' + exercise.input_name
-    output_name = exercise.get_directory() + '/' + exercise.output_name
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    bash_command = dir_path + '/run.sh ' + solution.get_directory() + ' ' + program_name + ' ' + input_name + ' ' + output_name + ' ' + run_command
-    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-    if len(output) == 0:
-        solution.points = exercise.max_points
-    else:
-        solution.points = 0
+    solution.points = 0
+    for test in exercise.tests.all():
+        test_dir = test.get_directory()
+        input_name = test_dir + '/' + test.input_name
+        output_name = test_dir + '/' + test.output_name
+        bash_command = dir_path + '/run.sh ' + solution.get_directory() + ' ' + program_name + ' ' + input_name + ' ' + output_name + ' ' + run_command
+        process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        if len(output) == 0:
+            solution.points += test.points
     accept_best_solution(solution.user_id, exercise)
 
 
-
-def exercise_query(form, id=None):
+def exercise_query(form, user_id=None):
     query = db.session.query(Solutions).select_from(Solutions, User, Course, Lesson, Exercise). \
         join(User, User.id == Solutions.user_id). \
         join(Exercise, Solutions.exercise_id == Exercise.id). \
@@ -72,7 +72,7 @@ def exercise_query(form, id=None):
         if not len(form.name.data) == 0:
             query = query.filter(User.name == form.name.data)
     else:
-        query = query.filter(User.id == id)
+        query = query.filter(User.id == user_id)
     if not len(form.exercise.data) == 0:
         query = query.filter(Exercise.name == form.exercise.data)
     return query

@@ -11,22 +11,13 @@
 {% block app_content %}
     <div><h2>{{ exercise.name }}</h2></div>
     <div><h1>{{ exercise.content }}</h1></div>
-        <table>
-            <thead>
-            <th>Plik</th>
-            <th>Punkty</th>
-            <th>Próba</th>
-            <th>Zaakceptowano</th>
-            </thead>
-            <tbody>
-            {% for solution in solutions %}
-                <tr>
-                    <td><p>{{ solution.file_path }}</p></td>
-                    <td><p>{{ solution.points }}</p></td>
-                    <td><p>{{ solution.attempt}}</p></td>
-                    <td><p>{{ solution.accept }}</p></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <div><h1>Możliwe punkty: {{ exercise.get_max_points() }}</h1></div>
+    <div><h1>Termin: {{ exercise.end_date }}</h1></div>
+    <div><h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1></div>
+    {% for test in exercise.tests %}
+        <div><p>Output: {{ test.output_name }}</p></div>
+        <div><p>Input: {{ test.input_name }}</p></div>
+        <div><p>Punkty: {{ test.points }}</p></div>
+    {% endfor %}
+    <div><a href="{{ url_for('admin.add_test', exercise_id = exercise.id) }}">>Dodaj test</a></div>
 {% endblock %}

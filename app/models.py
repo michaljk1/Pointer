@@ -3,6 +3,8 @@ import os
 from flask import current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+
 from app import db, login
 
 user_course_assoc = db.Table(
@@ -94,11 +96,8 @@ class Exercise(db.Model):
     name = db.Column(db.String(60))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
     content = db.Column(db.String(500))
-    max_points = db.Column(db.Float)
     end_date = db.Column(db.DATE)
     max_attempts = db.Column(db.Integer, default=3)
-    output_name = db.Column(db.String(100))
-    input_name = db.Column(db.String(100))
     program_name = db.Column(db.String(50))
     compile_command = db.Column(db.String(50))
     run_command = db.Column(db.String(50))
@@ -110,6 +109,12 @@ class Exercise(db.Model):
 
     def get_directory(self):
         return os.path.join(self.lesson.get_directory(), self.name.replace(" ", "_"))
+
+    def get_max_points(self):
+        max_points = 0
+        for test in self.tests:
+            max_points += test.points
+        return max_points
 
     def get_user_solutions(self, user_id):
         user_solutions = []
@@ -124,6 +129,15 @@ class Exercise(db.Model):
             points += test.points
         return points
 
+    def create_test(self, input_file, output_file, points):
+        input_name, output_name = secure_filename(input_file.filename), secure_filename(output_file.filename)
+        test = Test(points=points, input_name=input_name, output_name=output_name, exercise_id=self.id)
+        self.tests.append(test)
+        test_directory = test.get_directory()
+        os.makedirs(test_directory)
+        input_file.save(os.path.join(test_directory, input_name))
+        output_file.save(os.path.join(test_directory, output_name))
+
 
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -131,6 +145,9 @@ class Test(db.Model):
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
     points = db.Column(db.Float)
+
+    def get_directory(self):
+        return os.path.join(self.executor.get_directory(), str(len(self.executor.tests.all())))
 
 
 class Solutions(db.Model):

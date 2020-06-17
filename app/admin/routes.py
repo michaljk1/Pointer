@@ -6,9 +6,9 @@ from flask import render_template, url_for, flash, request, abort, send_from_dir
 from flask_login import logout_user, login_required, current_user
 from app.admin import bp
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, EnableAssingmentLink
+    SolutionAdminSearchForm, EnableAssingmentLink, TestForm
 from werkzeug.utils import redirect, secure_filename
-from app.models import Course, Exercise, Lesson, User, Solutions, Role, SolutionStatus
+from app.models import Course, Exercise, Lesson, User, Solutions, Role, SolutionStatus, Test
 from app import db
 from app.services.ExerciseService import exercise_query, accept_best_solution
 from app.services.RouteService import RouteService
@@ -90,22 +90,21 @@ def add_lesson(course_name):
     course = Course.query.filter_by(name=course_name).first()
     RouteService.validate_role_course(current_user, Role.ADMIN, course)
     form = LessonForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            file = request.files['pdf_content']
-            filename = secure_filename(file.filename)
-            if filename == '':
-                filename = None
-            lesson_name = form.name.data
-            new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
-                                raw_text=form.text_content.data)
-            course.lessons.append(new_lesson)
-            lesson_directory = new_lesson.get_directory()
-            os.makedirs(lesson_directory)
-            if filename is not None:
-                file.save(os.path.join(lesson_directory, filename))
-            db.session.commit()
-            return redirect(url_for('admin.view_lesson', lesson_id=new_lesson.id, course_name=course.name))
+    if request.method == 'POST' and form.validate_on_submit():
+        file = request.files['pdf_content']
+        filename = secure_filename(file.filename)
+        if filename == '':
+            filename = None
+        lesson_name = form.name.data
+        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
+                            raw_text=form.text_content.data)
+        course.lessons.append(new_lesson)
+        lesson_directory = new_lesson.get_directory()
+        os.makedirs(lesson_directory)
+        if filename is not None:
+            file.save(os.path.join(lesson_directory, filename))
+        db.session.commit()
+        return redirect(url_for('admin.view_lesson', lesson_id=new_lesson.id, course_name=course.name))
     return render_template('admin/add_lesson.html', form=form, course=course)
 
 
@@ -117,6 +116,17 @@ def view_exercise(exercise_id):
     return render_template('admin/exercise.html', exercise=exercise, solutions=solutions)
 
 
+@bp.route('/test/<int:exercise_id>', methods=['GET', 'POST'])
+def add_test(exercise_id):
+    exercise = Exercise.query.filter_by(id=exercise_id).first()
+    RouteService.validate_role_course(current_user, Role.ADMIN, exercise.lesson.course)
+    form = TestForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
+        db.session.commit()
+    return render_template('admin/add_test.html', exercise=exercise, form=form)
+
+
 @bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
@@ -125,19 +135,14 @@ def add_exercise(course_name, lesson_name):
     RouteService.validate_role_course(current_user, Role.ADMIN, course)
     form = ExerciseForm()
     if form.validate_on_submit():
-        input, output = request.files['input'], request.files['output']
-        input_name, output_name = secure_filename(input.filename), secure_filename(output.filename)
         exercise_name = form.name.data
         exercise = Exercise(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
-                            max_attempts=form.max_attempts.data, max_points=form.max_points.data,
-                            input_name=input_name, output_name=output_name,
-                            compile_command=form.compile_command.data, end_date=form.end_date.data,
-                            run_command=form.run_command.data, program_name=form.program_name.data)
+                            max_attempts=form.max_attempts.data, compile_command=form.compile_command.data,
+                            end_date=form.end_date.data, run_command=form.run_command.data,
+                            program_name=form.program_name.data)
         lesson.exercises.append(exercise)
-        exercise_directory = exercise.get_directory()
-        os.makedirs(exercise_directory)
-        input.save(os.path.join(exercise_directory, input_name))
-        output.save(os.path.join(exercise_directory, output_name))
+        os.makedirs(exercise.get_directory())
+        exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
         db.session.commit()
         return redirect(url_for('admin.view_lesson', course_name=lesson.course.name, lesson_id=lesson.id))
     return render_template('admin/add_template.html', form=form, lesson=lesson)
