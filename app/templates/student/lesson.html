@@ -16,9 +16,9 @@
             href="{{ url_for('student.download_content', lesson_id=lesson.id) }}" target="_blank">{{ lesson.content_pdf_path }}</a>
     </h1></div>
     {% endif %}
-    {% for template in lesson.exercise_templates %}
+    {% for exercise in lesson.exercises %}
         <div><p><a
-                href="{{ url_for('student.view_exercise', course_name = lesson.course.name, lesson_name = lesson.name, template_id = template.id ) }}">{{ template.name }}</a>
+                href="{{ url_for('student.view_exercise', course_name = lesson.course.name, lesson_name = lesson.name, exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
         </p></div>
     {% endfor %}
 {% endblock %}

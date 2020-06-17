@@ -10,7 +10,7 @@ from app.services.RouteService import RouteService
 from app.student import bp
 from app.student.forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, ExerciseTemplate, Lesson, Solutions, User, Role, SolutionStatus
+from app.models import Course, Exercise, Lesson, Solutions, User, Role, SolutionStatus
 from app import db
 
 
@@ -44,27 +44,27 @@ def view_lesson(lesson_id):
     return render_template('student/lesson.html', lesson=Lesson.query.filter_by(id=lesson_id).first())
 
 
-@bp.route('/exercise/<int:template_id>', methods=['GET', 'POST'])
+@bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
 @login_required
-def view_exercise(template_id):
-    template = ExerciseTemplate.query.filter_by(id=template_id).first()
-    RouteService.validate_role_course(current_user, Role.STUDENT, template.get_course())
+def view_exercise(exercise_id):
+    exercise = Exercise.query.filter_by(id=exercise_id).first()
+    RouteService.validate_role_course(current_user, Role.STUDENT, exercise.get_course())
     form = UploadForm()
-    attempts = len(template.get_user_solutions(current_user.id))
+    attempts = len(exercise.get_user_solutions(current_user.id))
     if form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
-        solution = Solutions(user_id=current_user.id, exercise_template_id=template.id, file_path=filename, points=0,
+        solution = Solutions(user_id=current_user.id, exercise_id=exercise.id, file_path=filename, points=0,
                              ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
                              status=SolutionStatus.SEND, send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
-        directory = os.path.join(template.get_directory(), current_user.login, str(attempts))
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        file.save(os.path.join(directory, filename))
+        exercise.solutions.append(solution)
+        current_user.solutions.append(solution)
+        solution_directory = solution.get_directory()
+        os.makedirs(solution_directory)
+        file.save(os.path.join(solution_directory, filename))
         if filename.endswith('.tar.gz') or filename.endswith('.gzip') or filename.endswith('.zip') or filename.endswith(
                 '.tar'):
-            shutil.unpack_archive(os.path.join(directory, filename), directory)
-        current_user.solutions.append(solution)
+            shutil.unpack_archive(os.path.join(solution_directory, filename), solution_directory)
         db.session.commit()
         try:
             ExerciseService.grade(solution)
@@ -72,9 +72,9 @@ def view_exercise(template_id):
             solution.points = 0
             solution.is_active = False
             db.session.commit()
-        return redirect(url_for('student.view_lesson', lesson_id=template.lesson.id))
-    return render_template('student/exercise.html', template=template, form=form, datetime=datetime.utcnow(),
-                           solutions=template.get_user_solutions(current_user.id))
+        return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
+    return render_template('student/exercise.html', exercise=exercise, form=form, datetime=datetime.utcnow(),
+                           solutions=exercise.get_user_solutions(current_user.id))
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])

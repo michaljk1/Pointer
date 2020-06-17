@@ -83,13 +83,13 @@ class Lesson(db.Model):
     content_pdf_path = db.Column(db.String(100))
     content_url = db.Column(db.String(100))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    exercise_templates = db.relationship('ExerciseTemplate', backref='lesson', lazy='dynamic')
+    exercises = db.relationship('Exercise', backref='lesson', lazy='dynamic')
 
     def get_directory(self):
-        return os.path.join(current_app.instance_path, self.course.name.replace(" ", "_"), self.name.replace(" ", "_"))
+        return os.path.join(self.course.get_directory(), self.name.replace(" ", "_"))
 
 
-class ExerciseTemplate(db.Model):
+class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
@@ -102,7 +102,8 @@ class ExerciseTemplate(db.Model):
     program_name = db.Column(db.String(50))
     compile_command = db.Column(db.String(30))
     run_command = db.Column(db.String(30))
-    solutions = db.relationship('Solutions', backref='template', lazy='dynamic')
+    solutions = db.relationship('Solutions', backref='exercise', lazy='dynamic')
+    tests = db.relationship('Test', backref='executor', lazy='dynamic')
 
     def get_course(self):
         return self.lesson.course
@@ -117,10 +118,24 @@ class ExerciseTemplate(db.Model):
                 user_solutions.append(solution)
         return user_solutions
 
+    def get_max_points(self):
+        points = 0
+        for test in self.tests:
+            points += test.points
+        return points
+
+
+class Test(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    exercise_id = db.Column(db.ForeignKey('exercise.id'))
+    output_name = db.Column(db.String(100))
+    input_name = db.Column(db.String(100))
+    points = db.Column(db.Float)
+
 
 class Solutions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    exercise_template_id = db.Column(db.ForeignKey('exercise_template.id'))
+    exercise_id = db.Column(db.ForeignKey('exercise.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     send_date = db.Column(db.DATE)
     points = db.Column(db.Float, nullable=False)
@@ -133,7 +148,7 @@ class Solutions(db.Model):
     status = db.Column(db.String(20), nullable=False)
 
     def get_course(self):
-        return self.template.lesson.course
+        return self.exercise.lesson.course
 
     def get_directory(self):
-        return os.path.join(self.template.get_directory(), self.author.login, str(self.attempt))
+        return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))

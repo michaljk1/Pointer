@@ -59,13 +59,16 @@ def register():
             return redirect(url_for('student.view_courses'))
     return render_template('auth/register.html', title='Register', form=form)
 
-#admin moze wstrzymac mozliwosc dolaczenia do kursu
+
 @bp.route('link/<string:link>')
 @login_required
 def append_course(link):
     course_by_link = Course.query.filter_by(link=link).first()
     RouteService.validate_exists(course_by_link)
-    if course_by_link not in current_user.courses and course_by_link.is_open:
+    if not course_by_link.is_open:
+        flash('Przypisanie do kursu nie jest obecnie możliwe')
+        return RouteService.redirect_for_index_by_role(current_user.role)
+    elif course_by_link not in current_user.courses:
         current_user.courses.append(course_by_link)
         db.session.commit()
         flash('Przypisano do kursu')
@@ -73,6 +76,8 @@ def append_course(link):
         flash('Użytkownik przypisany do kursu')
     if current_user.role == Role.ADMIN:
         return redirect(url_for('admin.view_course', course_name=course_by_link.name))
-    else:
+    elif current_user.role == Role.STUDENT:
         return redirect(url_for('student.view_course', course_name=course_by_link.name))
+    elif current_user.role == Role.MODERATOR:
+        return redirect(url_for('mod.index'))
 

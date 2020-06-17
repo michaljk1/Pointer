@@ -36,23 +36,34 @@ class LessonForm(FlaskForm):
                 raise ValidationError('Podana nazwa lekcji jest już zajęta')
 
 
-class TemplateForm(FlaskForm):
+class ExerciseForm(FlaskForm):
     name = StringField('Nazwa')
     content = StringField('Treść')
     max_attempts = IntegerField('Liczba prób', default=3)
-    max_points = FloatField('Liczba punktów')
     end_date = DateField('Termin końcowy', format='%Y-%m-%d')
     compile_command = StringField('compile command')
     run_command = StringField('run_command')
     output = FileField('Output')
     input = FileField('Input')
+    max_points = FloatField('Liczba punktów')
     program_name = StringField('Nazwa testowanego pliku')
     submit_button = SubmitField('Dodaj ćwiczenie')
 
 
-class CreateAccountRequestForm(FlaskForm):
+class TestForm(FlaskForm):
+    max_points = FloatField('Liczba punktów')
+    output = FileField('Output')
+    input = FileField('Input')
+    submit_button = SubmitField('Dodaj ćwiczenie')
+
+
+class AssigneUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
+
+class EnableAssingmentLink(FlaskForm):
+    activate = BooleanField('Aktywny zapis')
+    submit_button = SubmitField('Zapisz')
 
 
 class SolutionForm(FlaskForm):

@@ -1,8 +1,13 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('admin.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = course.name) }}"><pb> {{ course.name }} </pb></a>
+    <a href="{{ url_for('admin.view_course', course_name = course.name) }}">
+        <pb> {{ course.name }} </pb>
+    </a>
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ course.name }}</h2></div>
@@ -13,4 +18,10 @@
     {% endfor %}
     <div><h1><a href="{{ url_for('admin.add_lesson', course_name = course.name ) }}">Dodaj lekcję</a></h1></div>
     <div><h1><a href="{{ url_for('admin.add_student', course_name = course.name ) }}">Dodaj studenta</a></h1></div>
+    <div><h1>{{ url_for('auth.append_course', link = course.link, _external=True) }}</h1></div>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
 {% endblock %}

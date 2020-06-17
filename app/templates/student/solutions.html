@@ -21,7 +21,7 @@
         {% for solution in solutions %}
             <tr class="pointercurs">
                 <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}" target="_blank">{{ solution.file_path }}</a></p></td>
-                     {% if datetime.date() >= template.end_date %}
+                     {% if datetime.date() >= exercise.end_date %}
                     <td><p>{{ solution.status }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
                     {% else %}

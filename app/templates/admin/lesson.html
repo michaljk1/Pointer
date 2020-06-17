@@ -10,10 +10,10 @@
     <div><h2>{{ lesson.name }}</h2></div>
     <div><h1>{{ lesson.raw_text }}</h1></div>
     <div><h1><a href="{{ lesson.content_url }}">{{ lesson.content_url }}</a></h1></div>
-    {% for template in lesson.exercise_templates %}
+    {% for exercise in lesson.exercises %}
         <div><h1><a
-                href="{{ url_for('admin.view_exercise', template_id = template.id ) }}">{{ template.name }}</a>
+                href="{{ url_for('admin.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
         </h1></div>
     {% endfor %}
-    <div><h1><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Add exercise</a></h1></div>
+    <div><h1><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Dodaj ćwiczenie</a></h1></div>
 {% endblock %}

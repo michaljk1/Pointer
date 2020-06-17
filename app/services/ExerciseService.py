@@ -2,13 +2,13 @@ import os
 import subprocess
 
 from app import db
-from app.models import Solutions, User, Course, Lesson, ExerciseTemplate, SolutionStatus
+from app.models import Solutions, User, Course, Lesson, Exercise, SolutionStatus
 
 
 class ExerciseService:
     @staticmethod
     def accept_best_solution(user_id, exercise):
-        user_exercises = Solutions.query.filter_by(user_id=user_id, exercise_template_id=exercise.id).all()
+        user_exercises = Solutions.query.filter_by(user_id=user_id, exercise_id=exercise.id).all()
         points = 0
         best_solution = None
         for user_exercise in user_exercises:
@@ -25,7 +25,7 @@ class ExerciseService:
 
     @staticmethod
     def grade(solution):
-        exercise = solution.template
+        exercise = solution.exercise
         program_name = solution.file_path
         compile_command = exercise.compile_command
         compile_args = len(compile_command.split())
@@ -46,10 +46,10 @@ class ExerciseService:
 
     @staticmethod
     def exercise_query(form, id=None):
-        query = db.session.query(Solutions).select_from(Solutions, User, Course, Lesson, ExerciseTemplate). \
+        query = db.session.query(Solutions).select_from(Solutions, User, Course, Lesson, Exercise). \
             join(User, User.id == Solutions.user_id). \
-            join(ExerciseTemplate, Solutions.exercise_template_id == ExerciseTemplate.id). \
-            join(Lesson, Lesson.id == ExerciseTemplate.lesson_id). \
+            join(Exercise, Solutions.exercise_id == Exercise.id). \
+            join(Lesson, Lesson.id == Exercise.lesson_id). \
             join(Course, Course.id == Lesson.course_id)
 
         if form.status.data != SolutionStatus.ALL:
@@ -72,5 +72,5 @@ class ExerciseService:
         else:
             query = query.filter(User.id == id)
         if not len(form.exercise.data) == 0:
-            query = query.filter(ExerciseTemplate.name == form.exercise.data)
+            query = query.filter(Exercise.name == form.exercise.data)
         return query
