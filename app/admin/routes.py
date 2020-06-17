@@ -10,7 +10,7 @@ from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserFor
 from werkzeug.utils import redirect, secure_filename
 from app.models import Course, Exercise, Lesson, User, Solutions, Role, SolutionStatus
 from app import db
-from app.services.ExerciseService import ExerciseService
+from app.services.ExerciseService import exercise_query, accept_best_solution
 from app.services.RouteService import RouteService
 
 
@@ -154,7 +154,7 @@ def view_solutions():
     form.course.choices = form_courses
     if request.method == 'POST':
         if form.validate_on_submit():
-            solutions = ExerciseService.exercise_query(form).all()
+            solutions = exercise_query(form).all()
             return render_template('admin/solutions.html', form=form, solutions=solutions)
     return render_template('admin/solutions.html', form=form, solutions=[])
 
@@ -172,7 +172,7 @@ def view_solution(solution_id):
             solution.status = SolutionStatus.SEND
         solution.points = solution_form.points.data
         db.session.commit()
-        ExerciseService.accept_best_solution(solution.user_id, solution.exercise)
+        accept_best_solution(solution.user_id, solution.exercise)
         flash('Zapisano zmiany')
         return render_template('admin/solution.html', form=solution_form, solution=solution)
     return render_template('admin/solution.html', form=solution_form, solution=solution)

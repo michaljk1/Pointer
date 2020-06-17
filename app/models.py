@@ -100,8 +100,8 @@ class Exercise(db.Model):
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
     program_name = db.Column(db.String(50))
-    compile_command = db.Column(db.String(30))
-    run_command = db.Column(db.String(30))
+    compile_command = db.Column(db.String(50))
+    run_command = db.Column(db.String(50))
     solutions = db.relationship('Solutions', backref='exercise', lazy='dynamic')
     tests = db.relationship('Test', backref='executor', lazy='dynamic')
 

@@ -5,7 +5,7 @@ from datetime import datetime
 import pytz
 from flask import render_template, url_for, request, send_from_directory
 from flask_login import login_required, current_user
-from app.services.ExerciseService import ExerciseService
+from app.services.ExerciseService import compile, grade, exercise_query
 from app.services.RouteService import RouteService
 from app.student import bp
 from app.student.forms import UploadForm, SolutionStudentSearchForm
@@ -67,7 +67,8 @@ def view_exercise(exercise_id):
             shutil.unpack_archive(os.path.join(solution_directory, filename), solution_directory)
         db.session.commit()
         try:
-            ExerciseService.grade(solution)
+            compile(solution)
+            grade(solution)
         except:
             solution.points = 0
             solution.is_active = False
@@ -87,10 +88,9 @@ def view_solutions():
         course_data = (course.name, course.name)
         form_courses.append(course_data)
     form.course.choices = form_courses
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            solutions = ExerciseService.exercise_query(form, current_user.id).all()
-            return render_template('student/solutions.html', form=form, solutions=solutions)
+    if request.method == 'POST' and form.validate_on_submit():
+        solutions = exercise_query(form, current_user.id).all()
+        return render_template('student/solutions.html', form=form, solutions=solutions)
     return render_template('student/solutions.html', form=form, solutions=[])
 
 
@@ -99,8 +99,7 @@ def view_solutions():
 def download_content(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
     RouteService.validate_role_course(current_user, Role.STUDENT, lesson.course)
-    return send_from_directory(directory=lesson.get_directory(),
-                               filename=lesson.content_pdf_path)
+    return send_from_directory(directory=lesson.get_directory(), filename=lesson.content_pdf_path)
 
 
 @bp.route('/mysolution/<int:solution_id>/', methods=['GET', 'POST'])
@@ -108,5 +107,4 @@ def download_content(lesson_id):
 def download_solution(solution_id):
     solution = Solutions.query.filter_by(id=solution_id).first()
     RouteService.validate_role_solution(current_user, Role.STUDENT, solution)
-    return send_from_directory(directory=solution.get_directory(),
-                               filename=solution.file_path)
+    return send_from_directory(directory=solution.get_directory(), filename=solution.file_path)
