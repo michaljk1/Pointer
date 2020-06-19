@@ -25,8 +25,9 @@ def accept_best_solution(user_id, exercise):
 def compile(solution):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     compile_command = solution.exercise.compile_command
-    bash_command = dir_path + '/compile.sh ' + solution.get_directory() + ' ' + compile_command
-    subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+    if len(compile_command.split()) > 0:
+        bash_command = dir_path + '/compile.sh ' + solution.get_directory() + ' ' + compile_command
+        subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
 
 
 def grade(solution):
@@ -47,7 +48,7 @@ def grade(solution):
     accept_best_solution(solution.user_id, exercise)
 
 
-def exercise_query(form, user_id=None):
+def exercise_query(form, user_id=None, courses=None):
     query = db.session.query(Solutions).select_from(Solutions, User, Course, Lesson, Exercise). \
         join(User, User.id == Solutions.user_id). \
         join(Exercise, Solutions.exercise_id == Exercise.id). \
@@ -60,16 +61,17 @@ def exercise_query(form, user_id=None):
         query = query.filter(Solutions.points >= form.points_from.data)
     if form.points_to.data is not None:
         query = query.filter(Solutions.points <= form.points_to.data)
-    if not len(form.course.data) == 0:
+    #TODO apply current_user courses filter
+    if form.course.data != 'All':
         query = query.filter(Course.name == form.course.data)
     if not len(form.lesson.data) == 0:
         query = query.filter(Lesson.name == form.lesson.data)
     # Admin is able to search by name and surname, student can only view his solutions
     from app.admin.forms import SolutionAdminSearchForm
     if isinstance(form, SolutionAdminSearchForm):
-        if not len(form.surname.data) == 0:
+        if form.surname.data is not None and len(form.surname.data) > 0:
             query = query.filter(User.surname == form.surname.data)
-        if not len(form.name.data) == 0:
+        if form.name.data is not None and len(form.name.data) > 0:
             query = query.filter(User.name == form.name.data)
     else:
         query = query.filter(User.id == user_id)

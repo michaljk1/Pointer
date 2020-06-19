@@ -1,7 +1,16 @@
 import os
 import string
 import random
-
+# TODO
+# obsluga maili
+# nieudane logowania na admina do routow moda
+# udane logowania studenta do routow admina
+# sqllite
+# wyniki do csv i pdfa
+# paginacja wynikow
+# informacja dla usera na jakim etapie jest program
+# jesli nie przejdzie testów ot przerwac wykonywanie kolejnych, testy od najprostszych
+# query solution in user courses
 from flask import render_template, url_for, flash, request, abort, send_from_directory
 from flask_login import logout_user, login_required, current_user
 from app.admin import bp
@@ -151,16 +160,19 @@ def add_exercise(course_name, lesson_name):
 @bp.route('/solutions', methods=['GET', 'POST'])
 def view_solutions():
     RouteService.validate_role(current_user, Role.ADMIN)
-    form = SolutionAdminSearchForm()
-    form_courses, form_statuses = [], []
+    course = request.args.get('course')
+    lesson = request.args.get('lesson')
+    exercise = request.args.get('exercise')
+    course_db = Course.query.filter_by(name=course).first()
+    if course is None or lesson is None or exercise is None or course_db is None or course_db not in current_user.courses:
+        form = SolutionAdminSearchForm()
+    else:
+        form = SolutionAdminSearchForm(course=course, lesson=lesson, exercise=exercise)
     for course in current_user.courses:
-        course_data = (course.name, course.name)
-        form_courses.append(course_data)
-    form.course.choices = form_courses
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            solutions = exercise_query(form).all()
-            return render_template('admin/solutions.html', form=form, solutions=solutions)
+        form.course.choices.append((course.name, course.name))
+    if request.method == 'POST' and form.validate_on_submit():
+        solutions = exercise_query(form=form, courses=current_user.get_course_names()).all()
+        return render_template('admin/solutions.html', form=form, solutions=solutions)
     return render_template('admin/solutions.html', form=form, solutions=[])
 
 
@@ -187,6 +199,6 @@ def view_solution(solution_id):
 @login_required
 def download_solution(solution_id):
     solution = Solutions.query.filter_by(id=solution_id).first()
-    RouteService.validate_role_course(current_user, Role.STUDENT, solution.lesson.course)
+    RouteService.validate_role_course(current_user, Role.ADMIN, solution.exercise.lesson.course)
     return send_from_directory(directory=solution.get_directory(),
                                filename=solution.file_path)

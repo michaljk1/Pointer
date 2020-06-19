@@ -1,12 +1,20 @@
 {% extends "base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('admin.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = exercise.lesson.course.name) }}"><pb> {{ exercise.lesson.course.name }} </pb></a>
+    <a href="{{ url_for('admin.view_course', course_name = exercise.lesson.course.name) }}">
+        <pb> {{ exercise.lesson.course.name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('admin.view_lesson', course_name = exercise.lesson.course.name, lesson_id = exercise.lesson.id) }}"><pb> {{ exercise.lesson.name }} </pb></a>
+    <a href="{{ url_for('admin.view_lesson', course_name = exercise.lesson.course.name, lesson_id = exercise.lesson.id) }}">
+        <pb> {{ exercise.lesson.name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}"><pb> {{ exercise.name }} </pb></a>
+    <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}">
+        <pb> {{ exercise.name }} </pb>
+    </a>
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ exercise.name }}</h2></div>
@@ -19,5 +27,8 @@
         <div><p>Input: {{ test.input_name }}</p></div>
         <div><p>Punkty: {{ test.points }}</p></div>
     {% endfor %}
-    <div><a href="{{ url_for('admin.add_test', exercise_id = exercise.id) }}">>Dodaj test</a></div>
+    <div><a href="{{ url_for('admin.add_test', exercise_id = exercise.id) }}">Dodaj test</a></div>
+    <div>
+        <a href="{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}">
+            Zobacz rozwiązania</a></div>
 {% endblock %}

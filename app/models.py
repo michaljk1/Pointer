@@ -59,6 +59,12 @@ class User(UserMixin, db.Model):
     def is_student(self):
         return self.role == Role.STUDENT
 
+    def get_course_names(self):
+        course_names = []
+        for course in self.courses:
+            course_names.append(course.name)
+        return course_names
+
 
 class Role:
     ADMIN = 'ADMIN'
@@ -71,6 +77,7 @@ class SolutionStatus:
     REFUSED = 'Odrzucono'
     ACTIVE = 'Aktywne'
     ALL = 'Status'
+    ERROR = 'Error'
 
 
 @login.user_loader

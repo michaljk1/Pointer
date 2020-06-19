@@ -12,7 +12,7 @@ class UploadForm(FlaskForm):
 
 
 class SolutionStudentSearchForm(FlaskForm):
-    course = SelectField('Kurs', choices=[])
+    course = SelectField('Kurs', choices=[['All', 'Wszystkie kursy']])
     status = SelectField('Status', choices=[[SolutionStatus.ALL, SolutionStatus.ALL],
                                             [SolutionStatus.REFUSED, SolutionStatus.REFUSED],
                                             [SolutionStatus.ACTIVE, SolutionStatus.ACTIVE]])

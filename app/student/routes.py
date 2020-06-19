@@ -71,6 +71,7 @@ def view_exercise(exercise_id):
             grade(solution)
         except:
             solution.points = 0
+            solution.status = SolutionStatus.ERROR
             solution.is_active = False
             db.session.commit()
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
@@ -83,15 +84,12 @@ def view_exercise(exercise_id):
 def view_solutions():
     RouteService.validate_role(current_user, Role.STUDENT)
     form = SolutionStudentSearchForm()
-    form_courses = []
     for course in current_user.courses:
-        course_data = (course.name, course.name)
-        form_courses.append(course_data)
-    form.course.choices = form_courses
+        form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_query(form, current_user.id).all()
-        return render_template('student/solutions.html', form=form, solutions=solutions)
-    return render_template('student/solutions.html', form=form, solutions=[])
+        return render_template('student/solutions.html', form=form, solutions=solutions, datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
+    return render_template('student/solutions.html', form=form, solutions=[], datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
 
 
 @bp.route('/uploads/<int:lesson_id>/', methods=['GET', 'POST'])
