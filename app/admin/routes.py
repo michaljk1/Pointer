@@ -3,25 +3,26 @@ import string
 import random
 # TODO
 # obsluga maili
-# nieudane logowania na admina do routow moda
-# udane logowania studenta do routow admina
 # sqllite
 # wyniki do csv i pdfa
-# paginacja wynikow
-# informacja dla usera na jakim etapie jest program
-# jesli nie przejdzie testów ot przerwac wykonywanie kolejnych, testy od najprostszych
-# query solution in user courses
+# paginacja + order by przy wynikach
+# informacja dla usera na jakim etapie jest program, jesli nie przejdzie testów ot przerwac wykonywanie kolejnych, testy od najprostszych
 # przerwa miedzy wysylaniem zadan
 # modyfikacja istniejacych obiektow
-from flask import render_template, url_for, flash, request, abort, send_from_directory
+from flask import render_template, url_for, flash, request, send_from_directory
 from flask_login import logout_user, login_required, current_user
+from sqlalchemy import desc
+
 from app.admin import bp
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm
 from werkzeug.utils import redirect, secure_filename
-from app.models import Course, Exercise, Lesson, User, Solution, role, solutionStatus, Test
+
+from app.mod.forms import LoginInfoForm
+from app.models import Course, Exercise, Lesson, User, Solution, role, solutionStatus
 from app import db
-from app.services.ExerciseService import exercise_query, accept_best_solution
+from app.services.ExerciseService import accept_best_solution
+from app.services.QueryService import exercise_query, login_query
 from app.services.RouteService import RouteService
 
 
@@ -195,6 +196,24 @@ def view_solution(solution_id):
         flash('Zapisano zmiany')
         return render_template('admin/solution.html', form=solution_form, solution=solution)
     return render_template('admin/solution.html', form=solution_form, solution=solution)
+
+
+@bp.route('/logins', methods=['GET', 'POST'])
+@login_required
+def view_logins():
+    RouteService.validate_role(current_user, role['ADMIN'])
+    form = LoginInfoForm()
+    user_ids = []
+    form.email.choices.append(('All', 'All'))
+    for course in current_user.courses:
+        for member in course.members:
+            if member.role == role['STUDENT'] and member.id not in user_ids:
+                user_ids.append(member.id)
+                form.email.choices.append((member.email, member.email))
+    if form.validate_on_submit():
+        logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
+        return render_template('mod/logins.html', form=form, logins=logins)
+    return render_template('mod/logins.html', form=form, logins=[])
 
 
 @bp.route('/uploads/<int:solution_id>/', methods=['GET', 'POST'])

@@ -1,7 +1,5 @@
 import os
-from datetime import datetime
 
-import pytz
 from flask import current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -42,8 +40,8 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False)
     email_confirmed = db.Column(db.Boolean, default=False)
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
-    courses = db.relationship('Course', secondary=user_course_assoc, backref='member')
-    history_logins = db.relationship('LoginInfo', backref='author', lazy='dynamic')
+    courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
+    history_logins = db.relationship('LoginInfo', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -69,6 +67,9 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
+    def get_student_ids(self):
+        pass
+
 
 @login.user_loader
 def load_user(id):
@@ -91,7 +92,8 @@ solutionStatus = {
 
 loginStatus = {
     'SUCCESS': 'Success',
-    'ERROR': 'Error'
+    'ERROR': 'Error',
+    'ALL': 'All'
 }
 
 
@@ -192,5 +194,5 @@ class LoginInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     ip_address = db.Column(db.String(40), nullable=False)
-    login_date = db.Column(db.DATE)
+    login_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), nullable=False)

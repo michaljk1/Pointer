@@ -5,12 +5,13 @@ from datetime import datetime
 import pytz
 from flask import render_template, url_for, request, send_from_directory
 from flask_login import login_required, current_user
-from app.services.ExerciseService import compile, grade, exercise_query
+from app.services.ExerciseService import compile, grade
+from app.services.QueryService import exercise_query
 from app.services.RouteService import RouteService
 from app.student import bp
 from app.student.forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, Exercise, Lesson, Solution, User, role, solutionStatus
+from app.models import Course, Exercise, Lesson, Solution, role, solutionStatus
 from app import db
 
 
@@ -55,8 +56,8 @@ def view_exercise(exercise_id):
         file = request.files['file']
         filename = secure_filename(file.filename)
         solution = Solution(user_id=current_user.id, exercise_id=exercise.id, file_path=filename, points=0,
-                             ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
-                             status=solutionStatus['SEND'], send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
+                            ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
+                            status=solutionStatus['SEND'], send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
@@ -88,8 +89,10 @@ def view_solutions():
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_query(form, current_user.id).all()
-        return render_template('student/solutions.html', form=form, solutions=solutions, datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
-    return render_template('student/solutions.html', form=form, solutions=[], datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
+        return render_template('student/solutions.html', form=form, solutions=solutions,
+                               datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
+    return render_template('student/solutions.html', form=form, solutions=[],
+                           datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
 
 
 @bp.route('/uploads/<int:lesson_id>/', methods=['GET', 'POST'])

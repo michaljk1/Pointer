@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from app import db
-from app.models import Solution, User, Course, Lesson, Exercise, solutionStatus
+from app.models import Solution, solutionStatus
 
 
 def accept_best_solution(user_id, exercise):
@@ -45,35 +45,3 @@ def grade(solution):
         if len(output) == 0:
             solution.points += test.points
     accept_best_solution(solution.user_id, exercise)
-
-
-def exercise_query(form, user_id=None, courses=None):
-    query = db.session.query(Solution).select_from(Solution, User, Course, Lesson, Exercise). \
-        join(User, User.id == Solution.user_id). \
-        join(Exercise, Solution.exercise_id == Exercise.id). \
-        join(Lesson, Lesson.id == Exercise.lesson_id). \
-        join(Course, Course.id == Lesson.course_id)
-
-    if form.status.data != solutionStatus['ALL']:
-        query = query.filter(Solution.status == form.status.data)
-    if form.points_from.data is not None:
-        query = query.filter(Solution.points >= form.points_from.data)
-    if form.points_to.data is not None:
-        query = query.filter(Solution.points <= form.points_to.data)
-    #TODO apply current_user courses filter
-    if form.course.data != 'All':
-        query = query.filter(Course.name == form.course.data)
-    if not len(form.lesson.data) == 0:
-        query = query.filter(Lesson.name == form.lesson.data)
-    # Admin is able to search by name and surname, student can only view his solutions
-    from app.admin.forms import SolutionAdminSearchForm
-    if isinstance(form, SolutionAdminSearchForm):
-        if form.surname.data is not None and len(form.surname.data) > 0:
-            query = query.filter(User.surname == form.surname.data)
-        if form.name.data is not None and len(form.name.data) > 0:
-            query = query.filter(User.name == form.name.data)
-    else:
-        query = query.filter(User.id == user_id)
-    if not len(form.exercise.data) == 0:
-        query = query.filter(Exercise.name == form.exercise.data)
-    return query
