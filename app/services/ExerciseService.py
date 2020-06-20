@@ -2,23 +2,22 @@ import os
 import subprocess
 
 from app import db
-from app.models import Solutions, User, Course, Lesson, Exercise, SolutionStatus
+from app.models import Solution, User, Course, Lesson, Exercise, solutionStatus
 
 
 def accept_best_solution(user_id, exercise):
-    user_exercises = Solutions.query.filter_by(user_id=user_id, exercise_id=exercise.id).all()
-    points = 0
-    best_solution = None
+    user_exercises = Solution.query.filter_by(user_id=user_id, exercise_id=exercise.id).all()
+    points, best_solution = 0, None
     for user_exercise in user_exercises:
-        if user_exercise.status != SolutionStatus.REFUSED and user_exercise.points >= points:
+        if user_exercise.status != solutionStatus['REFUSED'] and user_exercise.points >= points:
             best_solution = user_exercise
             points = best_solution.points
     if best_solution is not None:
-        best_solution.status = SolutionStatus.ACTIVE
+        best_solution.status = solutionStatus['ACTIVE']
         user_exercises.remove(best_solution)
     for user_exercise in user_exercises:
-        if user_exercise.status != SolutionStatus.REFUSED:
-            user_exercise.status = SolutionStatus.SEND
+        if user_exercise.status != solutionStatus['REFUSED']:
+            user_exercise.status = solutionStatus['SEND']
     db.session.commit()
 
 
@@ -49,18 +48,18 @@ def grade(solution):
 
 
 def exercise_query(form, user_id=None, courses=None):
-    query = db.session.query(Solutions).select_from(Solutions, User, Course, Lesson, Exercise). \
-        join(User, User.id == Solutions.user_id). \
-        join(Exercise, Solutions.exercise_id == Exercise.id). \
+    query = db.session.query(Solution).select_from(Solution, User, Course, Lesson, Exercise). \
+        join(User, User.id == Solution.user_id). \
+        join(Exercise, Solution.exercise_id == Exercise.id). \
         join(Lesson, Lesson.id == Exercise.lesson_id). \
         join(Course, Course.id == Lesson.course_id)
 
-    if form.status.data != SolutionStatus.ALL:
-        query = query.filter(Solutions.status == form.status.data)
+    if form.status.data != solutionStatus['ALL']:
+        query = query.filter(Solution.status == form.status.data)
     if form.points_from.data is not None:
-        query = query.filter(Solutions.points >= form.points_from.data)
+        query = query.filter(Solution.points >= form.points_from.data)
     if form.points_to.data is not None:
-        query = query.filter(Solutions.points <= form.points_to.data)
+        query = query.filter(Solution.points <= form.points_to.data)
     #TODO apply current_user courses filter
     if form.course.data != 'All':
         query = query.filter(Course.name == form.course.data)

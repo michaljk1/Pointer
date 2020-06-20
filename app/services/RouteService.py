@@ -1,8 +1,5 @@
 from flask import abort, redirect, url_for
 
-from app.models import Role
-
-
 class RouteService:
     @staticmethod
     def validate_role(user, role):
@@ -26,10 +23,10 @@ class RouteService:
 
     @staticmethod
     def redirect_for_index_by_role(role):
-        if role == Role.STUDENT:
+        if role == role['STUDENT']:
             redirect(url_for('student.index'))
-        elif role == Role.ADMIN:
+        elif role == role['ADMIN']:
             return redirect(url_for('admin.index'))
-        elif role == Role.MODERATOR:
+        elif role == role['MODERATOR']:
             return redirect(url_for('mod.index'))
 

@@ -1,5 +1,7 @@
 import os
+from datetime import datetime
 
+import pytz
 from flask import current_app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -36,10 +38,12 @@ class User(UserMixin, db.Model):
     login = db.Column(db.String(20), index=True, unique=True)
     name = db.Column(db.String(20), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
-    password = db.Column(db.String(128))
+    password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False)
-    solutions = db.relationship('Solutions', backref='author', lazy='dynamic')
+    email_confirmed = db.Column(db.Boolean, default=False)
+    solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='member')
+    history_logins = db.relationship('LoginInfo', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -51,13 +55,13 @@ class User(UserMixin, db.Model):
         self.password = generate_password_hash(password)
 
     def is_admin(self):
-        return self.role == Role.ADMIN
+        return self.role == role['ADMIN']
 
     def is_moderator(self):
-        return self.role == Role.MODERATOR
+        return self.role == role['MODERATOR']
 
     def is_student(self):
-        return self.role == Role.STUDENT
+        return self.role == role['STUDENT']
 
     def get_course_names(self):
         course_names = []
@@ -66,23 +70,29 @@ class User(UserMixin, db.Model):
         return course_names
 
 
-class Role:
-    ADMIN = 'ADMIN'
-    STUDENT = 'STUDENT'
-    MODERATOR = 'MODERATOR'
-
-
-class SolutionStatus:
-    SEND = 'Oddano'
-    REFUSED = 'Odrzucono'
-    ACTIVE = 'Aktywne'
-    ALL = 'Status'
-    ERROR = 'Error'
-
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+role = {
+    'ADMIN': 'ADMIN',
+    'STUDENT': 'STUDENT',
+    'MODERATOR': 'MODERATOR'
+}
+
+solutionStatus = {
+    'SEND': 'Oddano',
+    'REFUSED': 'Odrzucono',
+    'ACTIVE': 'Aktywne',
+    'ALL': 'Status',
+    'ERROR': 'Error'
+}
+
+loginStatus = {
+    'SUCCESS': 'Success',
+    'ERROR': 'Error'
+}
 
 
 class Lesson(db.Model):
@@ -108,7 +118,7 @@ class Exercise(db.Model):
     program_name = db.Column(db.String(50))
     compile_command = db.Column(db.String(50))
     run_command = db.Column(db.String(50))
-    solutions = db.relationship('Solutions', backref='exercise', lazy='dynamic')
+    solutions = db.relationship('Solution', backref='exercise', lazy='dynamic')
     tests = db.relationship('Test', backref='executor', lazy='dynamic')
 
     def get_course(self):
@@ -157,7 +167,7 @@ class Test(db.Model):
         return os.path.join(self.executor.get_directory(), str(len(self.executor.tests.all())))
 
 
-class Solutions(db.Model):
+class Solution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise_id = db.Column(db.ForeignKey('exercise.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -176,3 +186,11 @@ class Solutions(db.Model):
 
     def get_directory(self):
         return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))
+
+
+class LoginInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    ip_address = db.Column(db.String(40), nullable=False)
+    login_date = db.Column(db.DATE)
+    status = db.Column(db.String(20), nullable=False)
