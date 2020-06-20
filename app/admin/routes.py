@@ -27,6 +27,7 @@ from app.services.RouteService import validate_exists, validate_role_course, val
 
 
 @bp.route('/logout')
+@login_required
 def logout():
     validate_role(current_user, role['ADMIN'])
     logout_user()
@@ -34,6 +35,7 @@ def logout():
 
 
 @bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
+@login_required
 def add_student(course_name):
     validate_role(current_user, role['ADMIN'])
     form = AssigneUserForm()
@@ -54,12 +56,14 @@ def add_student(course_name):
 @bp.route('/')
 @bp.route('/index')
 @bp.route('/courses', methods=['GET'])
+@login_required
 def view_courses():
     validate_role(current_user, role['ADMIN'])
     return render_template('admin/courses.html', courses=current_user.courses)
 
 
 @bp.route('/course/<string:course_name>', methods=['GET', 'POST'])
+@login_required
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
@@ -76,6 +80,7 @@ def view_course(course_name):
 
 
 @bp.route('/add_course', methods=['GET', 'POST'])
+@login_required
 def add_course():
     validate_role(current_user, role['ADMIN'])
     form = CourseForm()
@@ -91,6 +96,7 @@ def add_course():
 
 
 @bp.route('/<string:course_name>/<int:lesson_id>')
+@login_required
 def view_lesson(course_name, lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
@@ -98,6 +104,7 @@ def view_lesson(course_name, lesson_id):
 
 
 @bp.route('/<string:course_name>/add_lesson', methods=['GET', 'POST'])
+@login_required
 def add_lesson(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
@@ -121,6 +128,7 @@ def add_lesson(course_name):
 
 
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
+@login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
     validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
@@ -129,6 +137,7 @@ def view_exercise(exercise_id):
 
 
 @bp.route('/test/<int:exercise_id>', methods=['GET', 'POST'])
+@login_required
 def add_test(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
     validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
@@ -140,6 +149,7 @@ def add_test(exercise_id):
 
 
 @bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
+@login_required
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
     lesson = course.get_lesson_by_name(lesson_name)
@@ -161,6 +171,7 @@ def add_exercise(course_name, lesson_name):
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])
+@login_required
 def view_solutions():
     validate_role(current_user, role['ADMIN'])
     course = request.args.get('course')
@@ -180,6 +191,7 @@ def view_solutions():
 
 
 @bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
+@login_required
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_exists(solution)
