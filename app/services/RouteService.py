@@ -1,5 +1,7 @@
 from flask import abort, redirect, url_for
 
+from app.models import role
+
 
 def validate_role(user, role):
     if user.role != role:
@@ -21,10 +23,10 @@ def validate_exists(my_object):
         abort(404)
 
 
-def redirect_for_index_by_role(role):
-    if role == role['STUDENT']:
-        redirect(url_for('student.index'))
-    elif role == role['ADMIN']:
+def redirect_for_index_by_role(user_role):
+    if user_role == role['STUDENT']:
+        return redirect(url_for('student.index'))
+    elif user_role == role['ADMIN']:
         return redirect(url_for('admin.index'))
-    elif role == role['MODERATOR']:
+    elif user_role == role['MODERATOR']:
         return redirect(url_for('mod.index'))

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField
+from wtforms import SubmitField, SelectField, StringField
 
 from app.models import LoginInfo
 
@@ -15,4 +15,5 @@ class LoginInfoForm(FlaskForm):
     status = SelectField('Status', choices=[[LoginInfo.loginStatus['ALL'], LoginInfo.loginStatus['ALL']],
                                             [LoginInfo.loginStatus['ERROR'], LoginInfo.loginStatus['ERROR']],
                                             [LoginInfo.loginStatus['SUCCESS'], LoginInfo.loginStatus['SUCCESS']]])
+    ip_address = StringField('IP')
     submit_button = SubmitField('Wyszukaj')

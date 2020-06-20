@@ -2,7 +2,7 @@ from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
     ValidationError
-from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired
 
 from app.models import Course, Lesson
@@ -41,13 +41,15 @@ class ExerciseForm(FlaskForm):
     name = StringField('Nazwa', validators=[DataRequired()])
     content = StringField('Treść', validators=[DataRequired()])
     max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired()])
-    end_date = DateField('Termin końcowy', format='%Y-%m-%d', validators=[DataRequired()] )
+    end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()] )
+    end_time = TimeField('Godzina')
     compile_command = StringField('compile command')
     run_command = StringField('run_command' , validators=[DataRequired()])
     output = FileField('Output', validators=[DataRequired()])
     input = FileField('Input', validators=[DataRequired()])
     max_points = FloatField('Liczba punktów', validators=[DataRequired()])
     program_name = StringField('Nazwa testowanego pliku', validators=[DataRequired()])
+    timeout = IntegerField('Timeout w sekundach')
     submit_button = SubmitField('Dodaj ćwiczenie')
 
 

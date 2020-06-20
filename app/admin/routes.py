@@ -7,8 +7,11 @@ import random
 # wyniki do csv i pdfa
 # paginacja + order by przy wynikach
 # informacja dla usera na jakim etapie jest program, jesli nie przejdzie testów ot przerwac wykonywanie kolejnych, testy od najprostszych
-# data+time, przerwa miedzy wysylaniem zadan
 # modyfikacja istniejacych obiektow
+# zalezne formularze w js
+from datetime import datetime
+
+import pytz
 from flask import render_template, url_for, flash, request, send_from_directory
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
@@ -157,11 +160,14 @@ def add_exercise(course_name, lesson_name):
     validate_role_course(current_user, role['ADMIN'], course)
     form = ExerciseForm()
     if form.validate_on_submit():
+        end_date, end_time = form.end_date.data, form.end_time.data
+        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
+                                minute=end_time.minute)
         exercise_name = form.name.data
         exercise = Exercise(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
                             max_attempts=form.max_attempts.data, compile_command=form.compile_command.data,
-                            end_date=form.end_date.data, run_command=form.run_command.data,
-                            program_name=form.program_name.data)
+                            end_date=end_datetime, run_command=form.run_command.data,
+                            program_name=form.program_name.data, timeout=form.timeout.data)
         lesson.exercises.append(exercise)
         os.makedirs(exercise.get_directory())
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)

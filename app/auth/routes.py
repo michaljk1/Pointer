@@ -65,10 +65,11 @@ def register():
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
         login_user(user)
-        if user_amount == 0:
-            return redirect(url_for('admin.view_courses'))
-        else:
-            return redirect(url_for('student.view_courses'))
+        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.loginStatus['SUCCESS'], user_id=user.id,
+                               login_date=datetime.now(pytz.timezone('Europe/Warsaw')))
+        db.session.add(login_info)
+        db.session.commit()
+        return redirect_for_index_by_role(user.role)
     return render_template('auth/register.html', title='Register', form=form)
 
 

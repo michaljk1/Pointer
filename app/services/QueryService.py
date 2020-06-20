@@ -47,6 +47,8 @@ def login_query(form, user_role, ids=None):
     if form.status.data != LoginInfo.loginStatus['ALL']:
         query = query.filter(LoginInfo.status == form.status.data)
 
+    if form.ip_address.data != '':
+        query = query.filter(LoginInfo.ip_address == form.ip_address.data)
     if form.email.data != 'All':
         query = query.filter(User.email == form.email.data)
     elif user_role == role['MODERATOR']:

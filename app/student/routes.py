@@ -1,10 +1,12 @@
 import os
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 from flask import render_template, url_for, request, send_from_directory
 from flask_login import login_required, current_user
+from sqlalchemy import desc
+
 from app.services.ExerciseService import compile, grade
 from app.services.QueryService import exercise_query
 from app.services.RouteService import validate_role, validate_role_course, validate_role_solution
@@ -52,12 +54,26 @@ def view_exercise(exercise_id):
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
     form = UploadForm()
     attempts = len(exercise.get_user_solutions(current_user.id))
+    current_datetime = datetime.now(pytz.timezone('Europe/Warsaw'))
+    end_date = exercise.end_date
+    end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
+                            minute=end_date.minute, tzinfo=current_datetime.tzinfo)
+    solution = Solution.query.filter_by(exercise_id=exercise.id, user_id=current_user.id).order_by(
+        desc(Solution.send_date)).first()
+    show_score = current_datetime < end_datetime
+    if solution is None:
+        proper_date = show_score
+    else:
+        send_date = solution.send_date.replace(tzinfo=current_datetime.tzinfo)
+        proper_date = (current_datetime < end_datetime) and (current_datetime - send_date) > timedelta(
+            seconds=exercise.timeout)
     if form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
         solution = Solution(user_id=current_user.id, exercise_id=exercise.id, file_path=filename, points=0,
                             ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
-                            status=Solution.solutionStatus['SEND'], send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
+                            status=Solution.solutionStatus['SEND'],
+                            send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
@@ -76,7 +92,8 @@ def view_exercise(exercise_id):
             solution.is_active = False
             db.session.commit()
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
-    return render_template('student/exercise.html', exercise=exercise, form=form, datetime=datetime.utcnow(),
+    return render_template('student/exercise.html', exercise=exercise, form=form, proper_date=proper_date,
+                           show_score=show_score,
                            solutions=exercise.get_user_solutions(current_user.id))
 
 
@@ -88,7 +105,7 @@ def view_solutions():
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
-        solutions = exercise_query(form, current_user.id).all()
+        solutions = exercise_query(form=form, courses=current_user.get_course_names(), user_id=current_user.id).all()
         return render_template('student/solutions.html', form=form, solutions=solutions,
                                datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
     return render_template('student/solutions.html', form=form, solutions=[],

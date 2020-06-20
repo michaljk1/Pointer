@@ -26,7 +26,7 @@ def compile(solution):
     compile_command = solution.exercise.compile_command
     if len(compile_command.split()) > 0:
         bash_command = dir_path + '/compile.sh ' + solution.get_directory() + ' ' + compile_command
-        subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+        process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
 
 
 def grade(solution):
