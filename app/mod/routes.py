@@ -5,7 +5,7 @@ from sqlalchemy import desc
 from app import db
 from app.mod.forms import RoleForm, LoginInfoForm
 from app.mod import bp
-from app.models import role, User, LoginInfo, loginStatus
+from app.models import role, User
 from app.services.QueryService import login_query
 from app.services.RouteService import RouteService
 

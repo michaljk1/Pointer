@@ -7,7 +7,7 @@ from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
-from app.models import User, Course, role, LoginInfo, loginStatus
+from app.models import User, Course, role, LoginInfo
 from app import db
 from app.services.RouteService import RouteService
 
@@ -22,11 +22,11 @@ def login():
         if user is None:
             flash('Invalid email or password')
             return redirect(url_for('auth.login'))
-        login_info = LoginInfo(ip_address=request.remote_addr, status=loginStatus['SUCCESS'], user_id=user.id,
+        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.loginStatus['SUCCESS'], user_id=user.id,
                                login_date=datetime.now(pytz.timezone('Europe/Warsaw')))
         db.session.add(login_info)
         if not user.check_password(form.password.data):
-            login_info.status = loginStatus['ERROR']
+            login_info.status = LoginInfo.loginStatus['ERROR']
             db.session.commit()
             flash('Invalid email or password')
             return redirect(url_for('auth.login'))

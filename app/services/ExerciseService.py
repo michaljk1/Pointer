@@ -2,22 +2,22 @@ import os
 import subprocess
 
 from app import db
-from app.models import Solution, solutionStatus
+from app.models import Solution
 
 
 def accept_best_solution(user_id, exercise):
     user_exercises = Solution.query.filter_by(user_id=user_id, exercise_id=exercise.id).all()
     points, best_solution = 0, None
     for user_exercise in user_exercises:
-        if user_exercise.status != solutionStatus['REFUSED'] and user_exercise.points >= points:
+        if user_exercise.status != Solution.solutionStatus['REFUSED'] and user_exercise.points >= points:
             best_solution = user_exercise
             points = best_solution.points
     if best_solution is not None:
-        best_solution.status = solutionStatus['ACTIVE']
+        best_solution.status = Solution.solutionStatus['ACTIVE']
         user_exercises.remove(best_solution)
     for user_exercise in user_exercises:
-        if user_exercise.status != solutionStatus['REFUSED']:
-            user_exercise.status = solutionStatus['SEND']
+        if user_exercise.status != Solution.solutionStatus['REFUSED']:
+            user_exercise.status = Solution.solutionStatus['SEND']
     db.session.commit()
 
 

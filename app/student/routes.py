@@ -11,7 +11,7 @@ from app.services.RouteService import RouteService
 from app.student import bp
 from app.student.forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, Exercise, Lesson, Solution, role, solutionStatus
+from app.models import Course, Exercise, Lesson, Solution, role
 from app import db
 
 
@@ -57,7 +57,7 @@ def view_exercise(exercise_id):
         filename = secure_filename(file.filename)
         solution = Solution(user_id=current_user.id, exercise_id=exercise.id, file_path=filename, points=0,
                             ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
-                            status=solutionStatus['SEND'], send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
+                            status=Solution.solutionStatus['SEND'], send_date=datetime.now(pytz.timezone('Europe/Warsaw')))
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
@@ -72,7 +72,7 @@ def view_exercise(exercise_id):
             grade(solution)
         except:
             solution.points = 0
-            solution.status = solutionStatus['ERROR']
+            solution.status = Solution.solutionStatus['ERROR']
             solution.is_active = False
             db.session.commit()
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))

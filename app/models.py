@@ -82,20 +82,6 @@ role = {
     'MODERATOR': 'MODERATOR'
 }
 
-solutionStatus = {
-    'SEND': 'Oddano',
-    'REFUSED': 'Odrzucono',
-    'ACTIVE': 'Aktywne',
-    'ALL': 'Status',
-    'ERROR': 'Error'
-}
-
-loginStatus = {
-    'SUCCESS': 'Success',
-    'ERROR': 'Error',
-    'ALL': 'All'
-}
-
 
 class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -182,6 +168,13 @@ class Solution(db.Model):
     os_info = db.Column(db.String(150), nullable=False)
     admin_refused = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(20), nullable=False)
+    solutionStatus = {
+        'SEND': 'Oddano',
+        'REFUSED': 'Odrzucono',
+        'ACTIVE': 'Aktywne',
+        'ALL': 'Status',
+        'ERROR': 'Error'
+    }
 
     def get_course(self):
         return self.exercise.lesson.course
@@ -196,3 +189,8 @@ class LoginInfo(db.Model):
     ip_address = db.Column(db.String(40), nullable=False)
     login_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), nullable=False)
+    loginStatus = {
+        'SUCCESS': 'Success',
+        'ERROR': 'Error',
+        'ALL': 'All'
+    }

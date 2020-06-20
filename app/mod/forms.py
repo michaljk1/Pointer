@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField
 
-from app.models import loginStatus
+from app.models import LoginInfo
 
 
 class RoleForm(FlaskForm):
@@ -12,7 +12,7 @@ class RoleForm(FlaskForm):
 
 class LoginInfoForm(FlaskForm):
     email = SelectField('User', choices=[])
-    status = SelectField('Status', choices=[[loginStatus['ALL'], loginStatus['ALL']],
-                                            [loginStatus['ERROR'], loginStatus['ERROR']],
-                                            [loginStatus['SUCCESS'], loginStatus['SUCCESS']]])
+    status = SelectField('Status', choices=[[LoginInfo.loginStatus['ALL'], LoginInfo.loginStatus['ALL']],
+                                            [LoginInfo.loginStatus['ERROR'], LoginInfo.loginStatus['ERROR']],
+                                            [LoginInfo.loginStatus['SUCCESS'], LoginInfo.loginStatus['SUCCESS']]])
     submit_button = SubmitField('Wyszukaj')

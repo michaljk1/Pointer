@@ -7,7 +7,7 @@ import random
 # wyniki do csv i pdfa
 # paginacja + order by przy wynikach
 # informacja dla usera na jakim etapie jest program, jesli nie przejdzie testów ot przerwac wykonywanie kolejnych, testy od najprostszych
-# przerwa miedzy wysylaniem zadan
+# data+time, przerwa miedzy wysylaniem zadan
 # modyfikacja istniejacych obiektow
 from flask import render_template, url_for, flash, request, send_from_directory
 from flask_login import logout_user, login_required, current_user
@@ -19,7 +19,7 @@ from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserFor
 from werkzeug.utils import redirect, secure_filename
 
 from app.mod.forms import LoginInfoForm
-from app.models import Course, Exercise, Lesson, User, Solution, role, solutionStatus
+from app.models import Course, Exercise, Lesson, User, Solution, role
 from app import db
 from app.services.ExerciseService import accept_best_solution
 from app.services.QueryService import exercise_query, login_query
@@ -187,9 +187,9 @@ def view_solution(solution_id):
     solution_form = SolutionForm(obj=solution, email=solution.author.email)
     if request.method == 'POST':
         if solution_form.admin_refused.data:
-            solution.status = solutionStatus['REFUSED']
+            solution.status = Solution.solutionStatus['REFUSED']
         else:
-            solution.status = solutionStatus['SEND']
+            solution.status = Solution.solutionStatus['SEND']
         solution.points = solution_form.points.data
         db.session.commit()
         accept_best_solution(solution.user_id, solution.exercise)
