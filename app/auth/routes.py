@@ -9,7 +9,7 @@ from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 from app.models import User, Course, role, LoginInfo
 from app import db
-from app.services.RouteService import RouteService
+from app.services.RouteService import validate_exists, redirect_for_index_by_role
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -76,10 +76,10 @@ def register():
 @login_required
 def append_course(link):
     course_by_link = Course.query.filter_by(link=link).first()
-    RouteService.validate_exists(course_by_link)
+    validate_exists(course_by_link)
     if not course_by_link.is_open:
         flash('Przypisanie do kursu nie jest obecnie możliwe')
-        return RouteService.redirect_for_index_by_role(current_user.role)
+        return redirect_for_index_by_role(current_user.role)
     elif course_by_link not in current_user.courses:
         current_user.courses.append(course_by_link)
         db.session.commit()

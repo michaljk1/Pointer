@@ -7,21 +7,21 @@ from app.mod.forms import RoleForm, LoginInfoForm
 from app.mod import bp
 from app.models import role, User
 from app.services.QueryService import login_query
-from app.services.RouteService import RouteService
+from app.services.RouteService import validate_role
 
 
 @bp.route('/')
 @bp.route('/index')
 @login_required
 def index():
-    RouteService.validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, role['MODERATOR'])
     return redirect(url_for('mod.change_role'))
 
 
 @bp.route('/roles', methods=['GET', 'POST'])
 @login_required
 def change_role():
-    RouteService.validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, role['MODERATOR'])
     form = RoleForm()
     roles = []
     for user in User.query.filter(User.role != role['MODERATOR']).all():
@@ -40,7 +40,7 @@ def change_role():
 @bp.route('/logins', methods=['GET', 'POST'])
 @login_required
 def view_logins():
-    RouteService.validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, role['MODERATOR'])
     form = LoginInfoForm()
     form.email.choices.append(('All', 'All'))
     for user in User.query.filter(User.role == role['ADMIN']).all():

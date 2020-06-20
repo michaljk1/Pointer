@@ -23,19 +23,19 @@ from app.models import Course, Exercise, Lesson, User, Solution, role
 from app import db
 from app.services.ExerciseService import accept_best_solution
 from app.services.QueryService import exercise_query, login_query
-from app.services.RouteService import RouteService
+from app.services.RouteService import validate_exists, validate_role_course, validate_role
 
 
 @bp.route('/logout')
 def logout():
-    RouteService.validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, role['ADMIN'])
     logout_user()
     return redirect(url_for('auth.login'))
 
 
 @bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
 def add_student(course_name):
-    RouteService.validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, role['ADMIN'])
     form = AssigneUserForm()
     course = Course.query.filter_by(name=course_name).first()
     users = []
@@ -55,14 +55,14 @@ def add_student(course_name):
 @bp.route('/index')
 @bp.route('/courses', methods=['GET'])
 def view_courses():
-    RouteService.validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, role['ADMIN'])
     return render_template('admin/courses.html', courses=current_user.courses)
 
 
 @bp.route('/course/<string:course_name>', methods=['GET', 'POST'])
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
-    RouteService.validate_role_course(current_user, role['ADMIN'], course)
+    validate_role_course(current_user, role['ADMIN'], course)
     form = EnableAssingmentLink(activate=course.is_open)
     if request.method == 'POST' and form.validate_on_submit():
         if form.activate.data:
@@ -77,7 +77,7 @@ def view_course(course_name):
 
 @bp.route('/add_course', methods=['GET', 'POST'])
 def add_course():
-    RouteService.validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, role['ADMIN'])
     form = CourseForm()
     if request.method == 'POST' and form.validate_on_submit():
         new_course = Course(name=form.name.data, is_open=True,
@@ -93,14 +93,14 @@ def add_course():
 @bp.route('/<string:course_name>/<int:lesson_id>')
 def view_lesson(course_name, lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
-    RouteService.validate_role_course(current_user, role['ADMIN'], lesson.course)
+    validate_role_course(current_user, role['ADMIN'], lesson.course)
     return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
 
 
 @bp.route('/<string:course_name>/add_lesson', methods=['GET', 'POST'])
 def add_lesson(course_name):
     course = Course.query.filter_by(name=course_name).first()
-    RouteService.validate_role_course(current_user, role['ADMIN'], course)
+    validate_role_course(current_user, role['ADMIN'], course)
     form = LessonForm()
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['pdf_content']
@@ -123,7 +123,7 @@ def add_lesson(course_name):
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    RouteService.validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
+    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
     solutions = Solution.query.filter_by(exercise_id=exercise_id, is_active=True).all()
     return render_template('admin/exercise.html', exercise=exercise, solutions=solutions)
 
@@ -131,7 +131,7 @@ def view_exercise(exercise_id):
 @bp.route('/test/<int:exercise_id>', methods=['GET', 'POST'])
 def add_test(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    RouteService.validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
+    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
     form = TestForm()
     if request.method == 'POST' and form.validate_on_submit():
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
@@ -143,8 +143,8 @@ def add_test(exercise_id):
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
     lesson = course.get_lesson_by_name(lesson_name)
-    RouteService.validate_exists(lesson)
-    RouteService.validate_role_course(current_user, role['ADMIN'], course)
+    validate_exists(lesson)
+    validate_role_course(current_user, role['ADMIN'], course)
     form = ExerciseForm()
     if form.validate_on_submit():
         exercise_name = form.name.data
@@ -162,7 +162,7 @@ def add_exercise(course_name, lesson_name):
 
 @bp.route('/solutions', methods=['GET', 'POST'])
 def view_solutions():
-    RouteService.validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, role['ADMIN'])
     course = request.args.get('course')
     lesson = request.args.get('lesson')
     exercise = request.args.get('exercise')
@@ -182,8 +182,8 @@ def view_solutions():
 @bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    RouteService.validate_exists(solution)
-    RouteService.validate_role_course(current_user, role['ADMIN'], solution.exercise.lesson.course)
+    validate_exists(solution)
+    validate_role_course(current_user, role['ADMIN'], solution.exercise.lesson.course)
     solution_form = SolutionForm(obj=solution, email=solution.author.email)
     if request.method == 'POST':
         if solution_form.admin_refused.data:
@@ -201,7 +201,7 @@ def view_solution(solution_id):
 @bp.route('/logins', methods=['GET', 'POST'])
 @login_required
 def view_logins():
-    RouteService.validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, role['ADMIN'])
     form = LoginInfoForm()
     user_ids = []
     form.email.choices.append(('All', 'All'))
@@ -220,6 +220,6 @@ def view_logins():
 @login_required
 def download_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    RouteService.validate_role_course(current_user, role['ADMIN'], solution.exercise.lesson.course)
+    validate_role_course(current_user, role['ADMIN'], solution.exercise.lesson.course)
     return send_from_directory(directory=solution.get_directory(),
                                filename=solution.file_path)
