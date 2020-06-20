@@ -42,7 +42,6 @@ def change_role():
 def view_logins():
     validate_role(current_user, role['MODERATOR'])
     form = LoginInfoForm()
-    form.email.choices.append(('All', 'All'))
     for user in User.query.filter(User.role == role['ADMIN']).all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():

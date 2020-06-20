@@ -11,7 +11,7 @@ class RoleForm(FlaskForm):
 
 
 class LoginInfoForm(FlaskForm):
-    email = SelectField('User', choices=[])
+    email = SelectField('User', choices=[['All', 'All']])
     status = SelectField('Status', choices=[[LoginInfo.loginStatus['ALL'], LoginInfo.loginStatus['ALL']],
                                             [LoginInfo.loginStatus['ERROR'], LoginInfo.loginStatus['ERROR']],
                                             [LoginInfo.loginStatus['SUCCESS'], LoginInfo.loginStatus['SUCCESS']]])

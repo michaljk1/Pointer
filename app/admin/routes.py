@@ -204,7 +204,6 @@ def view_logins():
     validate_role(current_user, role['ADMIN'])
     form = LoginInfoForm()
     user_ids = []
-    form.email.choices.append(('All', 'All'))
     for course in current_user.courses:
         for member in course.members:
             if member.role == role['STUDENT'] and member.id not in user_ids:
