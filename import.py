@@ -13,6 +13,7 @@ commands = [
     "pip install setuptools",
     "pip install mysqlclient",
     "pip install pytz"
+#    "pip install pdfkit"
     ]
 # sudo apt-get install python3-dev
 for command in commands:

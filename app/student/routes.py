@@ -1,12 +1,10 @@
 import os
 import shutil
-from datetime import datetime, timedelta
-
 import pytz
+from datetime import datetime, timedelta
 from flask import render_template, url_for, request, send_from_directory
 from flask_login import login_required, current_user
 from sqlalchemy import desc
-
 from app.services.ExerciseService import compile, grade
 from app.services.QueryService import exercise_query
 from app.services.RouteService import validate_role, validate_role_course, validate_role_solution
@@ -60,9 +58,9 @@ def view_exercise(exercise_id):
                             minute=end_date.minute, tzinfo=current_datetime.tzinfo)
     solution = Solution.query.filter_by(exercise_id=exercise.id, user_id=current_user.id).order_by(
         desc(Solution.send_date)).first()
-    show_score = current_datetime < end_datetime
+    show_score = current_datetime > end_datetime
     if solution is None:
-        proper_date = show_score
+        proper_date = not show_score
     else:
         send_date = solution.send_date.replace(tzinfo=current_datetime.tzinfo)
         proper_date = (current_datetime < end_datetime) and (current_datetime - send_date) > timedelta(
@@ -84,8 +82,11 @@ def view_exercise(exercise_id):
             shutil.unpack_archive(os.path.join(solution_directory, filename), solution_directory)
         db.session.commit()
         try:
-            compile(solution)
-            grade(solution)
+            if compile(solution):
+                grade(solution)
+            else:
+                solution.status = solution.solutionStatus['COMPILE_ERROR']
+                db.session.commit()
         except:
             solution.points = 0
             solution.status = Solution.solutionStatus['ERROR']
@@ -93,8 +94,7 @@ def view_exercise(exercise_id):
             db.session.commit()
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
     return render_template('student/exercise.html', exercise=exercise, form=form, proper_date=proper_date,
-                           show_score=show_score,
-                           solutions=exercise.get_user_solutions(current_user.id))
+                           show_score=show_score, solutions=exercise.get_user_solutions(current_user.id))
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])
@@ -106,10 +106,22 @@ def view_solutions():
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_query(form=form, courses=current_user.get_course_names(), user_id=current_user.id).all()
+        exercises, forbidden_exercises = [], []
+        current_datetime = datetime.now(pytz.timezone('Europe/Warsaw'))
+        for solution in solutions:
+            if solution.exercise not in exercises:
+                exercises.append(solution.exercise)
+        for exercise in exercises:
+            end_date = exercise.end_date
+            end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
+                                    minute=end_date.minute, tzinfo=current_datetime.tzinfo)
+            if current_datetime < end_datetime:
+                forbidden_exercises.append(exercise)
         return render_template('student/solutions.html', form=form, solutions=solutions,
+                               forbidden_exercises=forbidden_exercises,
                                datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
-    return render_template('student/solutions.html', form=form, solutions=[],
-                           datetime=datetime.now(pytz.timezone('Europe/Warsaw')))
+    return render_template('student/solutions.html', form=form, solutions=[], forbidden_exercises=[],
+                           datetime=datetime.now(tz=None))
 
 
 @bp.route('/uploads/<int:lesson_id>/', methods=['GET', 'POST'])

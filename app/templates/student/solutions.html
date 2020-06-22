@@ -22,13 +22,13 @@
             <tr class="pointercurs">
                 <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}" target="_blank">{{ solution.file_path }}</a></p></td>
                     <td><p>{{ solution.send_date }}</p></td>
-                     {% if datetime.date() >= solution.exercise.end_date %}
+{#                     {% if solution.exercise not in forbidden_exercises%}#}
                     <td><p>{{ solution.status }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
-                    {% else %}
-                    <td><p> - </p></td>
-                    <td><p> - </p></td>
-                    {% endif %}
+{#                    {% else %}#}
+{#                    <td><p> - </p></td>#}
+{#                    <td><p> - </p></td>#}
+{#                    {% endif %}#}
             </tr>
         {% endfor %}
         </tbody>

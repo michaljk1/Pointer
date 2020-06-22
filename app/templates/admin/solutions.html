@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_solutions') }}"><pb> Rozwiązania </pb></a>
+    <a href="{{ url_for('admin.view_solutions') }}">
+        <pb> Rozwiązania</pb>
+    </a>
 {% endblock %}
 {% block app_content %}
     <form action="" method="post" class="form" role="form">
@@ -16,26 +18,32 @@
         {{ wtf.form_field(form.points_to, class='form-control') }}
         <p>{{ form.submit() }}</p>
     </form>
+        {% set solution_ids = [] %}
     {% if solutions|length > 0 %}
-    <table class="table">
-        <thead>
-        <th>Autor</th>
-        <th>Plik</th>
-        <th>Punkty</th>
-        <th>Próba</th>
-        <th>Status</th>
-        </thead>
-        <tbody>
-        {% for solution in solutions %}
-            <tr class="pointercurs" onclick="window.open('{{ url_for('admin.view_solution', solution_id = solution.id ) }}','_blank');">
-                <td><p>{{ solution.author.email }}</p></td>
-                <td><p>{{ solution.file_path }}</p></td>
-                <td><p>{{ solution.points }}</p></td>
-                <td><p>{{ solution.attempt }}</p></td>
-                <td><p>{{ solution.status }}</p></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <table class="table">
+            <thead>
+            <th>Autor</th>
+            <th>Plik</th>
+            <th>Punkty</th>
+            <th>Próba</th>
+            <th>Status</th>
+            </thead>
+            <tbody>
+            {% for solution in solutions %}
+                {% do solution_ids.append(solution.id) %}
+                <tr class="pointercurs"
+                    onclick="window.open('{{ url_for('admin.view_solution', solution_id = solution.id ) }}','_blank');">
+                    <td><p>{{ solution.author.email }}</p></td>
+                    <td><p>{{ solution.file_path }}</p></td>
+                    <td><p>{{ solution.points }}</p></td>
+                    <td><p>{{ solution.attempt }}</p></td>
+                    <td><p>{{ solution.status }}</p></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin.export_csv', ids=solution_ids) }}">
+            <pb> CSV</pb>
+        </a>
     {% endif %}
 {% endblock %}

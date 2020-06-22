@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin.view_solutions') }}">
+        <pb> Exporty</pb>
+    </a>
+{% endblock %}
+{% block app_content %}
+        <table class="table">
+            <thead>
+            <th>Plik</th>
+            <th>Data</th>
+            <th>Format</th>
+            </thead>
+            <tbody>
+            {% for export in exports %}
+                <tr class="pointercurs">
+                    <td><p><a href="{{ url_for('admin.download_export', export_id=export.id) }}" target="_blank">{{ export.file_name }}</a></p></td>
+                    <td><p>{{ export.generation_date }}</p></td>
+                    <td><p>{{ export.type }}</p></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}

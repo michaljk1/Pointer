@@ -35,13 +35,13 @@
                 <tr class="pointercurs">
                     <td><p>{{ solution.file_path }}</p></td>
                     <td><p>{{ solution.send_date }}</p></td>
-                    {% if show_score %}
+{#                    {% if show_score %}#}
                         <td><p>{{ solution.status }}</p></td>
                         <td><p>{{ solution.points }}</p></td>
-                    {% else %}
-                        <td><p> - </p></td>
-                        <td><p> - </p></td>
-                    {% endif %}
+{#                    {% else %}#}
+{#                        <td><p> - </p></td>#}
+{#                        <td><p> - </p></td>#}
+{#                    {% endif %}#}
                 </tr>
             {% endfor %}
             </tbody>

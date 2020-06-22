@@ -3,10 +3,8 @@
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 {% endblock %}
-
-
 {% block title %}
-    {% if title %}{{ title }} - Pointer{% else %}Pointer{% endif %}
+    Pointer
 {% endblock %}
 {% block navbar %}
     <nav class="navbar navbar-default">
@@ -31,6 +29,7 @@
                         <li><a href="{{ url_for('admin.view_courses') }}">Kursy</a></li>
                         <li><a href="{{ url_for('admin.view_solutions') }}">Rozwiązania</a></li>
                         <li><a href="{{ url_for('admin.view_logins') }}">Logowania</a></li>
+                        <li><a href="{{ url_for('admin.view_exports') }}">Pliki</a></li>
 {#                        <li><a href="{{ url_for('student.view_courses') }}">StudentKursy</a></li>#}
 {#                        <li><a href="{{ url_for('student.view_solutions') }}">StudentRozwiązania</a></li>#}
                     {% endif %}

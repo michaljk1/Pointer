@@ -2,29 +2,27 @@ import os
 import string
 import random
 # TODO
-# obsluga maili
-# sqllite
-# wyniki do csv i pdfa
-# paginacja + order by przy wynikach
-# informacja dla usera na jakim etapie jest program, jesli nie przejdzie testów ot przerwac wykonywanie kolejnych, testy od najprostszych
-# modyfikacja istniejacych obiektow
-# zalezne formularze w js
+# 1: obsluga maili, wyniki pdf
+# 2: modyfikacja istniejacych obiektow
+# 3: error przy tescie
+# 4: paginacja + order by przy wynikach, zalezne formularze w js
+# 5: selenium, backup, mysql -> sqlite
+
 from datetime import datetime
 
 import pytz
-from flask import render_template, url_for, flash, request, send_from_directory
+from flask import render_template, url_for, flash, request, send_from_directory, current_app
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
-
 from app.admin import bp
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm
 from werkzeug.utils import redirect, secure_filename
-
 from app.mod.forms import LoginInfoForm
-from app.models import Course, Exercise, Lesson, User, Solution, role
+from app.models import Course, Exercise, Lesson, User, Solution, role, SolutionExport
 from app import db
 from app.services.ExerciseService import accept_best_solution
+from app.services.ExportService import create_csv_export
 from app.services.QueryService import exercise_query, login_query
 from app.services.RouteService import validate_exists, validate_role_course, validate_role
 
@@ -45,8 +43,7 @@ def add_student(course_name):
     course = Course.query.filter_by(name=course_name).first()
     users = []
     for user in User.query.filter(~User.courses.any(name=course.name)).all():
-        data = (user.email, user.email)
-        users.append(data)
+        users.append((user.email, user.email))
     form.email.choices = users
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -148,6 +145,8 @@ def add_test(exercise_id):
     if request.method == 'POST' and form.validate_on_submit():
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
         db.session.commit()
+        flash('Dodano test')
+        return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
     return render_template('admin/add_test.html', exercise=exercise, form=form)
 
 
@@ -155,16 +154,15 @@ def add_test(exercise_id):
 @login_required
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
+    validate_exists(course)
     lesson = course.get_lesson_by_name(lesson_name)
     validate_exists(lesson)
     validate_role_course(current_user, role['ADMIN'], course)
     form = ExerciseForm()
     if form.validate_on_submit():
         end_date, end_time = form.end_date.data, form.end_time.data
-        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
-                                minute=end_time.minute)
-        exercise_name = form.name.data
-        exercise = Exercise(name=exercise_name, content=form.content.data, lesson_id=lesson.id,
+        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour, minute=end_time.minute)
+        exercise = Exercise(name=form.name.data, content=form.content.data, lesson_id=lesson.id,
                             max_attempts=form.max_attempts.data, compile_command=form.compile_command.data,
                             end_date=end_datetime, run_command=form.run_command.data,
                             program_name=form.program_name.data, timeout=form.timeout.data)
@@ -180,9 +178,7 @@ def add_exercise(course_name, lesson_name):
 @login_required
 def view_solutions():
     validate_role(current_user, role['ADMIN'])
-    course = request.args.get('course')
-    lesson = request.args.get('lesson')
-    exercise = request.args.get('exercise')
+    course, lesson, exercise = request.args.get('course'), request.args.get('lesson'), request.args.get('exercise')
     course_db = Course.query.filter_by(name=course).first()
     if course is None or lesson is None or exercise is None or course_db is None or course_db not in current_user.courses:
         form = SolutionAdminSearchForm()
@@ -201,7 +197,7 @@ def view_solutions():
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_exists(solution)
-    validate_role_course(current_user, role['ADMIN'], solution.exercise.lesson.course)
+    validate_role_course(current_user, role['ADMIN'], solution.get_course())
     solution_form = SolutionForm(obj=solution, email=solution.author.email)
     if request.method == 'POST':
         if solution_form.admin_refused.data:
@@ -233,10 +229,44 @@ def view_logins():
     return render_template('mod/logins.html', form=form, logins=[])
 
 
+@bp.route('/export_csv/')
+@login_required
+def export_csv():
+    validate_role(current_user, role['ADMIN'])
+    ids = request.args.getlist('ids')
+    solutions = Solution.query.filter(Solution.id.in_(ids)).all()
+    directory = os.path.join(current_app.instance_path, current_user.login)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    current_date = datetime.now(pytz.timezone('Europe/Warsaw'))
+    export = create_csv_export(solutions, directory, current_date, current_user.id)
+    db.session.add(export)
+    db.session.commit()
+    flash('Wyeksportowano')
+    return redirect(url_for('admin.view_exports'))
+
+
+@bp.route('/view_exports/')
+@login_required
+def view_exports():
+    validate_role(current_user, role['ADMIN'])
+    exports = SolutionExport.query.filter_by(user_id=current_user.id).all()
+    return render_template('admin/exports.html', exports=exports)
+
+
 @bp.route('/uploads/<int:solution_id>/', methods=['GET', 'POST'])
 @login_required
 def download_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_role_course(current_user, role['ADMIN'], solution.exercise.lesson.course)
+    validate_role_course(current_user, role['ADMIN'], solution.get_course())
     return send_from_directory(directory=solution.get_directory(),
                                filename=solution.file_path)
+
+
+@bp.route('/myexport')
+@login_required
+def download_export():
+    export_id = request.args.get('export_id')
+    export = SolutionExport.query.filter_by(id=export_id).first()
+    validate_role(current_user, role['ADMIN'])
+    return send_from_directory(directory=export.get_directory(), filename=export.file_name)

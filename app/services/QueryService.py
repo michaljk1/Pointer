@@ -1,5 +1,3 @@
-from sqlalchemy import desc
-
 from app import db
 from app.models import Solution, User, Course, Lesson, Exercise, LoginInfo, role
 

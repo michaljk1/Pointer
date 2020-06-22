@@ -1,10 +1,9 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
+from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
     ValidationError
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired
-
 from app.models import Course, Lesson
 from app.student.forms import SolutionStudentSearchForm
 
@@ -57,7 +56,7 @@ class TestForm(FlaskForm):
     max_points = FloatField('Liczba punktów', validators=[DataRequired()])
     output = FileField('Output', validators=[DataRequired()])
     input = FileField('Input', validators=[DataRequired()])
-    submit_button = SubmitField('Dodaj ćwiczenie')
+    submit_button = SubmitField('Dodaj test')
 
 
 class AssigneUserForm(FlaskForm):

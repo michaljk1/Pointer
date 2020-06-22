@@ -28,6 +28,7 @@ class Course(db.Model):
         for lesson in self.lessons:
             if lesson.name == name:
                 return lesson
+        return None
 
 
 class User(UserMixin, db.Model):
@@ -104,8 +105,8 @@ class Exercise(db.Model):
     end_date = db.Column(db.DateTime)
     max_attempts = db.Column(db.Integer, default=3)
     program_name = db.Column(db.String(50))
-    compile_command = db.Column(db.String(50))
-    run_command = db.Column(db.String(50))
+    compile_command = db.Column(db.String(100))
+    run_command = db.Column(db.String(100))
     timeout = db.Column(db.Integer, default=0, nullable=False)
     solutions = db.relationship('Solution', backref='exercise', lazy='dynamic')
     tests = db.relationship('Test', backref='executor', lazy='dynamic')
@@ -137,7 +138,8 @@ class Exercise(db.Model):
 
     def create_test(self, input_file, output_file, points):
         input_name, output_name = secure_filename(input_file.filename), secure_filename(output_file.filename)
-        test = Test(points=points, input_name=input_name, output_name=output_name, exercise_id=self.id)
+        test = Test(points=points, input_name=input_name, output_name=output_name, exercise_id=self.id,
+                    order=len(self.tests.all()))
         self.tests.append(test)
         test_directory = test.get_directory()
         os.makedirs(test_directory)
@@ -151,9 +153,10 @@ class Test(db.Model):
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
     points = db.Column(db.Float)
+    order = db.Column(db.Integer)
 
     def get_directory(self):
-        return os.path.join(self.executor.get_directory(), str(len(self.executor.tests.all())))
+        return os.path.join(self.executor.get_directory(), str(self.order))
 
 
 class Solution(db.Model):
@@ -174,8 +177,13 @@ class Solution(db.Model):
         'REFUSED': 'Odrzucono',
         'ACTIVE': 'Aktywne',
         'ALL': 'Status',
-        'ERROR': 'Error'
+        'COMPILE_ERROR': 'Błąd kompilacji',
+        'RUN_ERROR': 'Błąd uruchomienia',
+        'ERROR': 'Error',
     }
+
+    def get_lesson(self):
+        return self.exercise.lesson
 
     def get_course(self):
         return self.exercise.lesson.course
@@ -195,3 +203,20 @@ class LoginInfo(db.Model):
         'ERROR': 'Error',
         'ALL': 'All'
     }
+
+
+class SolutionExport(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    file_name = db.Column(db.String(100))
+    type = db.Column(db.String(10))
+    generation_date = db.Column(db.DateTime)
+    types = {
+        'CSV': 'csv',
+        'PDF': 'pdf'
+    }
+
+    def get_directory(self):
+        user = User.query.filter_by(id=self.user_id).first()
+        return os.path.join(current_app.instance_path, user.login)
+

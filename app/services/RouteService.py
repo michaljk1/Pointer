@@ -1,20 +1,19 @@
 from flask import abort, redirect, url_for
-
 from app.models import role
 
 
-def validate_role(user, role):
-    if user.role != role:
+def validate_role(user, user_role):
+    if user.role != user_role:
         abort(404)
 
 
-def validate_role_course(user, role, course):
-    if user.role != role or course not in user.courses:
+def validate_role_course(user, user_role, course):
+    if user.role != user_role or course not in user.courses:
         abort(404)
 
 
-def validate_role_solution(user, role, solution):
-    if user.role != role or solution.author.email != user.email:
+def validate_role_solution(user, user_role, solution):
+    if user.role != user_role or solution.author.email != user.email:
         abort(404)
 
 
