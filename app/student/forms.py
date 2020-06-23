@@ -1,13 +1,13 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import SubmitField, SelectField, StringField, FloatField
-from wtforms.validators import Optional
+from wtforms.validators import Optional, DataRequired
 
 from app.models import Solution
 
 
 class UploadForm(FlaskForm):
-    file = FileField('Wybierz plik')
+    file = FileField('Wybierz plik', validators=[DataRequired()])
     submit_button = SubmitField('Zapisz')
 
 

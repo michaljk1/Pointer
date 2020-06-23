@@ -180,6 +180,7 @@ class Solution(db.Model):
         'COMPILE_ERROR': 'Błąd kompilacji',
         'RUN_ERROR': 'Błąd uruchomienia',
         'ERROR': 'Error',
+        'NOT_ACTIVE': 'Nieaktywne'
     }
 
     def get_lesson(self):

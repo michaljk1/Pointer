@@ -1,11 +1,13 @@
 import os
 import shutil
+from threading import Thread
+
 import pytz
 from datetime import datetime, timedelta
-from flask import render_template, url_for, request, send_from_directory
+from flask import render_template, url_for, request, send_from_directory, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import desc
-from app.services.ExerciseService import compile, grade
+from app.services.ExerciseService import compile, grade, execute_solution
 from app.services.QueryService import exercise_query
 from app.services.RouteService import validate_role, validate_role_course, validate_role_solution
 from app.student import bp
@@ -81,17 +83,8 @@ def view_exercise(exercise_id):
                 '.tar'):
             shutil.unpack_archive(os.path.join(solution_directory, filename), solution_directory)
         db.session.commit()
-        try:
-            if compile(solution):
-                grade(solution)
-            else:
-                solution.status = solution.solutionStatus['COMPILE_ERROR']
-                db.session.commit()
-        except:
-            solution.points = 0
-            solution.status = Solution.solutionStatus['ERROR']
-            solution.is_active = False
-            db.session.commit()
+        # Thread(target=execute_solution, args=(current_app._get_current_object(), solution)).start()
+        execute_solution(solution)
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
     return render_template('student/exercise.html', exercise=exercise, form=form, proper_date=proper_date,
                            show_score=show_score, solutions=exercise.get_user_solutions(current_user.id))

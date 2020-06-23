@@ -3,8 +3,7 @@ import string
 import random
 # TODO
 # 1: obsluga maili, wyniki pdf
-# 2: modyfikacja istniejacych obiektow
-# 3: error przy tescie
+# 2: modyfikacja istniejacych obiektow, wyswietlanie rozwiazan, testy w osobnym watku
 # 4: paginacja + order by przy wynikach, zalezne formularze w js
 # 5: selenium, backup, mysql -> sqlite
 
@@ -15,10 +14,10 @@ from flask import render_template, url_for, flash, request, send_from_directory,
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
+from app.admin.AdminUtil import get_filled_form_with_ids
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm
 from werkzeug.utils import redirect, secure_filename
-from app.mod.forms import LoginInfoForm
 from app.models import Course, Exercise, Lesson, User, Solution, role, SolutionExport
 from app import db
 from app.services.ExerciseService import accept_best_solution
@@ -216,13 +215,7 @@ def view_solution(solution_id):
 @login_required
 def view_logins():
     validate_role(current_user, role['ADMIN'])
-    form = LoginInfoForm()
-    user_ids = []
-    for course in current_user.courses:
-        for member in course.members:
-            if member.role == role['STUDENT'] and member.id not in user_ids:
-                user_ids.append(member.id)
-                form.email.choices.append((member.email, member.email))
+    user_ids, form = get_filled_form_with_ids(current_user.courses)
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
         return render_template('mod/logins.html', form=form, logins=logins)

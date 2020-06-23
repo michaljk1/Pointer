@@ -9,29 +9,8 @@
             {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
         </div>
     </div>
-    {% if solutions|length > 0 %}
-    <table class="table">
-        <thead>
-            <th>Plik</th>
-            <th>Data wysłania</th>
-            <th>Status</th>
-            <th>Punkty</th>
-        </thead>
-        <tbody>
-        {% for solution in solutions %}
-            <tr class="pointercurs">
-                <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}" target="_blank">{{ solution.file_path }}</a></p></td>
-                    <td><p>{{ solution.send_date }}</p></td>
-{#                     {% if solution.exercise not in forbidden_exercises%}#}
-                    <td><p>{{ solution.status }}</p></td>
-                    <td><p>{{ solution.points }}</p></td>
-{#                    {% else %}#}
-{#                    <td><p> - </p></td>#}
-{#                    <td><p> - </p></td>#}
-{#                    {% endif %}#}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    {% with solutions=solutions %}
+        {% include "student/solutionlist.html" %}
+    {% endwith %}
+
 {% endblock %}

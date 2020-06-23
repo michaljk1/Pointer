@@ -53,10 +53,13 @@ def logout():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data)
         user.set_password(form.password.data)
         user_amount = len(User.query.all())
+        # if user.name == 'Szymon' and \
+        #         user.surname == 'Stefański':
+        #     user.is_trzodziuch = True
         if user_amount == 0:
             user.role = role['MODERATOR']
         else:

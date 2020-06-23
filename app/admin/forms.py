@@ -24,8 +24,8 @@ class CourseForm(FlaskForm):
 
 
 class LessonForm(FlaskForm):
-    name = StringField('Nazwa lekcji')
-    text_content = StringField('Treść')
+    name = StringField('Nazwa lekcji', validators=[DataRequired()])
+    text_content = StringField('Treść', validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
     content_url = StringField('Link')
     submit_button = SubmitField('Dodaj lekcję')
