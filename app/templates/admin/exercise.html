@@ -8,7 +8,7 @@
         <pb> {{ exercise.lesson.course.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', course_name = exercise.lesson.course.name, lesson_id = exercise.lesson.id) }}">
+    <a href="{{ url_for('admin.view_lesson', lesson_name = exercise.lesson.name) }}">
         <pb> {{ exercise.lesson.name }} </pb>
     </a>
     /

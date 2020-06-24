@@ -7,6 +7,8 @@ from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
+
+from app.default.DefaultUtil import get_current_date
 from app.models import User, Course, role, LoginInfo
 from app import db
 from app.services.RouteService import validate_exists, redirect_for_index_by_role
@@ -22,11 +24,11 @@ def login():
         if user is None:
             flash('Invalid email or password')
             return redirect(url_for('auth.login'))
-        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.loginStatus['SUCCESS'], user_id=user.id,
-                               login_date=datetime.now(pytz.timezone('Europe/Warsaw')))
+        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.Status['SUCCESS'], user_id=user.id,
+                               login_date=get_current_date())
         db.session.add(login_info)
         if not user.check_password(form.password.data):
-            login_info.status = LoginInfo.loginStatus['ERROR']
+            login_info.status = LoginInfo.Status['ERROR']
             db.session.commit()
             flash('Invalid email or password')
             return redirect(url_for('auth.login'))
@@ -68,8 +70,8 @@ def register():
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
         login_user(user)
-        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.loginStatus['SUCCESS'], user_id=user.id,
-                               login_date=datetime.now(pytz.timezone('Europe/Warsaw')))
+        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.Status['SUCCESS'], user_id=user.id,
+                               login_date=get_current_date())
         db.session.add(login_info)
         db.session.commit()
         return redirect_for_index_by_role(user.role)

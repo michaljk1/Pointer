@@ -86,7 +86,7 @@ role = {
 
 class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(60), unique=True)
     raw_text = db.Column(db.String(600))
     content_pdf_path = db.Column(db.String(100))
     content_url = db.Column(db.String(100))
@@ -167,12 +167,10 @@ class Solution(db.Model):
     points = db.Column(db.Float, nullable=False)
     file_path = db.Column(db.String(100), nullable=False)
     attempt = db.Column(db.Integer, nullable=False)
-    is_active = db.Column(db.Boolean, default=True)
     ip_address = db.Column(db.String(20), nullable=False)
     os_info = db.Column(db.String(150), nullable=False)
-    admin_refused = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(20), nullable=False)
-    solutionStatus = {
+    Status = {
         'SEND': 'Oddano',
         'REFUSED': 'Odrzucono',
         'ACTIVE': 'Aktywne',
@@ -199,7 +197,7 @@ class LoginInfo(db.Model):
     ip_address = db.Column(db.String(40), nullable=False)
     login_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), nullable=False)
-    loginStatus = {
+    Status = {
         'SUCCESS': 'Success',
         'ERROR': 'Error',
         'ALL': 'All'

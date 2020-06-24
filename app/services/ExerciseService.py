@@ -5,18 +5,18 @@ from app import db
 from app.models import Solution, Exercise
 
 
-def execute_solution_thread(app, solution):
+def execute_solution_thread(app, solution_id):
     with app.app_context():
         try:
+            solution = Solution.query.filter_by(id=solution_id).first()
             if compile(solution):
                 grade(solution)
             else:
-                solution.status = solution.solutionStatus['COMPILE_ERROR']
+                solution.status = solution.Status['COMPILE_ERROR']
                 db.session.commit()
         except:
             solution.points = 0
-            solution.status = Solution.solutionStatus['ERROR']
-            solution.is_active = False
+            solution.status = Solution.Status['ERROR']
             db.session.commit()
 
 
@@ -25,12 +25,11 @@ def execute_solution(solution):
         if compile(solution):
             grade(solution)
         else:
-            solution.status = solution.solutionStatus['COMPILE_ERROR']
+            solution.status = solution.Status['COMPILE_ERROR']
             db.session.commit()
     except:
         solution.points = 0
-        solution.status = Solution.solutionStatus['ERROR']
-        solution.is_active = False
+        solution.status = Solution.Status['ERROR']
         db.session.commit()
 
 
@@ -38,17 +37,17 @@ def accept_best_solution(user_id: int, exercise: Exercise):
     user_exercises = Solution.query.filter_by(user_id=user_id, exercise_id=exercise.id).all()
     points, best_solution = 0, None
     for user_exercise in user_exercises:
-        if user_exercise.status in [Solution.solutionStatus['SEND'],
-                                    Solution.solutionStatus['ACTIVE']] and user_exercise.points >= points:
+        if user_exercise.status in [Solution.Status['SEND'],
+                                    Solution.Status['ACTIVE']] and user_exercise.points >= points:
             best_solution = user_exercise
             points = best_solution.points
     if best_solution is not None:
-        best_solution.status = Solution.solutionStatus['ACTIVE']
+        best_solution.status = Solution.Status['ACTIVE']
         user_exercises.remove(best_solution)
     for user_exercise in user_exercises:
-        if user_exercise.status not in [Solution.solutionStatus['REFUSED'], Solution.solutionStatus['RUN_ERROR'],
-                                        Solution.solutionStatus['REFUSED']]:
-            user_exercise.status = Solution.solutionStatus['NOT_ACTIVE']
+        if user_exercise.status not in [Solution.Status['REFUSED'], Solution.Status['RUN_ERROR'],
+                                        Solution.Status['REFUSED']]:
+            user_exercise.status = Solution.Status['NOT_ACTIVE']
     db.session.commit()
 
 
@@ -84,7 +83,7 @@ def grade(solution):
         process.wait()
         error_file.close()
         if os.path.getsize(error_file.name) > 0:
-            solution.status = Solution.solutionStatus['RUN_ERROR']
+            solution.status = Solution.Status['RUN_ERROR']
             break
         elif len(output) == 0:
             solution.points += test.points

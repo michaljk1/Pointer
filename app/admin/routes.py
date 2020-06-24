@@ -3,21 +3,21 @@ import string
 import random
 # TODO
 # 1: obsluga maili, wyniki pdf
-# 2: modyfikacja istniejacych obiektow, wyswietlanie rozwiazan, testy w osobnym watku
+# 2: modyfikacja istniejacych obiektow, wyswietlanie rozwiazan, timeout testu
 # 4: paginacja + order by przy wynikach, zalezne formularze w js
 # 5: selenium, backup, mysql -> sqlite
-
 from datetime import datetime
 
-import pytz
 from flask import render_template, url_for, flash, request, send_from_directory, current_app
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
-from app.admin.AdminUtil import get_filled_form_with_ids
+from app.admin.AdminUtil import get_filled_form_with_ids, modify_solution
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm
 from werkzeug.utils import redirect, secure_filename
+
+from app.default.DefaultUtil import get_current_date
 from app.models import Course, Exercise, Lesson, User, Solution, role, SolutionExport
 from app import db
 from app.services.ExerciseService import accept_best_solution
@@ -94,10 +94,10 @@ def add_course():
     return render_template('admin/add_course.html', form=form)
 
 
-@bp.route('/<string:course_name>/<int:lesson_id>')
+@bp.route('/lesson/<string:lesson_name>/')
 @login_required
-def view_lesson(course_name, lesson_id):
-    lesson = Lesson.query.filter_by(id=lesson_id).first()
+def view_lesson(lesson_name):
+    lesson = Lesson.query.filter_by(name=lesson_name).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
     return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
 
@@ -122,7 +122,7 @@ def add_lesson(course_name):
         if filename is not None:
             file.save(os.path.join(lesson_directory, filename))
         db.session.commit()
-        return redirect(url_for('admin.view_lesson', lesson_id=new_lesson.id, course_name=course.name))
+        return redirect(url_for('admin.view_lesson', lesson_name=new_lesson.name))
     return render_template('admin/add_lesson.html', form=form, course=course)
 
 
@@ -160,7 +160,8 @@ def add_exercise(course_name, lesson_name):
     form = ExerciseForm()
     if form.validate_on_submit():
         end_date, end_time = form.end_date.data, form.end_time.data
-        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour, minute=end_time.minute)
+        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
+                                minute=end_time.minute)
         exercise = Exercise(name=form.name.data, content=form.content.data, lesson_id=lesson.id,
                             max_attempts=form.max_attempts.data, compile_command=form.compile_command.data,
                             end_date=end_datetime, run_command=form.run_command.data,
@@ -169,7 +170,7 @@ def add_exercise(course_name, lesson_name):
         os.makedirs(exercise.get_directory())
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
         db.session.commit()
-        return redirect(url_for('admin.view_lesson', course_name=lesson.course.name, lesson_id=lesson.id))
+        return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
     return render_template('admin/add_template.html', form=form, lesson=lesson)
 
 
@@ -197,14 +198,10 @@ def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_exists(solution)
     validate_role_course(current_user, role['ADMIN'], solution.get_course())
-    solution_form = SolutionForm(obj=solution, email=solution.author.email)
-    if request.method == 'POST':
-        if solution_form.admin_refused.data:
-            solution.status = Solution.solutionStatus['REFUSED']
-        else:
-            solution.status = Solution.solutionStatus['SEND']
-        solution.points = solution_form.points.data
-        db.session.commit()
+    solution_form = SolutionForm(obj=solution, email=solution.author.email,
+                                 admin_ref=(solution.status == solution.Status['REFUSED']))
+    if request.method == 'POST' and solution_form.validate_on_submit():
+        modify_solution(solution, solution_form.admin_ref.data, solution_form.points.data)
         accept_best_solution(solution.user_id, solution.exercise)
         flash('Zapisano zmiany')
         return render_template('admin/solution.html', form=solution_form, solution=solution)
@@ -231,8 +228,7 @@ def export_csv():
     directory = os.path.join(current_app.instance_path, current_user.login)
     if not os.path.exists(directory):
         os.makedirs(directory)
-    current_date = datetime.now(pytz.timezone('Europe/Warsaw'))
-    export = create_csv_export(solutions, directory, current_date, current_user.id)
+    export = create_csv_export(solutions, directory, get_current_date(), current_user.id)
     db.session.add(export)
     db.session.commit()
     flash('Wyeksportowano')

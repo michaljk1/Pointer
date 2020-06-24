@@ -63,6 +63,7 @@ class AssigneUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
 
+
 class EnableAssingmentLink(FlaskForm):
     activate = BooleanField('Aktywny zapis')
     submit_button = SubmitField('Zapisz')
@@ -71,7 +72,7 @@ class EnableAssingmentLink(FlaskForm):
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
     points = FloatField('Punkty')
-    admin_refused = BooleanField('Odrzuć zadanie')
+    admin_ref = BooleanField('Odrzuć zadanie')
     file_path = StringField('Plik', render_kw={'readonly': True})
     attempt = IntegerField('Próba', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})

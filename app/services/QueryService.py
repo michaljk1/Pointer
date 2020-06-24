@@ -9,7 +9,7 @@ def exercise_query(form, user_id=None, courses=None):
         join(Lesson, Lesson.id == Exercise.lesson_id). \
         join(Course, Course.id == Lesson.course_id)
 
-    if form.status.data != Solution.solutionStatus['ALL']:
+    if form.status.data != Solution.Status['ALL']:
         query = query.filter(Solution.status == form.status.data)
     if form.points_from.data is not None:
         query = query.filter(Solution.points >= form.points_from.data)
@@ -42,7 +42,7 @@ def exercise_query(form, user_id=None, courses=None):
 
 def login_query(form, user_role, ids=None):
     query = db.session.query(LoginInfo).select_from(LoginInfo).join(User, User.id == LoginInfo.user_id)
-    if form.status.data != LoginInfo.loginStatus['ALL']:
+    if form.status.data != LoginInfo.Status['ALL']:
         query = query.filter(LoginInfo.status == form.status.data)
 
     if form.ip_address.data != '':

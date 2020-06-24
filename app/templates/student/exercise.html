@@ -5,7 +5,7 @@
     /
     <a href="{{ url_for('student.view_course', course_name = exercise.lesson.course.name) }}"> {{ exercise.lesson.course.name }} </a>
     /
-    <a href="{{ url_for('student.view_lesson', course_name = exercise.lesson.course.name, lesson_id = exercise.lesson.id) }}"> {{ exercise.lesson.name }} </a>
+    <a href="{{ url_for('student.view_lesson', lesson_name = exercise.lesson.name) }}"> {{ exercise.lesson.name }} </a>
     /
     <a href="{{ url_for('student.view_exercise', exercise_id = exercise.id) }}"> {{ exercise.name }} </a>
 {% endblock %}

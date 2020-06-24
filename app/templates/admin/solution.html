@@ -3,7 +3,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for('admin.view_solutions') }}"><pb> Rozwiązania </pb></a>
     /
-    <a href="{{ url_for('admin.view_solutions', solution_id=solution.id) }}"><pb> solution.name </pb></a>
+    <a href="{{ url_for('admin.view_solution', solution_id=solution.id) }}"><pb> {{ solution.exercise.name }} - {{ solution.author.email }} </pb></a>
 {% endblock %}
 {% block app_content %}
     <form action="" method="post" class="form" role="form">
@@ -11,7 +11,7 @@
         {{ wtf.form_field(form.email, class='form-control') }}
         {{ wtf.form_field(form.points, class='form-control') }}
         <p><a href="{{ url_for('admin.download_solution', solution_id=solution.id) }}" target="_blank">{{ form.file_path }}</a></p>
-        {{ wtf.form_field(form.admin_refused, class='form-control') }}
+        {{ wtf.form_field(form.admin_ref, class='form-control') }}
         {{ wtf.form_field(form.attempt, class='form-control') }}
         {{ wtf.form_field(form.ip_address, class='form-control') }}
         {{ wtf.form_field(form.os_info, class='form-control') }}

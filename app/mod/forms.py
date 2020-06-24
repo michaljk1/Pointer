@@ -11,8 +11,8 @@ class RoleForm(FlaskForm):
 
 class LoginInfoForm(FlaskForm):
     email = SelectField('User', choices=[['All', 'All']])
-    status = SelectField('Status', choices=[[LoginInfo.loginStatus['ALL'], LoginInfo.loginStatus['ALL']],
-                                            [LoginInfo.loginStatus['ERROR'], LoginInfo.loginStatus['ERROR']],
-                                            [LoginInfo.loginStatus['SUCCESS'], LoginInfo.loginStatus['SUCCESS']]])
+    status = SelectField('Status', choices=[[LoginInfo.Status['ALL'], LoginInfo.Status['ALL']],
+                                            [LoginInfo.Status['ERROR'], LoginInfo.Status['ERROR']],
+                                            [LoginInfo.Status['SUCCESS'], LoginInfo.Status['SUCCESS']]])
     ip_address = StringField('IP')
     submit_button = SubmitField('Wyszukaj')

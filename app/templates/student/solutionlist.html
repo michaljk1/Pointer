@@ -16,7 +16,7 @@
                               target="_blank">{{ solution.file_path }}</a></p></td>
                     <td><p><a href="{{ url_for('student.view_course', course_name=solution.get_course().name) }}"
                               target="_blank">{{ solution.get_course().name }}</a></p></td>
-                    <td><p><a href="{{ url_for('student.view_lesson', lesson_id=solution.exercise.lesson.id) }}"
+                    <td><p><a href="{{ url_for('student.view_lesson', lesson_name=solution.exercise.lesson.name) }}"
                               target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
                     <td><p><a href="{{ url_for('student.view_exercise', exercise_id=solution.exercise.id) }}"
                               target="_blank">{{ solution.exercise.name }}</a></p></td>
