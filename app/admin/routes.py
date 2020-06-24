@@ -3,7 +3,7 @@ import string
 import random
 # TODO
 # 1: obsluga maili, wyniki pdf
-# 2: modyfikacja istniejacych obiektow, wyswietlanie rozwiazan, timeout testu
+# 2: modyfikacja istniejacych obiektow, timeout testu
 # 4: paginacja + order by przy wynikach, zalezne formularze w js
 # 5: selenium, backup, mysql -> sqlite
 from datetime import datetime

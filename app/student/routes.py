@@ -60,13 +60,7 @@ def view_exercise(exercise_id):
                             minute=end_date.minute, tzinfo=current_datetime.tzinfo)
     solution = Solution.query.filter_by(exercise_id=exercise.id, user_id=current_user.id).order_by(
         desc(Solution.send_date)).first()
-    show_score = current_datetime > end_datetime
-    if solution is None:
-        proper_date = not show_score
-    else:
-        send_date = solution.send_date.replace(tzinfo=current_datetime.tzinfo)
-        proper_date = (current_datetime < end_datetime) and (current_datetime - send_date) > timedelta(
-            seconds=exercise.timeout)
+    solutions = exercise.get_user_solutions(current_user.id)
     if form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
@@ -74,7 +68,7 @@ def view_exercise(exercise_id):
                             ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
                             status=Solution.Status['SEND'], send_date=get_current_date())
         exercise.solutions.append(solution)
-        #TODO check if needed
+        # TODO check if needed
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
         os.makedirs(solution_directory)
@@ -83,8 +77,8 @@ def view_exercise(exercise_id):
         db.session.commit()
         Thread(target=execute_solution_thread, args=(current_app._get_current_object(), solution.id)).start()
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
-    return render_template('student/exercise.html', exercise=exercise, form=form, proper_date=proper_date,
-                           show_score=show_score, solutions=exercise.get_user_solutions(current_user.id))
+    return render_template('student/exercise.html', exercise=exercise, form=form,
+                           solutions=solutions, finished_exercises=get_finished_exercises(solutions))
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])

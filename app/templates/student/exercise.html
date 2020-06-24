@@ -15,14 +15,12 @@
     <div><h1>{{ exercise.content }}</h1></div>
     <div><h1>Maksymalna liczba prób: {{ exercise.max_attempts }}</h1></div>
     <div><h1>Termin przesłania zadania: {{ exercise.end_date }}</h1></div>
-    {% if proper_date and solutions|length < exercise.max_attempts %}
+    {% if solutions|length < exercise.max_attempts %}
         <div class="row">
             <div class="col-md-4">
                 {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
             </div>
         </div>
     {% endif %}
-    {% with solutions=solutions, finished_exercises=finished_exercises %}
         {% include "student/solutionlist.html" %}
-    {% endwith %}
 {% endblock %}
