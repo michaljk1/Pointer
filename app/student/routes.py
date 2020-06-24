@@ -9,6 +9,7 @@ from app.services.ExerciseService import execute_solution_thread
 from app.services.QueryService import exercise_query
 from app.services.RouteService import validate_role, validate_role_course, validate_role_solution
 from app.student import bp
+from app.student.StudentUtil import get_finished_exercises
 from app.student.forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
 from app.models import Course, Exercise, Lesson, Solution, role
@@ -95,20 +96,9 @@ def view_solutions():
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_query(form=form, courses=current_user.get_course_names(), user_id=current_user.id).all()
-        exercises, forbidden_exercises = [], []
-        current_datetime = get_current_date()
-        for solution in solutions:
-            if solution.exercise not in exercises:
-                exercises.append(solution.exercise)
-        for exercise in exercises:
-            end_date = exercise.end_date
-            end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
-                                    minute=end_date.minute, tzinfo=current_datetime.tzinfo)
-            if current_datetime < end_datetime:
-                forbidden_exercises.append(exercise)
         return render_template('student/solutions.html', form=form, solutions=solutions,
-                               forbidden_exercises=forbidden_exercises,
-                               datetime=current_datetime)
+                               finished_exercises=get_finished_exercises(solutions),
+                               datetime=get_current_date())
     return render_template('student/solutions.html', form=form, solutions=[], forbidden_exercises=[],
                            datetime=datetime.now(tz=None))
 

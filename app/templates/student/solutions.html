@@ -9,7 +9,7 @@
             {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
         </div>
     </div>
-    {% with solutions=solutions %}
+    {% with solutions=solutions, finished_exercises=finished_exercises %}
         {% include "student/solutionlist.html" %}
     {% endwith %}
 

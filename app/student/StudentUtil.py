@@ -15,6 +15,6 @@ def get_finished_exercises(solutions: List[Solution]):
         end_date = exercise.end_date
         end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
                                 minute=end_date.minute, tzinfo=current_datetime.tzinfo)
-        if current_datetime < end_datetime:
+        if current_datetime > end_datetime:
             finished_exercises.append(exercise)
     return finished_exercises

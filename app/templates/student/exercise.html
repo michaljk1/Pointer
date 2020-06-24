@@ -22,7 +22,7 @@
             </div>
         </div>
     {% endif %}
-    {% with solutions=solutions %}
+    {% with solutions=solutions, finished_exercises=finished_exercises %}
         {% include "student/solutionlist.html" %}
     {% endwith %}
 {% endblock %}
