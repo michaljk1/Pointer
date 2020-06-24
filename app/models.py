@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from flask import current_app
 from flask_login import UserMixin
@@ -6,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app import db, login
+from app.DefaultUtil import get_current_date
 
 user_course_assoc = db.Table(
     'user_courses',
@@ -29,6 +31,13 @@ class Course(db.Model):
             if lesson.name == name:
                 return lesson
         return None
+
+    def get_course_points(self):
+        points = 0
+        for lesson in self.lessons:
+            for exercise in lesson.exercises:
+                points += exercise.get_max_points()
+        return points
 
 
 class User(UserMixin, db.Model):
@@ -68,8 +77,12 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
-    def get_student_ids(self):
-        pass
+    def get_points_course(self, course: Course):
+        user_points = 0
+        for solution in self.solutions:
+            if solution.get_course() == course and solution.status == solution.Status['ACTIVE'] and solution.is_visible():
+                user_points += solution.points
+        return user_points
 
 
 @login.user_loader
@@ -181,6 +194,7 @@ class Solution(db.Model):
         'NOT_ACTIVE': 'Nieaktywne'
     }
 
+
     def get_lesson(self):
         return self.exercise.lesson
 
@@ -189,6 +203,16 @@ class Solution(db.Model):
 
     def get_directory(self):
         return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))
+
+    def is_visible(self):
+        current_datetime = get_current_date()
+        end_date = self.exercise.end_date
+        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
+                                minute=end_date.minute, tzinfo=current_datetime.tzinfo)
+        if current_datetime > end_datetime:
+            return True
+        else:
+            return False
 
 
 class LoginInfo(db.Model):
@@ -219,3 +243,13 @@ class SolutionExport(db.Model):
         user = User.query.filter_by(id=self.user_id).first()
         return os.path.join(current_app.instance_path, user.login)
 
+
+class Statistics:
+    def __init__(self, course: Course, user: User):
+        self.user_points = user.get_points_course(course)
+        self.course_points = course.get_course_points()
+        self.email = user.email
+        self.course_name = course.name
+
+    def get_percent_value(self):
+        return round((self.user_points / self.course_points * 100), 2)

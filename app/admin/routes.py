@@ -2,8 +2,8 @@ import os
 import string
 import random
 # TODO
-# 1: obsluga maili, wyniki pdf
-# 2: modyfikacja istniejacych obiektow, timeout testu
+# 1: obsluga maili, wyniki pdf, active student search
+# 2: modyfikacja istniejacych obiektow, timeout testu, statystyki
 # 4: paginacja + order by przy wynikach, zalezne formularze w js
 # 5: selenium, backup, mysql -> sqlite
 from datetime import datetime
@@ -16,8 +16,7 @@ from app.admin.AdminUtil import get_filled_form_with_ids, modify_solution
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm
 from werkzeug.utils import redirect, secure_filename
-
-from app.default.DefaultUtil import get_current_date
+from app.DefaultUtil import get_current_date
 from app.models import Course, Exercise, Lesson, User, Solution, role, SolutionExport
 from app import db
 from app.services.ExerciseService import accept_best_solution
@@ -37,10 +36,10 @@ def logout():
 @bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
 @login_required
 def add_student(course_name):
-    validate_role(current_user, role['ADMIN'])
-    form = AssigneUserForm()
     course = Course.query.filter_by(name=course_name).first()
+    validate_role_course(current_user, role['ADMIN'], course)
     users = []
+    form = AssigneUserForm()
     for user in User.query.filter(~User.courses.any(name=course.name)).all():
         users.append((user.email, user.email))
     form.email.choices = users

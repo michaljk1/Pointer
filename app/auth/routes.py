@@ -1,6 +1,3 @@
-from datetime import datetime
-
-import pytz
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app.auth import bp
@@ -8,7 +5,7 @@ from app.auth.forms import LoginForm, RegistrationForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 
-from app.default.DefaultUtil import get_current_date
+from app.DefaultUtil import get_current_date
 from app.models import User, Course, role, LoginInfo
 from app import db
 from app.services.RouteService import validate_exists, redirect_for_index_by_role

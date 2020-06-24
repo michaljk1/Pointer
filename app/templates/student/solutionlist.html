@@ -21,7 +21,7 @@
                     <td><p><a href="{{ url_for('student.view_exercise', exercise_id=solution.exercise.id) }}"
                               target="_blank">{{ solution.exercise.name }}</a></p></td>
                     <td><p>{{ solution.send_date }}</p></td>
-                    {% if solution.exercise in finished_exercises%}
+                    {% if solution.is_visible()%}
                     <td><p>{{ solution.status }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
                     {% else %}

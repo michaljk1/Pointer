@@ -1,5 +1,18 @@
+from typing import List
+
 from app import db
 from app.models import Solution, User, Course, Lesson, Exercise, LoginInfo, role
+
+
+def filter_by_status(solutions: List[Solution], status: str):
+        if status == Solution.Status['ACTIVE'] or status == Solution.Status['NOT_ACTIVE']:
+            for solution in solutions:
+                if not solution.is_visible():
+                    solutions.remove(solution)
+        elif status != Solution.Status['ALL']:
+            for solution in solutions:
+                if solution.status != status:
+                    solutions.remove(solution)
 
 
 def exercise_query(form, user_id=None, courses=None):
@@ -8,7 +21,6 @@ def exercise_query(form, user_id=None, courses=None):
         join(Exercise, Solution.exercise_id == Exercise.id). \
         join(Lesson, Lesson.id == Exercise.lesson_id). \
         join(Course, Course.id == Lesson.course_id)
-
     if form.status.data != Solution.Status['ALL']:
         query = query.filter(Solution.status == form.status.data)
     if form.points_from.data is not None:
@@ -29,6 +41,8 @@ def exercise_query(form, user_id=None, courses=None):
     # Admin is able to search by name and surname, student can only view his solutions
     from app.admin.forms import SolutionAdminSearchForm
     if isinstance(form, SolutionAdminSearchForm):
+        if form.status.data != Solution.Status['ALL']:
+            query = query.filter(Solution.status == form.status.data)
         if form.surname.data is not None and len(form.surname.data) > 0:
             query = query.filter(User.surname == form.surname.data)
         if form.name.data is not None and len(form.name.data) > 0:
