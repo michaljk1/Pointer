@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, StringField
-from app.models import LoginInfo
+from app.models.logininfo import LoginInfo
 
 
 class RoleForm(FlaskForm):

@@ -2,15 +2,20 @@ import os
 from threading import Thread
 from flask import render_template, url_for, request, send_from_directory, current_app
 from flask_login import login_required, current_user
+
+from app import db
 from app.DefaultUtil import get_current_date, unpack_file
+from app.models.solution import Solution
 from app.services.ExerciseService import execute_solution_thread
 from app.services.QueryService import exercise_query, filter_by_status
 from app.services.RouteService import validate_role, validate_role_course, validate_role_solution
 from app.student import bp
 from app.student.forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
-from app.models import Course, Exercise, Lesson, Solution, role, Statistics
-from app import db
+from app.models.usercourse import Course, role
+from app.models.exercise import Exercise
+from app.models.lesson import Lesson
+from app.models.statistics import Statistics
 
 
 @bp.route('/')
@@ -90,7 +95,7 @@ def view_statistics():
     validate_role(current_user, role['STUDENT'])
     statistics_list = []
     for course in current_user.courses:
-        statistics_list.append(Statistics(course=course, user=current_user))
+        statistics_list.append(Statistics(course=course, user=current_user, is_admin=False))
     return render_template('student/statistics.html', statisticsList=statistics_list)
 
 

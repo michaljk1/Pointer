@@ -2,18 +2,18 @@ from typing import List
 
 from app import db
 from app.mod.forms import LoginInfoForm
-from app.models import Course, role, Solution
+from app.models.solution import Solution
+from app.models.usercourse import Course, role
 
 
-def get_filled_form_with_ids(courses: List[Course]):
-    user_ids = []
-    form = LoginInfoForm()
+def get_student_ids_emails(courses: List[Course]):
+    user_ids, emails = [], []
     for course in courses:
         for member in course.members:
             if member.role == role['STUDENT'] and member.id not in user_ids:
                 user_ids.append(member.id)
-                form.email.choices.append((member.email, member.email))
-    return user_ids, form
+                emails.append((member.email, member.email))
+    return user_ids, emails
 
 
 def modify_solution(solution: Solution, refused: bool, points: float):
@@ -23,3 +23,4 @@ def modify_solution(solution: Solution, refused: bool, points: float):
         solution.status = Solution.Status['SEND']
     solution.points = points
     db.session.commit()
+

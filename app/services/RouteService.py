@@ -1,5 +1,5 @@
 from flask import abort, redirect, url_for
-from app.models import role
+from app.models.usercourse import role
 
 
 def validate_role(user, user_role):

@@ -1,7 +1,7 @@
 import csv
 import os
 
-from app.models import SolutionExport
+from app.models.solutionexport import SolutionExport
 
 
 def create_csv_export(solutions, directory, current_date, user_id):

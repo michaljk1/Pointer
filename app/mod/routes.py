@@ -1,11 +1,11 @@
-from flask import url_for, abort, flash, render_template, redirect
+from flask import url_for, flash, render_template, redirect
 from flask_login import current_user, login_required
 from sqlalchemy import desc
 
 from app import db
 from app.mod.forms import RoleForm, LoginInfoForm
 from app.mod import bp
-from app.models import role, User
+from app.models.usercourse import role, User
 from app.services.QueryService import login_query
 from app.services.RouteService import validate_role
 

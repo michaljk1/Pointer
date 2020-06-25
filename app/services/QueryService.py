@@ -1,7 +1,11 @@
 from typing import List
 
 from app import db
-from app.models import Solution, User, Course, Lesson, Exercise, LoginInfo, role
+from app.models.logininfo import LoginInfo
+from app.models.solution import Solution
+from app.models.usercourse import User, Course, role
+from app.models.lesson import Lesson
+from app.models.exercise import Exercise
 
 
 def filter_by_status(solutions: List[Solution], status: str):

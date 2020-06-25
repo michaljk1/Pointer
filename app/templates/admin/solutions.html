@@ -8,12 +8,12 @@
 {% block app_content %}
     <form action="" method="post" class="form" role="form">
         {{ form.csrf_token() }}
-        {{ wtf.form_field(form.name, class='form-control') }}
-        {{ wtf.form_field(form.surname, class='form-control') }}
         {{ wtf.form_field(form.course, class='form-control') }}
         {{ wtf.form_field(form.lesson, class='form-control') }}
-        {{ wtf.form_field(form.status, class='form-control') }}
         {{ wtf.form_field(form.exercise, class='form-control') }}
+        {{ wtf.form_field(form.name, class='form-control') }}
+        {{ wtf.form_field(form.surname, class='form-control') }}
+        {{ wtf.form_field(form.status, class='form-control') }}
         {{ wtf.form_field(form.points_from, class='form-control') }}
         {{ wtf.form_field(form.points_to, class='form-control') }}
         <p>{{ form.submit() }}</p>

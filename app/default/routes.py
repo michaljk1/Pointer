@@ -3,7 +3,7 @@ from flask_login import current_user
 from werkzeug.utils import redirect
 
 from app.default import bp
-from app.models import role
+from app.models.usercourse import role
 
 
 @bp.route('/')

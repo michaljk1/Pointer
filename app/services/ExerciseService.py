@@ -2,7 +2,8 @@ import os
 import subprocess
 
 from app import db
-from app.models import Solution, Exercise
+from app.models.exercise import Exercise
+from app.models.solution import Solution
 
 
 def execute_solution_thread(app, solution_id):

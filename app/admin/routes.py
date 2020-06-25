@@ -2,23 +2,30 @@ import os
 import string
 import random
 # TODO
-# 1: obsluga maili, wyniki pdf, active student search
+# 1: obsluga maili, wyniki pdf,
 # 2: modyfikacja istniejacych obiektow, timeout testu, statystyki
 # 4: paginacja + order by przy wynikach, zalezne formularze w js
-# 5: selenium, backup, mysql -> sqlite
+# 5: selenium, backup, mysql -> sqlite, osmkdirs
 from datetime import datetime
 
 from flask import render_template, url_for, flash, request, send_from_directory, current_app
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
-from app.admin.AdminUtil import get_filled_form_with_ids, modify_solution
+from app.admin.AdminUtil import modify_solution, get_student_ids_emails
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, EnableAssingmentLink, TestForm
+    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsForm
 from werkzeug.utils import redirect, secure_filename
 from app.DefaultUtil import get_current_date
-from app.models import Course, Exercise, Lesson, User, Solution, role, SolutionExport
+from app.mod.forms import LoginInfoForm
+from app.models.statistics import Statistics
+from app.models.usercourse import Course, User, role
+from app.models.solutionexport import SolutionExport
+from app.models.lesson import Lesson
+from app.models.exercise import Exercise
+
 from app import db
+from app.models.solution import Solution
 from app.services.ExerciseService import accept_best_solution
 from app.services.ExportService import create_csv_export
 from app.services.QueryService import exercise_query, login_query
@@ -130,8 +137,7 @@ def add_lesson(course_name):
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
     validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
-    solutions = Solution.query.filter_by(exercise_id=exercise_id, is_active=True).all()
-    return render_template('admin/exercise.html', exercise=exercise, solutions=solutions)
+    return render_template('admin/exercise.html', exercise=exercise)
 
 
 @bp.route('/test/<int:exercise_id>', methods=['GET', 'POST'])
@@ -211,7 +217,8 @@ def view_solution(solution_id):
 @login_required
 def view_logins():
     validate_role(current_user, role['ADMIN'])
-    user_ids, form = get_filled_form_with_ids(current_user.courses)
+    form = LoginInfoForm()
+    user_ids, form.email.choices = get_student_ids_emails(current_user.courses)
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
         return render_template('mod/logins.html', form=form, logins=logins)
@@ -258,3 +265,25 @@ def download_export():
     export = SolutionExport.query.filter_by(id=export_id).first()
     validate_role(current_user, role['ADMIN'])
     return send_from_directory(directory=export.get_directory(), filename=export.file_name)
+
+
+@bp.route('/statistics', methods=['GET', 'POST'])
+@login_required
+def view_statistics():
+    validate_role(current_user, role['ADMIN'])
+    form = StatisticsForm()
+    statistics_list = []
+    form.email.choices = get_student_ids_emails(current_user.courses)[1]
+    for course in current_user.courses:
+        for member in course.members:
+            if member.role == role['STUDENT']:
+                statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+    # if request.method == 'POST' and form.validate_on_submit():
+        # for course in current_user.courses:
+        #     for member in course.members:
+        #         if member.role == role['STUDENT']:
+        #             statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+        # flash('Zapisano zmiany')
+
+        # return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
+    return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)

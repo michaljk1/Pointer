@@ -4,7 +4,8 @@ from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatF
     ValidationError
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired
-from app.models import Course, Lesson
+from app.models.usercourse import Course
+from app.models.lesson import Lesson
 from app.student.forms import SolutionStudentSearchForm
 
 
@@ -62,6 +63,12 @@ class TestForm(FlaskForm):
 class AssigneUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
+
+
+class StatisticsForm(FlaskForm):
+    course = SelectField('Kurs', choices=[['All', 'Wszystkie kursy']])
+    email = SelectField('Użytkownik', choices=[])
+    submit_button = SubmitField('Wyszukaj')
 
 
 class EnableAssingmentLink(FlaskForm):
