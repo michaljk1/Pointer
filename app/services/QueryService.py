@@ -9,15 +9,31 @@ from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 
 
-def filter_by_status(solutions: List[Solution], status: str):
-    if status == Solution.Status['ACTIVE'] or status == Solution.Status['NOT_ACTIVE']:
-        for solution in solutions:
-            if not solution.is_visible():
-                solutions.remove(solution)
-    elif status != Solution.Status['ALL']:
-        for solution in solutions:
-            if solution.status != status:
-                solutions.remove(solution)
+def get_filtered_by_status(solutions: List[Solution], status: str):
+    qualified_solutions = []
+    if status == Solution.Status['ALL']:
+        return solutions
+    else:
+        if status in [Solution.Status['ACTIVE'], Solution.Status['NOT_ACTIVE']]:
+            filter_visible_by_status(qualified_solutions, solutions, status)
+        elif status == Solution.Status['SEND']:
+            for solution in solutions:
+                if (solution.status in [Solution.Status['ACTIVE'],
+                                        Solution.Status['NOT_ACTIVE']] and not solution.is_visible()) \
+                        or solution.status == Solution.Status['SEND']:
+                    qualified_solutions.append(solution)
+        else:
+            for solution in solutions:
+                if solution.status == status:
+                    qualified_solutions.append(solution)
+    return qualified_solutions
+
+
+def filter_visible_by_status(qualified_solutions: List[Solution], solutions: List[Solution], status: str):
+    for solution in solutions:
+        if solution.status == status:
+            if solution.is_visible():
+                qualified_solutions.append(solution)
 
 
 def exercise_query(form, user_id=None, courses=None):
@@ -77,5 +93,5 @@ def login_query(form: LoginInfoForm, user_role: str, ids=None):
             query = query.filter(1 == 0)
         else:
             query = query.filter(User.id.in_(ids))
-    #order_by(desc(Course.name, Lesson.name, Exercise.name, Solution.attempt))
+    # order_by(desc(Course.name, Lesson.name, Exercise.name, Solution.attempt))
     return query

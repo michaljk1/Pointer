@@ -65,8 +65,11 @@ class AssigneUserForm(FlaskForm):
     submit_button = SubmitField('Przypisz użytkownika')
 
 
-class StatisticsForm(FlaskForm):
-    course = SelectField('Kurs', choices=[['All', 'Wszystkie kursy']])
+class StatisticsCourseForm(FlaskForm):
+    course = SelectField('Kurs', choices=[])
+    submit_button = SubmitField('Wyszukaj')
+
+class StatisticsUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Wyszukaj')
 

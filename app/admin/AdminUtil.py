@@ -1,7 +1,6 @@
 from typing import List
 
 from app import db
-from app.mod.forms import LoginInfoForm
 from app.models.solution import Solution
 from app.models.usercourse import Course, role
 
@@ -23,4 +22,3 @@ def modify_solution(solution: Solution, refused: bool, points: float):
         solution.status = Solution.Status['SEND']
     solution.points = points
     db.session.commit()
-

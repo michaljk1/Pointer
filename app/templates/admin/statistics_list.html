@@ -1,0 +1,22 @@
+{% if statisticsList|length > 0 %}
+<table class="table">
+        <thead>
+        <th>Student</th>
+        <th>Kurs</th>
+        <th>Punkty</th>
+        <th>Możliwe punkty</th>
+        <th>Procentowo</th>
+        </thead>
+        <tbody>
+        {% for statistics in statisticsList %}
+            <tr>
+                <td><p>{{ statistics.user_email }}</p></td>
+                <td><p>{{ statistics.course_name }}</p></td>
+                <td><p>{{ statistics.user_points }}</p></td>
+                <td><p>{{ statistics.course_points }}</p></td>
+                <td><p>{{ statistics.get_percent_value() }}%</p></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

@@ -7,7 +7,7 @@ from app import db
 from app.DefaultUtil import get_current_date, unpack_file
 from app.models.solution import Solution
 from app.services.ExerciseService import execute_solution_thread
-from app.services.QueryService import exercise_query, filter_by_status
+from app.services.QueryService import exercise_query, get_filtered_by_status
 from app.services.RouteService import validate_role, validate_role_course, validate_role_solution
 from app.student import bp
 from app.student.forms import UploadForm, SolutionStudentSearchForm
@@ -83,8 +83,8 @@ def view_solutions():
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
-        solutions = exercise_query(form=form, courses=current_user.get_course_names(), user_id=current_user.id).all()
-        filter_by_status(solutions, form.status.data)
+        all_solutions = exercise_query(form=form, courses=current_user.get_course_names(), user_id=current_user.id).all()
+        solutions = get_filtered_by_status(all_solutions, form.status.data)
         return render_template('student/solutions.html', form=form, solutions=solutions)
     return render_template('student/solutions.html', form=form, solutions=[])
 

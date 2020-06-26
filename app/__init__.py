@@ -44,6 +44,3 @@ def create_app():
     app.register_blueprint(student_bp, url_prefix='/student')
 
     return app
-
-
-from app import models

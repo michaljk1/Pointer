@@ -15,7 +15,7 @@ from app.admin import bp
 from app.admin.AdminUtil import modify_solution, get_student_ids_emails
 from app.auth.email import send_confirm_email, send_course_email
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsForm
+    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm
 from werkzeug.utils import redirect, secure_filename
 from app.DefaultUtil import get_current_date
 from app.mod.forms import LoginInfoForm
@@ -255,22 +255,45 @@ def view_exports():
 @login_required
 def view_statistics():
     validate_role(current_user, role['ADMIN'])
-    form = StatisticsForm()
     statistics_list = []
-    form.email.choices = get_student_ids_emails(current_user.courses)[1]
     for course in current_user.courses:
         for member in course.members:
             if member.role == role['STUDENT']:
                 statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-    # if request.method == 'POST' and form.validate_on_submit():
-    # for course in current_user.courses:
-    #     for member in course.members:
-    #         if member.role == role['STUDENT']:
-    #             statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-    # flash('Zapisano zmiany')
+    return render_template('admin/statistics.html', statisticsList=statistics_list)
 
-    # return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
-    return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
+
+@bp.route('/statistics/by_course', methods=['GET', 'POST'])
+@login_required
+def view_statistics_course():
+    validate_role(current_user, role['ADMIN'])
+    form = StatisticsCourseForm()
+    statistics_list = []
+    for course in current_user.courses:
+        form.course.choices.append((course.name, course.name))
+    if request.method == 'POST' and form.validate_on_submit():
+        course = Course.query.filter_by(name=form.course.data).first()
+        for member in course.members:
+            if member.role == role['STUDENT']:
+                statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+        return render_template('admin/statistics_course.html', statisticsList=statistics_list, form=form)
+    return render_template('admin/statistics_course.html', statisticsList=statistics_list, form=form)
+
+
+@bp.route('/statistics/by_user', methods=['GET', 'POST'])
+@login_required
+def view_statistics_user():
+    validate_role(current_user, role['ADMIN'])
+    form = StatisticsUserForm()
+    statistics_list = []
+    form.email.choices = get_student_ids_emails(current_user.courses)[1]
+    if request.method == 'POST' and form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        for course in user.courses:
+            if course in current_user.courses:
+                statistics_list.append(Statistics(course=course, user=user, is_admin=True))
+        return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form)
+    return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form)
 
 
 @bp.route('/download')
