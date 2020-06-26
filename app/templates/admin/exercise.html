@@ -22,10 +22,15 @@
     <div><h1>Możliwe punkty: {{ exercise.get_max_points() }}</h1></div>
     <div><h1>Termin: {{ exercise.end_date }}</h1></div>
     <div><h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1></div>
+    <div><h1>Testy: </h1></div>
+    <hr>
     {% for test in exercise.tests %}
-        <div><p>Output: {{ test.output_name }}</p></div>
-        <div><p>Input: {{ test.input_name }}</p></div>
+        <div><p>Output: <a href="{{ url_for('admin.download_test', test_id=test.id, filename=test.output_name) }}"
+                           target="_blank"> {{ test.output_name }}</a></p></div>
+        <div><p>Input: <a href="{{ url_for('admin.download_test', test_id=test.id, filename=test.input_name) }}"
+                          target="_blank"> {{ test.input_name }}</a></p></div>
         <div><p>Punkty: {{ test.points }}</p></div>
+        <hr>
     {% endfor %}
     <div><a href="{{ url_for('admin.add_test', exercise_id = exercise.id) }}">Dodaj test</a></div>
     <div>

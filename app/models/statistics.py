@@ -12,4 +12,7 @@ class Statistics:
         self.course_name = course.name
 
     def get_percent_value(self):
-        return round((self.user_points / self.course_points * 100), 2)
+        if self.course_points > 0:
+            return round((self.user_points / self.course_points * 100), 2)
+        else:
+            return float(0)

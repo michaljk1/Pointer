@@ -33,7 +33,7 @@
                         <li><a href="{{ url_for('admin.view_statistics') }}">Statystyki</a></li>
                     {% endif %}
                     {% if not current_user.is_anonymous and current_user.is_student() %}
-                        <li><a href="{{ url_for('student.view_courses') }}">StudentKursy</a></li>
+                        <li><a href="{{ url_for('student.view_courses') }}">Kursy</a></li>
                         <li><a href="{{ url_for('student.view_solutions') }}">Rozwiązania</a></li>
                         <li><a href="{{ url_for('student.view_statistics') }}">Statystyki</a></li>
                     {% endif %}

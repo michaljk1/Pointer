@@ -3,7 +3,7 @@ import string
 import random
 # TODO
 # 1: obsluga maili, wyniki pdf,
-# 2: modyfikacja istniejacych obiektow, timeout testu, statystyki
+# 2: modyfikacja istniejacych obiektow, timeout testu, statystyki dla kursu i uzytkownika
 # 4: paginacja + order by przy wynikach, zalezne formularze w js
 # 5: selenium, backup, mysql -> sqlite, osmkdirs
 from datetime import datetime
@@ -19,6 +19,7 @@ from werkzeug.utils import redirect, secure_filename
 from app.DefaultUtil import get_current_date
 from app.mod.forms import LoginInfoForm
 from app.models.statistics import Statistics
+from app.models.test import Test
 from app.models.usercourse import Course, User, role
 from app.models.solutionexport import SolutionExport
 from app.models.lesson import Lesson
@@ -265,6 +266,16 @@ def download_export():
     export = SolutionExport.query.filter_by(id=export_id).first()
     validate_role(current_user, role['ADMIN'])
     return send_from_directory(directory=export.get_directory(), filename=export.file_name)
+
+
+@bp.route('/mytest')
+@login_required
+def download_test():
+    test_id = request.args.get('test_id')
+    filename = request.args.get('filename')
+    test = Test.query.filter_by(id=test_id).first()
+    validate_role(current_user, role['ADMIN'])
+    return send_from_directory(directory=test.get_directory(), filename=filename)
 
 
 @bp.route('/statistics', methods=['GET', 'POST'])

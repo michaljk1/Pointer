@@ -47,7 +47,7 @@ def accept_best_solution(user_id: int, exercise: Exercise):
         user_exercises.remove(best_solution)
     for user_exercise in user_exercises:
         if user_exercise.status not in [Solution.Status['REFUSED'], Solution.Status['RUN_ERROR'],
-                                        Solution.Status['REFUSED']]:
+                                        Solution.Status['COMPILE_ERROR'], Solution.Status['ERROR']]:
             user_exercise.status = Solution.Status['NOT_ACTIVE']
     db.session.commit()
 
@@ -81,7 +81,12 @@ def grade(solution):
         bash_command = dir_path + '/run.sh ' + solution.get_directory() + ' ' + program_name + ' ' + input_name + ' ' + output_name + ' ' + run_command
         process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE, stderr=error_file)
         output, error = process.communicate()
-        process.wait()
+        # try:
+        #     outs, errs = process.communicate(timeout=15)
+        # except subprocess.TimeoutExpired:
+        #     process.kill()
+        #     outs, errs = process.communicate()
+        process.wait(15)
         error_file.close()
         if os.path.getsize(error_file.name) > 0:
             solution.status = Solution.Status['RUN_ERROR']
