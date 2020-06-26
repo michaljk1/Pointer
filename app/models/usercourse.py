@@ -1,5 +1,6 @@
 import os
 
+import jwt
 from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
@@ -35,6 +36,7 @@ class Course(db.Model):
                 points += exercise.get_max_points()
         return points
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
@@ -43,7 +45,7 @@ class User(UserMixin, db.Model):
     surname = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False)
-    email_confirmed = db.Column(db.Boolean, default=False)
+    is_confirmed = db.Column(db.Boolean, default=False)
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
     history_logins = db.relationship('LoginInfo', backref='user', lazy='dynamic')
@@ -72,19 +74,28 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
-    def get_points_student(self, course: Course):
+    def get_points_for_student(self, course: Course):
         user_points = 0
         for solution in self.solutions:
             if solution.get_course() == course and solution.status == solution.Status['ACTIVE'] and solution.is_visible():
                 user_points += solution.points
         return user_points
 
-    def get_points_admin(self, course: Course):
+    def get_points_for_admin(self, course: Course):
         user_points = 0
         for solution in self.solutions:
             if solution.get_course() == course and solution.status == solution.Status['ACTIVE']:
                 user_points += solution.points
         return user_points
+
+    @staticmethod
+    def verify_confirm_email_token(token):
+        try:
+            email = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['confirm_email']
+        except:
+            return
+        return User.query.filter_by(email=email).first()
 
 
 @login.user_loader

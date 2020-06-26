@@ -1,7 +1,8 @@
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.email import send_confirm_email
+from app.auth.forms import LoginForm, RegistrationForm, ConfirmEmailForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 
@@ -30,6 +31,12 @@ def login():
             db.session.commit()
             flash('Invalid email or password')
             return redirect(url_for('auth.login'))
+        #TODO odkomentowac
+        # if not user.is_confirmed:
+        #     login_info.status = LoginInfo.Status['ERROR']
+        #     db.session.commit()
+        #     flash('Aktywuj swoje konto')
+        #     return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
         db.session.commit()
         next_page = request.args.get('next')
@@ -50,29 +57,26 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
+@bp.route('/activate', methods=['GET', 'POST'])
+def activate():
+    form = ConfirmEmailForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        send_confirm_email(form.email.data)
+        flash('Wysłano link aktywacyjny')
+        return redirect(url_for('auth.login'))
+    return  render_template('auth/activate.html', form=form)
+
+
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data)
+        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data, role=role['STUDENT'])
         user.set_password(form.password.data)
-        user_amount = len(User.query.all())
-        # if user.name == 'Szymon' and \
-        #         user.surname == 'Stefański':
-        #     user.is_trzodziuch = True
-        if user_amount == 0:
-            user.role = role['MODERATOR']
-        else:
-            user.role = role['STUDENT']
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
-        login_user(user)
-        login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.Status['SUCCESS'], user_id=user.id,
-                               login_date=get_current_date())
-        db.session.add(login_info)
-        db.session.commit()
-        return redirect_for_index_by_role(user.role)
+        return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 
 
@@ -96,3 +100,18 @@ def append_course(link):
         return redirect(url_for('student.view_course', course_name=course_by_link.name))
     elif current_user.role == role['MODERATOR']:
         return redirect(url_for('mod.index'))
+
+
+@bp.route('/confirm_email/<token>', methods=['GET', 'POST'])
+def confirm_email(token):
+    user: User = User.verify_confirm_email_token(token)
+    if not user:
+        flash('Nieaktywny link')
+        return redirect(url_for('default.index'))
+    user.is_confirmed = True
+    db.session.commit()
+    flash('Potwierdzono email')
+    if not current_user.is_authenticated:
+        flash('Potwierdzono email, zaloguj się')
+        return redirect(url_for('auth.login'))
+    return redirect(url_for('default.index'))

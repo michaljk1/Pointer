@@ -13,13 +13,14 @@ from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
 from app.admin.AdminUtil import modify_solution, get_student_ids_emails
+from app.auth.email import send_confirm_email, send_course_email
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsForm
 from werkzeug.utils import redirect, secure_filename
 from app.DefaultUtil import get_current_date
 from app.mod.forms import LoginInfoForm
 from app.models.statistics import Statistics
-from app.models.test import Test, Directorable
+from app.models.test import Test
 from app.models.usercourse import Course, User, role
 from app.models.solutionexport import SolutionExport
 from app.models.lesson import Lesson
@@ -46,14 +47,14 @@ def logout():
 def add_student(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
-    users = []
     form = AssigneUserForm()
-    for user in User.query.filter(~User.courses.any(name=course.name)).all():
-        users.append((user.email, user.email))
-    form.email.choices = users
+    for user in User.query.filter(~User.courses.any(name=course.name)).filter(
+            User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
+        form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         user.courses.append(course)
+        send_course_email(form.email.data, course_name=course.name, role = user.role)
         db.session.commit()
         flash('Dodano studenta')
     return render_template('admin/add_student.html', form=form, course=course)
@@ -262,13 +263,13 @@ def view_statistics():
             if member.role == role['STUDENT']:
                 statistics_list.append(Statistics(course=course, user=member, is_admin=True))
     # if request.method == 'POST' and form.validate_on_submit():
-        # for course in current_user.courses:
-        #     for member in course.members:
-        #         if member.role == role['STUDENT']:
-        #             statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-        # flash('Zapisano zmiany')
+    # for course in current_user.courses:
+    #     for member in course.members:
+    #         if member.role == role['STUDENT']:
+    #             statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+    # flash('Zapisano zmiany')
 
-        # return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
+    # return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
     return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
 
 

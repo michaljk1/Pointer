@@ -41,7 +41,4 @@ class Solution(db.Model):
         end_date = self.exercise.end_date
         end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
                                 minute=end_date.minute, tzinfo=current_datetime.tzinfo)
-        if current_datetime > end_datetime:
-            return True
-        else:
-            return False
+        return current_datetime > end_datetime

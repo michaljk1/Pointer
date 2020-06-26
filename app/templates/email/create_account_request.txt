@@ -1,3 +1,0 @@
-To reset your password click on the following link:
-
-{{ url_for('student.view_courses', token=token, _external=True) }}
