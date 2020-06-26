@@ -8,7 +8,7 @@ import random
 # 5: selenium, backup, mysql -> sqlite, osmkdirs
 from datetime import datetime
 
-from flask import render_template, url_for, flash, request, send_from_directory, current_app
+from flask import render_template, url_for, flash, request, send_from_directory, current_app, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
@@ -19,7 +19,7 @@ from werkzeug.utils import redirect, secure_filename
 from app.DefaultUtil import get_current_date
 from app.mod.forms import LoginInfoForm
 from app.models.statistics import Statistics
-from app.models.test import Test
+from app.models.test import Test, Directorable
 from app.models.usercourse import Course, User, role
 from app.models.solutionexport import SolutionExport
 from app.models.lesson import Lesson
@@ -250,34 +250,6 @@ def view_exports():
     return render_template('admin/exports.html', exports=exports)
 
 
-@bp.route('/uploads/<int:solution_id>/', methods=['GET', 'POST'])
-@login_required
-def download_solution(solution_id):
-    solution = Solution.query.filter_by(id=solution_id).first()
-    validate_role_course(current_user, role['ADMIN'], solution.get_course())
-    return send_from_directory(directory=solution.get_directory(),
-                               filename=solution.file_path)
-
-
-@bp.route('/myexport')
-@login_required
-def download_export():
-    export_id = request.args.get('export_id')
-    export = SolutionExport.query.filter_by(id=export_id).first()
-    validate_role(current_user, role['ADMIN'])
-    return send_from_directory(directory=export.get_directory(), filename=export.file_name)
-
-
-@bp.route('/mytest')
-@login_required
-def download_test():
-    test_id = request.args.get('test_id')
-    filename = request.args.get('filename')
-    test = Test.query.filter_by(id=test_id).first()
-    validate_role(current_user, role['ADMIN'])
-    return send_from_directory(directory=test.get_directory(), filename=filename)
-
-
 @bp.route('/statistics', methods=['GET', 'POST'])
 @login_required
 def view_statistics():
@@ -298,3 +270,28 @@ def view_statistics():
 
         # return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
     return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
+
+
+@bp.route('/download')
+def download():
+    request_id = request.args.get('id')
+    domain = request.args.get('domain')
+    my_object, my_course, filename = None, None, None
+    if domain == 'test':
+        my_object = Test.query.filter_by(id=request_id).first()
+        filename = request.args.get('filename')
+        my_course = my_object.get_course()
+    elif domain == 'solution':
+        my_object = Solution.query.filter_by(id=request_id).first()
+        filename = my_object.file_path
+        my_course = my_object.get_course()
+    elif domain == 'export':
+        my_object = SolutionExport.query.filter_by(id=request_id).first()
+        filename = my_object.file_name
+    else:
+        abort(404)
+    if my_course is not None:
+        validate_role_course(current_user, role['ADMIN'], my_course)
+    else:
+        validate_role(current_user, role['ADMIN'])
+    return send_from_directory(directory=my_object.get_directory(), filename=filename)

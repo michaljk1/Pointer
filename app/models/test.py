@@ -13,3 +13,6 @@ class Test(db.Model):
 
     def get_directory(self):
         return os.path.join(self.executor.get_directory(), str(self.order))
+
+    def get_course(self):
+        return self.executor.get_course()

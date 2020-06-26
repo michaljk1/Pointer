@@ -27,7 +27,6 @@ class Solution(db.Model):
         'NOT_ACTIVE': 'Nieaktywne'
     }
 
-
     def get_lesson(self):
         return self.exercise.lesson
 

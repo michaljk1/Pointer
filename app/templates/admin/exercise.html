@@ -25,9 +25,9 @@
     <div><h1>Testy: </h1></div>
     <hr>
     {% for test in exercise.tests %}
-        <div><p>Output: <a href="{{ url_for('admin.download_test', test_id=test.id, filename=test.output_name) }}"
+        <div><p>Output: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.output_name) }}"
                            target="_blank"> {{ test.output_name }}</a></p></div>
-        <div><p>Input: <a href="{{ url_for('admin.download_test', test_id=test.id, filename=test.input_name) }}"
+        <div><p>Input: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.input_name) }}"
                           target="_blank"> {{ test.input_name }}</a></p></div>
         <div><p>Punkty: {{ test.points }}</p></div>
         <hr>
