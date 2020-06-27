@@ -5,7 +5,7 @@
     /
     <a href="{{ url_for('student.view_course', course_name = exercise.lesson.course.name) }}"> {{ exercise.lesson.course.name }} </a>
     /
-    <a href="{{ url_for('student.view_lesson', course_name = exercise.lesson.course.name, lesson_id = exercise.lesson.id) }}"> {{ exercise.lesson.name }} </a>
+    <a href="{{ url_for('student.view_lesson', lesson_name = exercise.lesson.name) }}"> {{ exercise.lesson.name }} </a>
     /
     <a href="{{ url_for('student.view_exercise', exercise_id = exercise.id) }}"> {{ exercise.name }} </a>
 {% endblock %}
@@ -15,37 +15,12 @@
     <div><h1>{{ exercise.content }}</h1></div>
     <div><h1>Maksymalna liczba prób: {{ exercise.max_attempts }}</h1></div>
     <div><h1>Termin przesłania zadania: {{ exercise.end_date }}</h1></div>
-    {% if datetime.date() < exercise.end_date and solutions|length < exercise.max_attempts %}
+    {% if solutions|length < exercise.max_attempts and not exercise.is_finished() %}
         <div class="row">
             <div class="col-md-4">
                 {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
             </div>
         </div>
     {% endif %}
-    {% if solutions|length > 0 %}
-        <table class="table">
-            <thead>
-            <th>Plik</th>
-            <th>Data wysłania</th>
-            <th>Status</th>
-            <th>Punkty</th>
-            </thead>
-            <tbody>
-            {% for solution in solutions %}
-                <tr class="pointercurs">
-                    <td><p>{{ solution.file_path }}</p></td>
-                    <td><p>{{ solution.send_date }}</p></td>
-                    {% if datetime.date() >= exercise.end_date %}
-                        <td><p>{{ solution.status }}</p></td>
-                        <td><p>{{ solution.points }}</p></td>
-                    {% else %}
-                        <td><p> - </p></td>
-                        <td><p> - </p></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
-    {% endif %}
+        {% include "student/solutionlist.html" %}
 {% endblock %}

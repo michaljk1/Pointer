@@ -1,0 +1,33 @@
+{% set statistics_json = [] %}
+{% if statisticsList|length > 0 %}
+    <table class="table">
+        <thead>
+        <th>Student</th>
+        <th>Kurs</th>
+        <th>Punkty</th>
+        <th>Możliwe punkty</th>
+        <th>Procentowo</th>
+        </thead>
+        <tbody>
+        {% for statistics in statisticsList %}
+            {% do statistics_json.append({
+            "user_email": statistics.user_email,
+            "course_name": statistics.course_name,
+            "course_points": statistics.course_points,
+            "user_points": statistics.user_points,
+            "percent_value": statistics.get_percent_value()
+            }) %}
+            <tr>
+                <td><p>{{ statistics.user_email }}</p></td>
+                <td><p>{{ statistics.course_name }}</p></td>
+                <td><p>{{ statistics.user_points }}</p></td>
+                <td><p>{{ statistics.course_points }}</p></td>
+                <td><p>{{ statistics.get_percent_value() }}%</p></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h1><a href="{{ url_for('admin.export_statistics', statistics_json = statistics_json)}}">Export CSV</a></h1>
+
+{% endif %}
+

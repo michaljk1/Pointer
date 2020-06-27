@@ -11,7 +11,7 @@ body {
     border-style: solid;
     border-color: grey;
     margin: 0 auto;
-    min-height: 500px;
+    min-height: 600px;
     padding: 10px;
 }
 
@@ -29,6 +29,9 @@ div.about {
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
+}
+h1 {
+    font-size: 1.5em;
 }
 
 h2 {

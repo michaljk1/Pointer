@@ -1,41 +1,58 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_solutions') }}"><pb> Rozwiązania </pb></a>
+    <a href="{{ url_for('admin.view_solutions') }}">
+        <pb> Rozwiązania</pb>
+    </a>
 {% endblock %}
 {% block app_content %}
     <form action="" method="post" class="form" role="form">
         {{ form.csrf_token() }}
-        {{ wtf.form_field(form.name, class='form-control') }}
-        {{ wtf.form_field(form.surname, class='form-control') }}
         {{ wtf.form_field(form.course, class='form-control') }}
         {{ wtf.form_field(form.lesson, class='form-control') }}
-        {{ wtf.form_field(form.status, class='form-control') }}
         {{ wtf.form_field(form.exercise, class='form-control') }}
+        {{ wtf.form_field(form.status, class='form-control') }}
+        {{ wtf.form_field(form.name, class='form-control') }}
+        {{ wtf.form_field(form.surname, class='form-control') }}
         {{ wtf.form_field(form.points_from, class='form-control') }}
         {{ wtf.form_field(form.points_to, class='form-control') }}
         <p>{{ form.submit() }}</p>
     </form>
+    {% set solution_ids = [] %}
     {% if solutions|length > 0 %}
-    <table class="table">
-        <thead>
-        <th>Autor</th>
-        <th>Plik</th>
-        <th>Punkty</th>
-        <th>Próba</th>
-        <th>Status</th>
-        </thead>
-        <tbody>
-        {% for solution in solutions %}
-            <tr class="pointercurs" onclick="window.open('{{ url_for('admin.view_solution', solution_id = solution.id ) }}','_blank');">
-                <td><p>{{ solution.author.email }}</p></td>
-                <td><p>{{ solution.file_path }}</p></td>
-                <td><p>{{ solution.points }}</p></td>
-                <td><p>{{ solution.attempt }}</p></td>
-                <td><p>{{ solution.status }}</p></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <table class="table">
+            <thead>
+            <th>Autor</th>
+            <th>Kurs</th>
+            <th>Lekcja</th>
+            <th>Ćwiczenie</th>
+            <th>Data wysłania</th>
+            <th>Punkty</th>
+            <th>Próba</th>
+            <th>Status</th>
+            </thead>
+            <tbody>
+            {% for solution in solutions %}
+                {% do solution_ids.append(solution.id) %}
+                <tr class="pointercurs"
+                    onclick="window.open('{{ url_for('admin.view_solution', solution_id = solution.id ) }}','_blank');">
+                    <td><p>{{ solution.author.email }}</p></td>
+                    <td><p><a href="{{ url_for('admin.view_course', course_name=solution.get_course().name) }}"
+                              target="_blank">{{ solution.get_course().name }}</a></p></td>
+                    <td><p><a href="{{ url_for('admin.view_lesson', lesson_name=solution.exercise.lesson.name) }}"
+                              target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
+                    <td><p><a href="{{ url_for('admin.view_exercise', exercise_id=solution.exercise.id) }}"
+                              target="_blank">{{ solution.exercise.name }}</a></p></td>
+                    <td><p>{{ solution.send_date }}</p></td>
+                    <td><p>{{ solution.points }}</p></td>
+                    <td><p>{{ solution.attempt }}</p></td>
+                    <td><p>{{ solution.status }}</p></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin.export_solutions', ids=solution_ids) }}">
+            <pb> CSV</pb>
+        </a>
     {% endif %}
 {% endblock %}

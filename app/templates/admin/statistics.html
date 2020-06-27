@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin.view_statistics') }}"> Statystki </a>
+{% endblock %}
+{% block app_content %}
+    <div><a href="{{ url_for('admin.view_statistics_user') }}"> Statystyki studenta </a></div>
+    <div><a href="{{ url_for('admin.view_statistics_course') }}"> Statystyki kursu </a></div>
+    {% include "admin/statistics_list.html" %}
+{% endblock %}

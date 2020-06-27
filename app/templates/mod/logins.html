@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+    {% if logins|length > 0 %}
+        <table class="table">
+            <thead>
+            <th>Użytkownik</th>
+            <th>IP</th>
+            <th>Data</th>
+            <th>Status</th>
+            </thead>
+            <tbody>
+            {% for login in logins %}
+                <tr>
+                    <td><p>{{ login.user.email }}</p></td>
+                    <td><p>{{ login.ip_address }}</p></td>
+                    <td><p>{{ login.login_date }}</p></td>
+                    <td><p>{{ login.status }}</p></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

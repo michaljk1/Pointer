@@ -7,6 +7,6 @@
 {% block app_content %}
     <div><h2>{{ course.name }}</h2></div>
     {% for lesson in course.lessons %}
-        <div><h1><a href="{{ url_for('student.view_lesson', lesson_id = lesson.id ) }}">{{ lesson.name }}</a></h1></div>
+        <div><h1><a href="{{ url_for('student.view_lesson', lesson_name = lesson.name ) }}">{{ lesson.name }}</a></h1></div>
     {% endfor %}
 {% endblock %}

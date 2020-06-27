@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin.view_statistics') }}"> Statystki </a>
+    /
+    <a href="{{ url_for('admin.view_statistics_course') }}"> Kurs </a>
+{% endblock %}
+{% block app_content %}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'search_button': 'primary'}) }}
+        </div>
+    </div>
+    {% include "admin/statistics_list.html" %}
+
+{% endblock %}

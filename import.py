@@ -1,18 +1,19 @@
 import os
 
 commands = [
-    "pip3 install flask-sqlalchemy",
-    "pip3 install flask-migrate",
-    "pip3 install flask-login",
-    "pip3 install flask-wtf",
-    "pip3 install Flask-User",
-    "pip3 install flask-bootstrap",
-    "pip3 install python-dotenv",
-    "pip3 install flask-mail",
-    "pip3 install pyjwt",
-    "pip3 install setuptools",
-    "pip3 install mysqlclient",
-    "pip3 install pytz"
+    "pip install flask-sqlalchemy",
+    "pip install flask-migrate",
+    "pip install flask-login",
+    "pip install flask-wtf",
+    "pip install Flask-User",
+    "pip install flask-bootstrap",
+    "pip install python-dotenv",
+    "pip install flask-mail",
+    "pip install pyjwt",
+    "pip install setuptools",
+    # "pip install mysqlclient",
+    "pip install pytz"
+#    "pip install pdfkit"
     ]
 # sudo apt-get install python3-dev
 for command in commands:

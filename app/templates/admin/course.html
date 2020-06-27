@@ -13,7 +13,7 @@
     <div><h2>{{ course.name }}</h2></div>
     {% for lesson in course.lessons %}
         <div><h1><a
-                href="{{ url_for('admin.view_lesson',course_name = course.name, lesson_id = lesson.id ) }}">{{ lesson.name }}</a>
+                href="{{ url_for('admin.view_lesson',lesson_name = lesson.name) }}">{{ lesson.name }}</a>
         </h1></div>
     {% endfor %}
     <div><h1><a href="{{ url_for('admin.add_lesson', course_name = course.name ) }}">Dodaj lekcję</a></h1></div>

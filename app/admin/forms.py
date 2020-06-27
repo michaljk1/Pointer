@@ -1,10 +1,11 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
+from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
     ValidationError
-from wtforms.fields.html5 import DateField
-
-from app.models import Course, Lesson
+from wtforms.fields.html5 import DateField, TimeField
+from wtforms.validators import DataRequired
+from app.models.usercourse import Course
+from app.models.lesson import Lesson
 from app.student.forms import SolutionStudentSearchForm
 
 
@@ -24,8 +25,8 @@ class CourseForm(FlaskForm):
 
 
 class LessonForm(FlaskForm):
-    name = StringField('Nazwa lekcji')
-    text_content = StringField('Treść')
+    name = StringField('Nazwa lekcji', validators=[DataRequired()])
+    text_content = StringField('Treść', validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
     content_url = StringField('Link')
     submit_button = SubmitField('Dodaj lekcję')
@@ -37,29 +38,46 @@ class LessonForm(FlaskForm):
 
 
 class ExerciseForm(FlaskForm):
-    name = StringField('Nazwa')
-    content = StringField('Treść')
-    max_attempts = IntegerField('Liczba prób', default=3)
-    end_date = DateField('Termin końcowy', format='%Y-%m-%d')
+    name = StringField('Nazwa', validators=[DataRequired()])
+    content = StringField('Treść', validators=[DataRequired()])
+    max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired()])
+    end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()] )
+    end_time = TimeField('Godzina')
     compile_command = StringField('compile command')
-    run_command = StringField('run_command')
-    output = FileField('Output')
-    input = FileField('Input')
-    max_points = FloatField('Liczba punktów')
-    program_name = StringField('Nazwa testowanego pliku')
+    run_command = StringField('run_command' , validators=[DataRequired()])
+    output = FileField('Output', validators=[DataRequired()])
+    input = FileField('Input', validators=[DataRequired()])
+    max_points = FloatField('Liczba punktów', validators=[DataRequired()])
+    program_name = StringField('Nazwa testowanego pliku', validators=[DataRequired()])
+    timeout = IntegerField('Timeout w sekundach')
     submit_button = SubmitField('Dodaj ćwiczenie')
 
 
 class TestForm(FlaskForm):
-    max_points = FloatField('Liczba punktów')
-    output = FileField('Output')
-    input = FileField('Input')
-    submit_button = SubmitField('Dodaj ćwiczenie')
+    max_points = FloatField('Liczba punktów', validators=[DataRequired()])
+    output = FileField('Output', validators=[DataRequired()])
+    input = FileField('Input', validators=[DataRequired()])
+    submit_button = SubmitField('Dodaj test')
 
 
 class AssigneUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
+
+
+class StatisticsCourseForm(FlaskForm):
+    course = SelectField('Kurs', choices=[])
+    search_button = SubmitField('Wyszukaj')
+
+
+class CSVForm(FlaskForm):
+    submit_button = SubmitField('Eksport CSV')
+
+
+class StatisticsUserForm(FlaskForm):
+    email = SelectField('Użytkownik', choices=[])
+    search_button = SubmitField('Wyszukaj')
+
 
 class EnableAssingmentLink(FlaskForm):
     activate = BooleanField('Aktywny zapis')
@@ -69,7 +87,7 @@ class EnableAssingmentLink(FlaskForm):
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
     points = FloatField('Punkty')
-    admin_refused = BooleanField('Odrzuć zadanie')
+    admin_ref = BooleanField('Odrzuć zadanie')
     file_path = StringField('Plik', render_kw={'readonly': True})
     attempt = IntegerField('Próba', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})

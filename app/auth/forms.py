@@ -1,14 +1,24 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email
-from app.models import User
+from app.models.usercourse import User
 
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    password = PasswordField('Hasło', validators=[DataRequired()])
+    remember_me = BooleanField('Zapisz')
+    submit = SubmitField('Zaloguj się')
+
+
+class ConfirmEmailForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Wyślij link')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('Podany adres email nie istnieje')
 
 
 class RegistrationForm(FlaskForm):
@@ -17,7 +27,7 @@ class RegistrationForm(FlaskForm):
     name = StringField('Imię', validators=[DataRequired()])
     surname = StringField('Nazwisko', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Register user')
+    submit = SubmitField('Zarejestruj się')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
