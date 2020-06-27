@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-
 from app import db
 from app.DefaultUtil import get_current_date
 
@@ -36,9 +35,3 @@ class Solution(db.Model):
     def get_directory(self):
         return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))
 
-    def is_visible(self):
-        current_datetime = get_current_date()
-        end_date = self.exercise.end_date
-        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_date.hour,
-                                minute=end_date.minute, tzinfo=current_datetime.tzinfo)
-        return current_datetime > end_datetime

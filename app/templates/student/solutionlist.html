@@ -21,12 +21,12 @@
                     <td><p><a href="{{ url_for('student.view_exercise', exercise_id=solution.exercise.id) }}"
                               target="_blank">{{ solution.exercise.name }}</a></p></td>
                     <td><p>{{ solution.send_date }}</p></td>
-                    {% if solution.is_visible()%}
+                    {% if solution.exercise.is_finished()%}
                     <td><p>{{ solution.status }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
                     {% else %}
                         {% if solution.status == solution.Status['ACTIVE'] or solution.status == solution.Status['NOT_ACTIVE'] %}
-                        <td><p> Oddano </p></td>
+                        <td><p> {{ solution.Status['SEND'] }} </p></td>
                         {% else %}
                         <td><p>{{ solution.status }}</p></td>
                         {% endif %}

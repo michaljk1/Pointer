@@ -19,7 +19,7 @@ def get_filtered_by_status(solutions: List[Solution], status: str):
         elif status == Solution.Status['SEND']:
             for solution in solutions:
                 if (solution.status in [Solution.Status['ACTIVE'],
-                                        Solution.Status['NOT_ACTIVE']] and not solution.is_visible()) \
+                                        Solution.Status['NOT_ACTIVE']] and not solution.exercise.is_finished()) \
                         or solution.status == Solution.Status['SEND']:
                     qualified_solutions.append(solution)
         else:
@@ -32,7 +32,7 @@ def get_filtered_by_status(solutions: List[Solution], status: str):
 def filter_visible_by_status(qualified_solutions: List[Solution], solutions: List[Solution], status: str):
     for solution in solutions:
         if solution.status == status:
-            if solution.is_visible():
+            if solution.exercise.is_finished():
                 qualified_solutions.append(solution)
 
 

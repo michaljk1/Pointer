@@ -77,7 +77,7 @@ class User(UserMixin, db.Model):
     def get_points_for_student(self, course: Course):
         user_points = 0
         for solution in self.solutions:
-            if solution.get_course() == course and solution.status == solution.Status['ACTIVE'] and solution.is_visible():
+            if solution.get_course() == course and solution.status == solution.Status['ACTIVE'] and solution.exercise.is_finished():
                 user_points += solution.points
         return user_points
 

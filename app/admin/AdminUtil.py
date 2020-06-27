@@ -22,3 +22,11 @@ def modify_solution(solution: Solution, refused: bool, points: float):
         solution.status = Solution.Status['SEND']
     solution.points = points
     db.session.commit()
+
+
+def modify_course(course: Course, is_open: bool):
+    if is_open:
+        course.is_open = True
+    else:
+        course.is_open = False
+    db.session.commit()

@@ -2,17 +2,17 @@ import os
 import string
 import random
 # TODO
-# 1: obsluga maili, wyniki pdf,
-# 2: modyfikacja istniejacych obiektow, timeout testu, statystyki dla kursu i uzytkownika
-# 4: paginacja + order by przy wynikach, zalezne formularze w js
-# 5: selenium, backup, mysql -> sqlite, osmkdirs
+# 1: wyniki pdf,
+# 2: modyfikacja istniejacych obiektow, timeout testu,
+# 4: paginacja + order by przy wynikach
+# 5: selenium, backup, mysql -> sqlite
 from datetime import datetime
 
 from flask import render_template, url_for, flash, request, send_from_directory, current_app, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
-from app.admin.AdminUtil import modify_solution, get_student_ids_emails
+from app.admin.AdminUtil import modify_solution, get_student_ids_emails, modify_course
 from app.auth.email import send_confirm_email, send_course_email
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
     SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm
@@ -76,11 +76,7 @@ def view_course(course_name):
     validate_role_course(current_user, role['ADMIN'], course)
     form = EnableAssingmentLink(activate=course.is_open)
     if request.method == 'POST' and form.validate_on_submit():
-        if form.activate.data:
-            course.is_open = True
-        else:
-            course.is_open = False
-        db.session.commit()
+        modify_course(course, form.activate.data)
         flash('Zapisano zmiany')
         return render_template('admin/course.html', form=form, course=course)
     return render_template('admin/course.html', form=form, course=course)
@@ -118,10 +114,9 @@ def add_lesson(course_name):
     form = LessonForm()
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['pdf_content']
-        filename = secure_filename(file.filename)
+        filename, lesson_name = secure_filename(file.filename), form.name.data
         if filename == '':
             filename = None
-        lesson_name = form.name.data
         new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
                             raw_text=form.text_content.data)
         course.lessons.append(new_lesson)
@@ -254,6 +249,7 @@ def view_exports():
 @bp.route('/statistics', methods=['GET', 'POST'])
 @login_required
 def view_statistics():
+
     validate_role(current_user, role['ADMIN'])
     statistics_list = []
     for course in current_user.courses:

@@ -7,8 +7,13 @@ def validate_role(user, user_role):
         abort(404)
 
 
+def validate_role_course_name(user, user_role, course):
+    if user.role != user_role or user.get_course_by_name(course) is None:
+        abort(404)
+
+
 def validate_role_course(user, user_role, course):
-    if user.role != user_role or course not in user.courses:
+    if user.role != user_role or course is None or course not in user.courses:
         abort(404)
 
 

@@ -1,8 +1,10 @@
 import os
+from datetime import datetime
 
 from werkzeug.utils import secure_filename
 
 from app import db
+from app.DefaultUtil import get_current_date
 from app.models.test import Test
 
 
@@ -55,4 +57,9 @@ class Exercise(db.Model):
         input_file.save(os.path.join(test_directory, input_name))
         output_file.save(os.path.join(test_directory, output_name))
 
+    def is_finished(self):
+        current_datetime = get_current_date()
+        end_datetime = datetime(year=self.end_date.year, month=self.end_date.month, day=self.end_date.day, hour=self.end_date.hour,
+                                minute=self.end_date.minute, tzinfo=current_datetime.tzinfo)
+        return current_datetime > end_datetime
 
