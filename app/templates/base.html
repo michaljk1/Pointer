@@ -27,15 +27,15 @@
                 <ul class="nav navbar-nav">
                     {% if not current_user.is_anonymous and current_user.is_admin() %}
                         <li><a href="{{ url_for('admin.view_courses') }}">Kursy</a></li>
-                        <li><a href="{{ url_for('admin.view_solutions') }}">Rozwiązania</a></li>
-                        <li><a href="{{ url_for('admin.view_logins') }}">Logowania</a></li>
-                        <li><a href="{{ url_for('admin.view_exports') }}">Pliki</a></li>
                         <li><a href="{{ url_for('admin.view_statistics') }}">Statystyki</a></li>
+                        <li><a href="{{ url_for('admin.view_solutions') }}">Rozwiązania</a></li>
+                        <li><a href="{{ url_for('admin.view_exports') }}">Pliki</a></li>
+                        <li><a href="{{ url_for('admin.view_logins') }}">Logowania</a></li>
                     {% endif %}
                     {% if not current_user.is_anonymous and current_user.is_student() %}
                         <li><a href="{{ url_for('student.view_courses') }}">Kursy</a></li>
-                        <li><a href="{{ url_for('student.view_solutions') }}">Rozwiązania</a></li>
                         <li><a href="{{ url_for('student.view_statistics') }}">Statystyki</a></li>
+                        <li><a href="{{ url_for('student.view_solutions') }}">Rozwiązania</a></li>
                     {% endif %}
                     {% if not current_user.is_anonymous and current_user.is_moderator() %}
                         <li><a href="{{ url_for('mod.change_role') }}">Role użytkowników</a></li>

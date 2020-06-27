@@ -37,7 +37,6 @@ class Course(db.Model):
         return points
 
 
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
@@ -102,10 +101,6 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.filter_by(email=email).first()
-
-
-class Mod(User):
-    email_mod = db.Column(db.String(70), index=True, unique=True)
 
 
 @login.user_loader

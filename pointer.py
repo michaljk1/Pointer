@@ -9,8 +9,8 @@ from app.models.usercourse import User
 with app.app_context():
     mod = User.query.filter_by(role='MODERATOR').all()
     if len(mod) == 0:
-        user = User(email='moderator@mod.com', login='moderator', name='Moderator', surname='Moderator',
+        user = User(email='mod@admin.com', login='moderator', name='Moderator', surname='Moderator',
                     role='MODERATOR', is_confirmed=True)
-        user.set_password(sys.argv[1])
+        user.set_password('admin')
         db.session.add(user)
         db.session.commit()

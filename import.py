@@ -11,7 +11,7 @@ commands = [
     "pip install flask-mail",
     "pip install pyjwt",
     "pip install setuptools",
-    "pip install mysqlclient",
+    # "pip install mysqlclient",
     "pip install pytz"
 #    "pip install pdfkit"
     ]

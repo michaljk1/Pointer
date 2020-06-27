@@ -4,7 +4,7 @@ import random
 # TODO
 # 1: wyniki pdf,
 # 2: modyfikacja istniejacych obiektow, timeout testu,
-# 4: paginacja + order by przy wynikach
+# 4: paginacja
 # 5: selenium, backup, mysql -> sqlite
 from datetime import datetime
 
@@ -13,11 +13,10 @@ from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from app.admin import bp
 from app.admin.AdminUtil import modify_solution, get_student_ids_emails, modify_course
-from app.auth.email import send_confirm_email, send_course_email
+from app.auth.email import send_course_email
 from app.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm, CSVForm
+    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm
 from werkzeug.utils import redirect, secure_filename
-from app.DefaultUtil import get_current_date
 from app.mod.forms import LoginInfoForm
 from app.models.statistics import Statistics
 from app.models.test import Test
@@ -30,7 +29,7 @@ from app import db
 from app.models.solution import Solution
 from app.services.ExerciseService import accept_best_solution
 from app.services.ExportService import create_csv_solution_export, create_csv_statistics_export
-from app.services.QueryService import exercise_query, login_query
+from app.services.QueryService import login_query, exercise_admin_query
 from app.services.RouteService import validate_exists, validate_role_course, validate_role
 
 
@@ -189,7 +188,7 @@ def view_solutions():
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
-        solutions = exercise_query(form=form, courses=current_user.get_course_names()).all()
+        solutions = exercise_admin_query(form=form, courses=current_user.get_course_names()).all()
         return render_template('admin/solutions.html', form=form, solutions=solutions)
     return render_template('admin/solutions.html', form=form, solutions=[])
 
@@ -206,7 +205,6 @@ def view_solution(solution_id):
         modify_solution(solution, solution_form.admin_ref.data, solution_form.points.data)
         accept_best_solution(solution.user_id, solution.exercise)
         flash('Zapisano zmiany')
-        return render_template('admin/solution.html', form=solution_form, solution=solution)
     return render_template('admin/solution.html', form=solution_form, solution=solution)
 
 
@@ -214,12 +212,11 @@ def view_solution(solution_id):
 @login_required
 def view_logins():
     validate_role(current_user, role['ADMIN'])
-    form = LoginInfoForm()
+    form, logins = LoginInfoForm(), []
     user_ids, form.email.choices = get_student_ids_emails(current_user.courses)
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
-        return render_template('mod/logins.html', form=form, logins=logins)
-    return render_template('mod/logins.html', form=form, logins=[])
+    return render_template('mod/logins.html', form=form, logins=logins)
 
 
 @bp.route('/export_solutions/')
@@ -246,7 +243,7 @@ def export_statistics():
 @login_required
 def view_exports():
     validate_role(current_user, role['ADMIN'])
-    exports = Export.query.filter_by(user_id=current_user.id).all()
+    exports = Export.query.filter_by(user_id=current_user.id).order_by(desc(Export.generation_date)).all()
     return render_template('admin/exports.html', exports=exports)
 
 
@@ -285,7 +282,7 @@ def view_statistics_user():
     form = StatisticsUserForm()
     statistics_list = []
     form.email.choices = get_student_ids_emails(current_user.courses)[1]
-    if request.method == 'POST' and form.search_button.data and form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         for course in user.courses:
             if course in current_user.courses:
