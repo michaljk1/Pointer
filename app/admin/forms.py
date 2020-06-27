@@ -67,15 +67,16 @@ class AssigneUserForm(FlaskForm):
 
 class StatisticsCourseForm(FlaskForm):
     course = SelectField('Kurs', choices=[])
-    submit_button = SubmitField('Wyszukaj')
+    search_button = SubmitField('Wyszukaj')
 
 
 class CSVForm(FlaskForm):
-    submit_button = SubmitField('Eksport')
+    submit_button = SubmitField('Eksport CSV')
+
 
 class StatisticsUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
-    submit_button = SubmitField('Wyszukaj')
+    search_button = SubmitField('Wyszukaj')
 
 
 class EnableAssingmentLink(FlaskForm):

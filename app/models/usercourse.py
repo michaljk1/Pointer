@@ -37,6 +37,7 @@ class Course(db.Model):
         return points
 
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
@@ -88,6 +89,11 @@ class User(UserMixin, db.Model):
                 user_points += solution.points
         return user_points
 
+    def get_admin_directory(self):
+        if self.role == role['ADMIN']:
+            return os.path.join(current_app.instance_path, self.login)
+        return None
+
     @staticmethod
     def verify_confirm_email_token(token):
         try:
@@ -96,6 +102,10 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.filter_by(email=email).first()
+
+
+class Mod(User):
+    email_mod = db.Column(db.String(70), index=True, unique=True)
 
 
 @login.user_loader

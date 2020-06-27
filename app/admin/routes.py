@@ -29,7 +29,7 @@ from app.models.exercise import Exercise
 from app import db
 from app.models.solution import Solution
 from app.services.ExerciseService import accept_best_solution
-from app.services.ExportService import create_csv_solution_export, create_csv_sstatistics_export
+from app.services.ExportService import create_csv_solution_export, create_csv_statistics_export
 from app.services.QueryService import exercise_query, login_query
 from app.services.RouteService import validate_exists, validate_role_course, validate_role
 
@@ -54,7 +54,7 @@ def add_student(course_name):
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         user.courses.append(course)
-        send_course_email(form.email.data, course_name=course.name, role = user.role)
+        send_course_email(form.email.data, course_name=course.name, role=user.role)
         db.session.commit()
         flash('Dodano studenta')
     return render_template('admin/add_student.html', form=form, course=course)
@@ -222,18 +222,22 @@ def view_logins():
     return render_template('mod/logins.html', form=form, logins=[])
 
 
-@bp.route('/export_csv/')
+@bp.route('/export_solutions/')
 @login_required
-def export_csv():
+def export_solutions():
     validate_role(current_user, role['ADMIN'])
     ids = request.args.getlist('ids')
     solutions = Solution.query.filter(Solution.id.in_(ids)).all()
-    directory = os.path.join(current_app.instance_path, current_user.login)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    export = create_csv_solution_export(solutions, directory, get_current_date(), current_user.id)
-    db.session.add(export)
-    db.session.commit()
+    create_csv_solution_export(solutions, current_user)
+    flash('Wyeksportowano')
+    return redirect(url_for('admin.view_exports'))
+
+
+@bp.route('/export_statistics/')
+@login_required
+def export_statistics():
+    validate_role(current_user, role['ADMIN'])
+    create_csv_statistics_export(request.args.getlist('statistics_json'), current_user)
     flash('Wyeksportowano')
     return redirect(url_for('admin.view_exports'))
 
@@ -251,20 +255,11 @@ def view_exports():
 def view_statistics():
     validate_role(current_user, role['ADMIN'])
     statistics_list = []
-    csv_form = CSVForm()
     for course in current_user.courses:
         for member in course.members:
             if member.role == role['STUDENT']:
                 statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-    if csv_form.validate_on_submit() and csv_form.submit_button.data:
-        directory = os.path.join(current_app.instance_path, current_user.login)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        export = create_csv_sstatistics_export(statistics_list, directory, get_current_date(), current_user.id)
-        db.session.add(export)
-        db.session.commit()
-        return render_template('admin/statistics.html', statisticsList=statistics_list, csv_form=csv_form)
-    return render_template('admin/statistics.html', statisticsList=statistics_list, csv_form=csv_form)
+    return render_template('admin/statistics.html', statisticsList=statistics_list)
 
 
 @bp.route('/statistics/by_course', methods=['GET', 'POST'])
@@ -272,25 +267,15 @@ def view_statistics():
 def view_statistics_course():
     validate_role(current_user, role['ADMIN'])
     form = StatisticsCourseForm()
-    csv_form = CSVForm()
     statistics_list = []
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
-    if request.method == 'POST' and form.submit_button.data and form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         course = Course.query.filter_by(name=form.course.data).first()
         for member in course.members:
             if member.role == role['STUDENT']:
                 statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-        return render_template('admin/statistics_course.html', statisticsList=statistics_list, form=form,csv_form=csv_form)
-    if csv_form.validate_on_submit() and csv_form.submit_button.data:
-        directory = os.path.join(current_app.instance_path, current_user.login)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        export = create_csv_sstatistics_export(statistics_list, directory, get_current_date(), current_user.id)
-        db.session.add(export)
-        db.session.commit()
-        return render_template('admin/statistics_course.html', statisticsList=statistics_list, form=form, csv_form=csv_form)
-    return render_template('admin/statistics_course.html', statisticsList=[], form=form, csv_form=csv_form)
+    return render_template('admin/statistics_course.html', statisticsList=statistics_list, form=form)
 
 
 @bp.route('/statistics/by_user', methods=['GET', 'POST'])
@@ -300,22 +285,12 @@ def view_statistics_user():
     form = StatisticsUserForm()
     statistics_list = []
     form.email.choices = get_student_ids_emails(current_user.courses)[1]
-    csv_form = CSVForm()
-    if csv_form.validate_on_submit() and csv_form.submit_button.data:
-        directory = os.path.join(current_app.instance_path, current_user.login)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        export = create_csv_sstatistics_export(statistics_list, directory, get_current_date(), current_user.id)
-        db.session.add(export)
-        db.session.commit()
-        return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form, csv_form=csv_form)
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST' and form.search_button.data and form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         for course in user.courses:
             if course in current_user.courses:
                 statistics_list.append(Statistics(course=course, user=user, is_admin=True))
-        return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form, csv_form=csv_form)
-    return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form, csv_form=csv_form)
+    return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form)
 
 
 @bp.route('/download')

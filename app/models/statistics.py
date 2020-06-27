@@ -1,3 +1,5 @@
+import json
+
 from app.models.usercourse import Course, User, role
 
 
@@ -16,3 +18,13 @@ class Statistics:
             return round((self.user_points / self.course_points * 100), 2)
         else:
             return float(0)
+
+    def to_json(self):
+        return json.dumps({
+            {"user_email": self.user_email,
+             "course_name": self.course_name,
+             "user_points": self.user_points,
+             "course_points": self.course_points,
+             "percent_value": self.get_percent_value()
+             }
+        })

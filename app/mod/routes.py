@@ -1,3 +1,5 @@
+import os
+
 from flask import url_for, flash, render_template, redirect
 from flask_login import current_user, login_required
 from sqlalchemy import desc
@@ -32,6 +34,10 @@ def change_role():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         user.role = form.roles.data
+        if user.role == role['ADMIN']:
+            directory = user.get_admin_directory()
+            if not os.path.exists(directory):
+                os.makedirs(directory)
         db.session.commit()
         flash('Zmieniono status')
     return render_template('mod/roles.html', form=form)
