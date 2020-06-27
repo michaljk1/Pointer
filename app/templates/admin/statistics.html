@@ -7,4 +7,9 @@
     <div><a href="{{ url_for('admin.view_statistics_user') }}"> Statystyki studenta </a></div>
     <div><a href="{{ url_for('admin.view_statistics_course') }}"> Statystyki kursu </a></div>
     {% include "admin/statistics_list.html" %}
+        <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(csv_form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
 {% endblock %}

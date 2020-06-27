@@ -71,7 +71,7 @@ class StatisticsCourseForm(FlaskForm):
 
 
 class CSVForm(FlaskForm):
-    submit_button = SubmitField('Wyszukaj')
+    submit_button = SubmitField('Eksport')
 
 class StatisticsUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])

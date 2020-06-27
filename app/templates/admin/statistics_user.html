@@ -12,4 +12,9 @@
         </div>
     </div>
     {% include "admin/statistics_list.html" %}
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(csv_form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
 {% endblock %}
