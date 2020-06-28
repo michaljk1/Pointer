@@ -1,0 +1,80 @@
+{% extends 'bootstrap/base.html' %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+{% block title %}
+    Pointer
+{% endblock %}
+{% block navbar %}
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                {% if current_user.is_anonymous %}
+                    <a class="navbar-brand"
+                       href="{{ url_for('auth.login') }}">Pointer</a>
+                {% endif %}
+                {% if not current_user.is_anonymous and current_user.is_admin() %}
+                    <a class="navbar-brand"
+                       href="{{ url_for('admin.view_courses') }}">Pointer</a>
+                {% elif not current_user.is_anonymous and current_user.is_student() %}
+                    <a class="navbar-brand" href="{{ url_for('student.index') }}">Pointer</a>
+                {% elif not current_user.is_anonymous and current_user.is_moderator() %}
+                    <a class="navbar-brand" href="{{ url_for('mod.index') }}">Pointer</a>
+                {% endif %}
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    {% if not current_user.is_anonymous and current_user.is_admin() %}
+                        <li><a href="{{ url_for('admin.view_courses') }}">Kursy</a></li>
+                        <li><a href="{{ url_for('admin.view_statistics') }}">Statystyki</a></li>
+                        <li><a href="{{ url_for('admin.view_solutions') }}">Rozwiązania</a></li>
+                        <li><a href="{{ url_for('admin.view_exports') }}">Pliki</a></li>
+                        <li><a href="{{ url_for('admin.view_logins') }}">Logowania</a></li>
+                    {% endif %}
+                    {% if not current_user.is_anonymous and current_user.is_student() %}
+                        <li><a href="{{ url_for('student.view_courses') }}">Kursy</a></li>
+                        <li><a href="{{ url_for('student.view_statistics') }}">Statystyki</a></li>
+                        <li><a href="{{ url_for('student.view_solutions') }}">Rozwiązania</a></li>
+                    {% endif %}
+                    {% if not current_user.is_anonymous and current_user.is_moderator() %}
+                        <li><a href="{{ url_for('mod.admin_roles') }}">Dodaj prawa administratora</a></li>
+                        <li><a href="{{ url_for('mod.student_roles') }}">Odbierz prawa administratora</a></li>
+                        <li><a href="{{ url_for('mod.view_logins') }}">Logowania</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_anonymous %}
+                        <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                        <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    {% endif %}
+                    {% if not current_user.is_anonymous %}
+                        {% if current_user.is_admin() %}
+                            <li><a href="{{ url_for('admin.view_courses') }}">{{ current_user.email }}</a></li>
+                        {% elif current_user.is_student() %}
+                            <li><a href="{{ url_for('student.view_courses') }}">{{ current_user.email }}</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('mod.admin_roles') }}">{{ current_user.email }}</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                    <div class="alert alert-info" role="alert">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+        <div class="container3">
+            {% block breadcrumb %}{% endblock %}
+        <hr>
+            {% block app_content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

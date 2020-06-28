@@ -1,5 +1,4 @@
 import os
-
 commands = [
     "pip install flask-sqlalchemy",
     "pip install flask-migrate",

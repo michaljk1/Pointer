@@ -1,0 +1,32 @@
+from typing import List
+
+from pointer import db
+from pointer.models.solution import Solution
+from pointer.models.usercourse import Course, role
+
+
+def get_student_ids_emails(courses: List[Course]):
+    user_ids, emails = [], []
+    for course in courses:
+        for member in course.members:
+            if member.role == role['STUDENT'] and member.id not in user_ids:
+                user_ids.append(member.id)
+                emails.append((member.email, member.email))
+    return user_ids, emails
+
+
+def modify_solution(solution: Solution, refused: bool, points: float):
+    if refused:
+        solution.status = Solution.Status['REFUSED']
+    else:
+        solution.status = Solution.Status['SEND']
+    solution.points = points
+    db.session.commit()
+
+
+def modify_course(course: Course, is_open: bool):
+    if is_open:
+        course.is_open = True
+    else:
+        course.is_open = False
+    db.session.commit()
