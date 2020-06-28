@@ -41,17 +41,12 @@ class Exercise(db.Model):
                 user_solutions.append(solution)
         return user_solutions
 
-    def get_max_points(self):
-        points = 0
-        for test in self.tests:
-            points += test.points
-        return points
-
     def create_test(self, input_file, output_file, points):
         input_name, output_name = secure_filename(input_file.filename), secure_filename(output_file.filename)
         test = Test(points=points, input_name=input_name, output_name=output_name, exercise_id=self.id,
                     order=len(self.tests.all()))
         self.tests.append(test)
+        db.session.commit()
         test_directory = test.get_directory()
         os.makedirs(test_directory)
         input_file.save(os.path.join(test_directory, input_name))

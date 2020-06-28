@@ -1,4 +1,5 @@
 import os
+import shutil
 import string
 import random
 # TODO
@@ -145,10 +146,22 @@ def add_test(exercise_id):
     form = TestForm()
     if request.method == 'POST' and form.validate_on_submit():
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
-        db.session.commit()
         flash('Dodano test')
         return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
     return render_template('admin/add_test.html', exercise=exercise, form=form)
+
+
+@bp.route('/<int:test_id>', methods=['GET', 'POST'])
+@login_required
+def delete_test(test_id):
+    test = Test.query.filter_by(id=test_id).first()
+    exercise_id = test.exercise_id
+    validate_role_course(current_user, role['ADMIN'], test.get_course())
+    shutil.rmtree(test.get_directory(), ignore_errors=True)
+    db.session.delete(test)
+    db.session.commit()
+    flash('Usunięto test')
+    return redirect(url_for('admin.view_exercise', exercise_id=exercise_id))
 
 
 @bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
@@ -160,7 +173,7 @@ def add_exercise(course_name, lesson_name):
     validate_exists(lesson)
     validate_role_course(current_user, role['ADMIN'], course)
     form = ExerciseForm()
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         end_date, end_time = form.end_date.data, form.end_time.data
         end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
                                 minute=end_time.minute)
@@ -171,7 +184,6 @@ def add_exercise(course_name, lesson_name):
         lesson.exercises.append(exercise)
         os.makedirs(exercise.get_directory())
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
-        db.session.commit()
         return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
     return render_template('admin/add_template.html', form=form, lesson=lesson)
 

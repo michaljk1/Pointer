@@ -10,7 +10,7 @@ class RoleStudentForm(FlaskForm):
 
 class RoleAdminForm(FlaskForm):
     email = SelectField('User', choices=[])
-    submit_button = SubmitField('Odbierz uprawnienia administratora')
+    submit_button = SubmitField('Nadaj uprawnienia administratora')
 
 
 class LoginInfoForm(FlaskForm):

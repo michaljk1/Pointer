@@ -12,7 +12,7 @@ class Test(db.Model):
     order = db.Column(db.Integer)
 
     def get_directory(self):
-        return os.path.join(self.executor.get_directory(), str(self.order))
+        return os.path.join(self.executor.get_directory(), 'tests', 'test'+str(self.id))
 
     def get_course(self):
         return self.executor.get_course()

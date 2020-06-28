@@ -15,6 +15,7 @@
     <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}">
         <pb> {{ exercise.name }} </pb>
     </a>
+
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ exercise.name }}</h2></div>
@@ -30,6 +31,8 @@
         <div><p>Input: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.input_name) }}"
                           target="_blank"> {{ test.input_name }}</a></p></div>
         <div><p>Punkty: {{ test.points }}</p></div>
+        <div><p><a href="{{ url_for('admin.delete_test', test_id=test.id) }}"
+                          target="_blank"> Usuń test</a></p></div>
         <hr>
     {% endfor %}
     <div><a href="{{ url_for('admin.add_test', exercise_id = exercise.id) }}">Dodaj test</a></div>
