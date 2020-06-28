@@ -6,7 +6,6 @@
     <a href="{{ url_for('admin.view_course', course_name = course.name) }}"><pb> {{ course.name }} </pb></a>
     /
     <a href="{{ url_for('admin.add_lesson', course_name = course.name) }}"><pb>Dodaj lekcję</pb></a>
-    <hr>
 {% endblock %}
 {% block app_content %}
     <div class="row">

@@ -48,7 +48,8 @@ def add_student(course_name):
     validate_role_course(current_user, role['ADMIN'], course)
     form = AssigneUserForm()
     for user in User.query.filter(~User.courses.any(name=course.name)).filter(
-            User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
+            User.role.in_([role['ADMIN'], role['STUDENT']])).all():
+   #TODO do zmiany         User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()

@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('auth.login') }}"><pb>Logowanie</pb></a>
+    /
+    <a href="{{ url_for('auth.activate') }}"><pb>Aktywacja</pb></a>
+{% endblock %}
 {% block app_content %}
     <div class="row">
         <div class="col-md-4">
