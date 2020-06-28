@@ -4,7 +4,7 @@ import random
 # TODO
 # 1: wyniki pdf,
 # 2: modyfikacja istniejacych obiektow, timeout testu,
-# 4: paginacja
+# 4: paginacja, filtrowanie na punkty
 # 5: selenium, backup, mysql -> sqlite
 from datetime import datetime
 

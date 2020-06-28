@@ -38,7 +38,7 @@ def accept_best_solution(user_id: int, exercise: Exercise):
     user_exercises = Solution.query.filter_by(user_id=user_id, exercise_id=exercise.id).all()
     points, best_solution = 0, None
     for user_exercise in user_exercises:
-        if user_exercise.status in [Solution.Status['SEND'],
+        if user_exercise.status in [Solution.Status['NOT_ACTIVE'], Solution.Status['SEND'],
                                     Solution.Status['ACTIVE']] and user_exercise.points >= points:
             best_solution = user_exercise
             points = best_solution.points

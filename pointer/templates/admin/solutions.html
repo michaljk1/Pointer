@@ -30,12 +30,12 @@
             <th>Punkty</th>
             <th>Próba</th>
             <th>Status</th>
+            <th> </th>
             </thead>
             <tbody>
             {% for solution in solutions %}
                 {% do solution_ids.append(solution.id) %}
-                <tr class="pointercurs"
-                    onclick="window.open('{{ url_for('admin.view_solution', solution_id = solution.id ) }}','_blank');">
+                <tr>
                     <td><p>{{ solution.author.email }}</p></td>
                     <td><p><a href="{{ url_for('admin.view_course', course_name=solution.get_course().name) }}"
                               target="_blank">{{ solution.get_course().name }}</a></p></td>
@@ -47,6 +47,8 @@
                     <td><p>{{ solution.points }}</p></td>
                     <td><p>{{ solution.attempt }}</p></td>
                     <td><p>{{ solution.status }}</p></td>
+                    <td><p><a href="{{ url_for('admin.view_solution', solution_id = solution.id) }}"
+                              target="_blank"> Edytuj </a></p></td>
                 </tr>
             {% endfor %}
             </tbody>
