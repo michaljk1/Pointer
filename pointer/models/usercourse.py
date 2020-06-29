@@ -23,6 +23,12 @@ class Course(db.Model):
     def get_directory(self):
         return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
 
+    def is_lesson_name_proper(self, lesson_name):
+        for lesson in self.lessons:
+            if lesson.name.replace(" ", "_") == lesson_name.replace(" ", "_"):
+                return False
+        return True
+
     def get_lesson_by_name(self, name):
         for lesson in self.lessons:
             if lesson.name == name:

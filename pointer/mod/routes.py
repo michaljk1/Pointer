@@ -34,7 +34,7 @@ def admin_roles():
         if not os.path.exists(directory):
             os.makedirs(directory)
         db.session.commit()
-        flash('Nadano prawa administratora')
+        flash('Nadano prawa administratora', 'message')
         return redirect(url_for('mod.admin_roles'))
     return render_template('mod/admin_roles.html', admin_form=admin_form)
 
@@ -50,7 +50,7 @@ def student_roles():
         user = User.query.filter_by(email=student_form.email.data).first()
         user.role = role['STUDENT']
         db.session.commit()
-        flash('Nadano prawa studenta')
+        flash('Nadano prawa studenta', 'message')
         return redirect(url_for('mod.student_roles'))
     return render_template('mod/student_roles.html', student_form=student_form)
 

@@ -13,7 +13,7 @@ def execute_solution_thread(app, solution_id):
             if compile(solution):
                 grade(solution)
             else:
-                solution.status = solution.Status['COMPILE_ERROR']
+                solution.status = Solution.Status['COMPILE_ERROR']
                 db.session.commit()
         except:
             solution.points = 0
@@ -65,6 +65,8 @@ def compile(solution):
             return False
         else:
             return True
+    else:
+        return True
 
 
 def grade(solution):

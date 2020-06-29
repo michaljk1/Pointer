@@ -21,7 +21,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            flash('Invalid email or password')
+            flash('Invalid email or password', 'message')
             return redirect(url_for('auth.login'))
         login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.Status['SUCCESS'], user_id=user.id,
                                login_date=get_current_date())
@@ -29,7 +29,7 @@ def login():
         if not user.check_password(form.password.data):
             login_info.status = LoginInfo.Status['ERROR']
             db.session.commit()
-            flash('Invalid email or password')
+            flash('Invalid email or password', 'message')
             return redirect(url_for('auth.login'))
         #TODO odkomentowac
         # if not user.is_confirmed:
@@ -62,7 +62,7 @@ def activate():
     form = ConfirmEmailForm()
     if request.method == 'POST' and form.validate_on_submit():
         send_confirm_email(form.email.data)
-        flash('Wysłano link aktywacyjny')
+        flash('Wysłano link aktywacyjny', 'message')
         return redirect(url_for('auth.login'))
     return  render_template('auth/activate.html', form=form)
 
@@ -75,7 +75,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        flash('Congratulations, you are now a registered user!', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 
@@ -106,11 +106,11 @@ def append_course(link):
 def confirm_email(token):
     user: User = User.verify_confirm_email_token(token)
     if not user:
-        flash('Nieaktywny link')
+        flash('Nieaktywny link', 'error')
         return redirect(url_for('default.index'))
     user.is_confirmed = True
     db.session.commit()
-    flash('Potwierdzono email')
+    flash('Potwierdzono email', 'message')
     if not current_user.is_authenticated:
         flash('Potwierdzono email, zaloguj się')
         return redirect(url_for('auth.login'))

@@ -8,9 +8,12 @@
     <a href="{{ url_for('admin.add_lesson', course_name = course.name) }}"><pb>Dodaj lekcję</pb></a>
 {% endblock %}
 {% block app_content %}
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
-        </div>
-    </div>
+        <form action="" method="post" enctype="multipart/form-data" class="form" role="form">
+        {{ form.csrf_token() }}
+        {{ wtf.form_field(form.name, class='form-control') }}
+        {{ wtf.form_field(form.text_content, class='form-control') }}
+        {{ form.pdf_content() }}
+        {{ wtf.form_field(form.content_url, class='form-control') }}
+        {{ form.submit_button() }}
+    </form>
 {% endblock %}

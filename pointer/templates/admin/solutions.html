@@ -28,7 +28,7 @@
             <th>Ćwiczenie</th>
             <th>Data wysłania</th>
             <th>Punkty</th>
-            <th>Próba</th>
+            <th>IP</th>
             <th>Status</th>
             <th> </th>
             </thead>
@@ -45,7 +45,7 @@
                               target="_blank">{{ solution.exercise.name }}</a></p></td>
                     <td><p>{{ solution.send_date }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
-                    <td><p>{{ solution.attempt }}</p></td>
+                    <td><p>{{ solution.ip_address }}</p></td>
                     <td><p>{{ solution.status }}</p></td>
                     <td><p><a href="{{ url_for('admin.view_solution', solution_id = solution.id) }}"
                               target="_blank"> Edytuj </a></p></td>

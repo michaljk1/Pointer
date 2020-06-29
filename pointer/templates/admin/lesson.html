@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('admin.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = lesson.course.name) }}"><pb> {{ lesson.course.name }} </pb></a>
+    <a href="{{ url_for('admin.view_course', course_name = lesson.course.name) }}">
+        <pb> {{ lesson.course.name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_name = lesson.name) }}"><pb> {{ lesson.name }} </pb></a>
+    <a href="{{ url_for('admin.view_lesson', lesson_name = lesson.name) }}">
+        <pb> {{ lesson.name }} </pb>
+    </a>
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ lesson.name }}</h2></div>
@@ -15,5 +21,8 @@
                 href="{{ url_for('admin.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
         </h1></div>
     {% endfor %}
-    <div><h1><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Dodaj ćwiczenie</a></h1></div>
+    <div><h1><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Dodaj
+        ćwiczenie</a></h1></div>
+    <a href="{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}">Edytuj lekcję</a>
+
 {% endblock %}

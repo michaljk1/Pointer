@@ -15,5 +15,8 @@ class Lesson(db.Model):
     def get_directory(self):
         return os.path.join(self.course.get_directory(), self.name.replace(" ", "_"))
 
-
-
+    def is_exercise_name_proper(self, exercise_name):
+        for exercise in self.exercises:
+            if exercise.name.replace(" ", "_") == exercise_name.replace(" ", "_"):
+                return False
+        return True

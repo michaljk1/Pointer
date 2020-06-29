@@ -3,7 +3,7 @@ import shutil
 import string
 import random
 # TODO
-# 1: wyniki pdf,
+# 1: wyniki pdf, przyznawanie watkow
 # 2: modyfikacja istniejacych obiektow, timeout testu,
 # 4: paginacja, filtrowanie na punkty
 # 5: selenium, backup, mysql -> sqlite
@@ -16,7 +16,7 @@ from pointer.admin import bp
 from pointer.admin.AdminUtil import modify_solution, get_student_ids_emails, modify_course
 from pointer.auth.email import send_course_email
 from pointer.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm
+    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm, EditLessonForm
 from werkzeug.utils import redirect, secure_filename
 from pointer.mod.forms import LoginInfoForm
 from pointer.models.statistics import Statistics
@@ -57,7 +57,7 @@ def add_student(course_name):
         user.courses.append(course)
         send_course_email(form.email.data, course_name=course.name, role=user.role)
         db.session.commit()
-        flash('Dodano studenta')
+        flash('Dodano studenta', 'message')
     return render_template('admin/add_student.html', form=form, course=course)
 
 
@@ -78,7 +78,7 @@ def view_course(course_name):
     form = EnableAssingmentLink(activate=course.is_open)
     if request.method == 'POST' and form.validate_on_submit():
         modify_course(course, form.activate.data)
-        flash('Zapisano zmiany')
+        flash('Zapisano zmiany', 'message')
         return render_template('admin/course.html', form=form, course=course)
     return render_template('admin/course.html', form=form, course=course)
 
@@ -89,12 +89,13 @@ def add_course():
     validate_role(current_user, role['ADMIN'])
     form = CourseForm()
     if request.method == 'POST' and form.validate_on_submit():
+        flash('Invalid password provided', 'error')
         new_course = Course(name=form.name.data, is_open=True,
                             link=''.join(random.choice(string.ascii_lowercase) for i in range(25)))
         current_user.courses.append(new_course)
         os.makedirs(new_course.get_directory())
         db.session.commit()
-        flash('Dodano kurs')
+        flash('Dodano kurs', 'message')
         return redirect(url_for('admin.view_courses'))
     return render_template('admin/add_course.html', form=form)
 
@@ -114,8 +115,12 @@ def add_lesson(course_name):
     validate_role_course(current_user, role['ADMIN'], course)
     form = LessonForm()
     if request.method == 'POST' and form.validate_on_submit():
+        lesson_name = form.name.data
+        if not course.is_lesson_name_proper(lesson_name):
+            flash('Wprowadź inną nazwę lekcji', 'error')
+            return redirect(url_for('admin.add_lesson', course_name=course.name))
         file = request.files['pdf_content']
-        filename, lesson_name = secure_filename(file.filename), form.name.data
+        filename = secure_filename(file.filename)
         if filename == '':
             filename = None
         new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
@@ -128,6 +133,27 @@ def add_lesson(course_name):
         db.session.commit()
         return redirect(url_for('admin.view_lesson', lesson_name=new_lesson.name))
     return render_template('admin/add_lesson.html', form=form, course=course)
+
+
+@bp.route('/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
+@login_required
+def edit_lesson(lesson_id):
+    lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
+    validate_role_course(current_user, role['ADMIN'], lesson.course)
+    form = EditLessonForm(text_content=lesson.raw_text, content_url=lesson.content_url,)
+    if request.method == 'POST' and form.validate_on_submit():
+        file = request.files['pdf_content']
+        filename = secure_filename(file.filename)
+        lesson.raw_text = form.text_content.data
+        lesson.content_url = form.content_url.data
+        if filename != '':
+            lesson_dir = lesson.get_directory()
+            os.remove(os.path.join(lesson_dir, lesson.content_pdf_path))
+            file.save(os.path.join(lesson_dir, filename))
+        db.session.add(lesson)
+        db.session.commit()
+        return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
+    return render_template('admin/edit_lesson.html', form=form, lesson=lesson)
 
 
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
@@ -146,7 +172,7 @@ def add_test(exercise_id):
     form = TestForm()
     if request.method == 'POST' and form.validate_on_submit():
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
-        flash('Dodano test')
+        flash('Dodano test', 'message')
         return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
     return render_template('admin/add_test.html', exercise=exercise, form=form)
 
@@ -160,7 +186,7 @@ def delete_test(test_id):
     shutil.rmtree(test.get_directory(), ignore_errors=True)
     db.session.delete(test)
     db.session.commit()
-    flash('Usunięto test')
+    flash('Usunięto test', 'message')
     return redirect(url_for('admin.view_exercise', exercise_id=exercise_id))
 
 
@@ -169,11 +195,14 @@ def delete_test(test_id):
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_exists(course)
-    lesson = course.get_lesson_by_name(lesson_name)
+    lesson: Lesson = course.get_lesson_by_name(lesson_name)
     validate_exists(lesson)
     validate_role_course(current_user, role['ADMIN'], course)
     form = ExerciseForm()
     if request.method == 'POST' and form.validate_on_submit():
+        if not lesson.is_exercise_name_proper(form.name.data):
+            flash('Wprowadź inną nazwę lekcji', 'error')
+            return render_template('admin/add_template.html', form=form, lesson=lesson)
         end_date, end_time = form.end_date.data, form.end_time.data
         end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
                                 minute=end_time.minute)
@@ -194,16 +223,18 @@ def view_solutions():
     validate_role(current_user, role['ADMIN'])
     course, lesson, exercise = request.args.get('course'), request.args.get('lesson'), request.args.get('exercise')
     course_db = Course.query.filter_by(name=course).first()
+    solutions = []
     if course is None or lesson is None or exercise is None or course_db is None or course_db not in current_user.courses:
         form = SolutionAdminSearchForm()
     else:
         form = SolutionAdminSearchForm(course=course, lesson=lesson, exercise=exercise)
+        solutions = exercise_admin_query(form=form, courses=current_user.get_course_names()).all()
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_admin_query(form=form, courses=current_user.get_course_names()).all()
         return render_template('admin/solutions.html', form=form, solutions=solutions)
-    return render_template('admin/solutions.html', form=form, solutions=[])
+    return render_template('admin/solutions.html', form=form, solutions=solutions)
 
 
 @bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
@@ -217,7 +248,7 @@ def view_solution(solution_id):
     if request.method == 'POST' and solution_form.validate_on_submit():
         modify_solution(solution, solution_form.admin_ref.data, solution_form.points.data)
         accept_best_solution(solution.user_id, solution.exercise)
-        flash('Zapisano zmiany')
+        flash('Zapisano zmiany', 'message')
     return render_template('admin/solution.html', form=solution_form, solution=solution)
 
 
@@ -239,7 +270,7 @@ def export_solutions():
     ids = request.args.getlist('ids')
     solutions = Solution.query.filter(Solution.id.in_(ids)).all()
     create_csv_solution_export(solutions, current_user)
-    flash('Wyeksportowano')
+    flash('Wyeksportowano', 'message')
     return redirect(url_for('admin.view_exports'))
 
 
@@ -248,7 +279,7 @@ def export_solutions():
 def export_statistics():
     validate_role(current_user, role['ADMIN'])
     create_csv_statistics_export(request.args.getlist('statistics_json'), current_user)
-    flash('Wyeksportowano')
+    flash('Wyeksportowano', 'message')
     return redirect(url_for('admin.view_exports'))
 
 

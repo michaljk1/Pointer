@@ -1,7 +1,7 @@
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
-    ValidationError
+    ValidationError, TextAreaField
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired
 from pointer.models.usercourse import Course
@@ -24,27 +24,31 @@ class CourseForm(FlaskForm):
             raise ValidationError('Podana nazwa kursu jest już zajęta.')
 
 
+class EditLessonForm(FlaskForm):
+    text_content = TextAreaField('Treść', render_kw={'cols': '40', 'rows': '13'},
+                                 validators=[DataRequired()])
+    pdf_content = FileField('Wybierz plik')
+    content_url = StringField('Link')
+    submit_button = SubmitField('Edytuj lekcję')
+
+
 class LessonForm(FlaskForm):
     name = StringField('Nazwa lekcji', validators=[DataRequired()])
-    text_content = StringField('Treść', validators=[DataRequired()])
+    text_content = TextAreaField('Treść', render_kw={'cols': '40', 'rows': '13'},
+                                 validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
     content_url = StringField('Link')
     submit_button = SubmitField('Dodaj lekcję')
-
-    def validate_name(self, name):
-        for lesson in Lesson.query.all():
-            if lesson.name.replace(" ", "_") == name.data.replace(" ", "_"):
-                raise ValidationError('Podana nazwa lekcji jest już zajęta')
 
 
 class ExerciseForm(FlaskForm):
     name = StringField('Nazwa', validators=[DataRequired()])
     content = StringField('Treść', validators=[DataRequired()])
     max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired()])
-    end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()] )
+    end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()])
     end_time = TimeField('Godzina')
     compile_command = StringField('compile command')
-    run_command = StringField('run_command' , validators=[DataRequired()])
+    run_command = StringField('run_command', validators=[DataRequired()])
     output = FileField('Output', validators=[DataRequired()])
     input = FileField('Input', validators=[DataRequired()])
     max_points = FloatField('Liczba punktów', validators=[DataRequired()])

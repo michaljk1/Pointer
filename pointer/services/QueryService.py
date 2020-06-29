@@ -37,7 +37,7 @@ def filter_visible_by_status(qualified_solutions: List[Solution], solutions: Lis
 
 def exercise_admin_query(form, courses=None):
     query = exercise_query(form, courses)
-    if form.status.data != Solution.Status['ALL']:
+    if form.status.data != Solution.Status['ALL'] and form.status.data != 'None':
         query = query.filter(Solution.status == form.status.data)
     if form.surname.data is not None and len(form.surname.data) > 0:
         query = query.filter(User.surname == form.surname.data)
