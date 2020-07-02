@@ -14,7 +14,7 @@ def execute_solution_thread(app, solution_id):
                 grade(solution)
             else:
                 solution.status = Solution.Status['COMPILE_ERROR']
-                db.session.commit()
+            db.session.commit()
         except:
             solution.points = 0
             solution.status = Solution.Status['ERROR']
@@ -52,7 +52,7 @@ def accept_best_solution(user_id: int, exercise: Exercise):
     db.session.commit()
 
 
-def compile(solution):
+def compile(solution: Solution):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     compile_command = solution.exercise.compile_command
     error_file = open(os.path.join(solution.get_directory(), 'compilerror.txt'), 'w+')
@@ -62,6 +62,8 @@ def compile(solution):
         process.wait()
         error_file.close()
         if os.path.getsize(error_file.name) > 0:
+            with open(error_file.name) as f:
+                solution.details = f.read()
             return False
         else:
             return True

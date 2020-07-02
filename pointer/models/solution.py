@@ -15,6 +15,7 @@ class Solution(db.Model):
     ip_address = db.Column(db.String(20), nullable=False)
     os_info = db.Column(db.String(150), nullable=False)
     status = db.Column(db.String(20), nullable=False)
+    details = db.Column(db.TEXT)
     Status = {
         'SEND': 'Oddano',
         'REFUSED': 'Odrzucono',
@@ -34,4 +35,3 @@ class Solution(db.Model):
 
     def get_directory(self):
         return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))
-

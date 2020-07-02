@@ -10,5 +10,5 @@ class LoginInfo(db.Model):
     Status = {
         'SUCCESS': 'Success',
         'ERROR': 'Error',
-        'ALL': 'All'
+        'ALL': 'Dowolny'
     }

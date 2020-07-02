@@ -3,20 +3,21 @@ import shutil
 import string
 import random
 # TODO
-# 1: wyniki pdf, przyznawanie watkow
-# 2: modyfikacja istniejacych obiektow, timeout testu,
-# 4: paginacja, filtrowanie na punkty
-# 5: selenium, backup, mysql -> sqlite
+# 1: rich editor, wyniki pdf, numer indeksu, zatwierdzenie zadania, wiadomosc zadania
+# zmiana w eksporcie z zatwierdzonymi zadaniami
+# 2: timeout testu, maksymalna ilosc pamieci,
+# 4: paginacja, estetyka, breadrcumbry filtrowanie zadań użytkownika
+# 5: mysql -> sqlite, walidacja przy dodawaniu testow
 from datetime import datetime
 
 from flask import render_template, url_for, flash, request, send_from_directory, current_app, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
-from pointer.admin.AdminUtil import modify_solution, get_student_ids_emails, modify_course
+from pointer.admin.AdminUtil import modify_solution, get_student_ids_emails
 from pointer.auth.email import send_course_email
 from pointer.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, EnableAssingmentLink, TestForm, StatisticsCourseForm, StatisticsUserForm, EditLessonForm
+    SolutionAdminSearchForm, TestForm, StatisticsCourseForm, StatisticsUserForm, EditLessonForm
 from werkzeug.utils import redirect, secure_filename
 from pointer.mod.forms import LoginInfoForm
 from pointer.models.statistics import Statistics
@@ -50,7 +51,7 @@ def add_student(course_name):
     form = AssigneUserForm()
     for user in User.query.filter(~User.courses.any(name=course.name)).filter(
             User.role.in_([role['ADMIN'], role['STUDENT']])).all():
-   #TODO do zmiany         User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
+        # TODO do zmiany         User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -75,12 +76,18 @@ def view_courses():
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
-    form = EnableAssingmentLink(activate=course.is_open)
-    if request.method == 'POST' and form.validate_on_submit():
-        modify_course(course, form.activate.data)
-        flash('Zapisano zmiany', 'message')
-        return render_template('admin/course.html', form=form, course=course)
-    return render_template('admin/course.html', form=form, course=course)
+    return render_template('admin/course.html', course=course)
+
+
+@bp.route('/change_open/<int:course_id>', methods=['GET', 'POST'])
+@login_required
+def change_open_course(course_id):
+    course = Course.query.filter_by(id=course_id).first()
+    validate_role_course(current_user, role['ADMIN'], course)
+    course.is_open = not course.is_open
+    db.session.commit()
+    flash('Zapisano zmiany', 'message')
+    return redirect(url_for('admin.view_course', course_name=course.name))
 
 
 @bp.route('/add_course', methods=['GET', 'POST'])
@@ -89,7 +96,6 @@ def add_course():
     validate_role(current_user, role['ADMIN'])
     form = CourseForm()
     if request.method == 'POST' and form.validate_on_submit():
-        flash('Invalid password provided', 'error')
         new_course = Course(name=form.name.data, is_open=True,
                             link=''.join(random.choice(string.ascii_lowercase) for i in range(25)))
         current_user.courses.append(new_course)
@@ -123,8 +129,7 @@ def add_lesson(course_name):
         filename = secure_filename(file.filename)
         if filename == '':
             filename = None
-        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_url=form.content_url.data,
-                            raw_text=form.text_content.data)
+        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename,raw_text=form.text_content.data)
         course.lessons.append(new_lesson)
         lesson_directory = new_lesson.get_directory()
         os.makedirs(lesson_directory)
@@ -140,17 +145,16 @@ def add_lesson(course_name):
 def edit_lesson(lesson_id):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
-    form = EditLessonForm(text_content=lesson.raw_text, content_url=lesson.content_url,)
+    form = EditLessonForm(text_content=lesson.raw_text)
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['pdf_content']
         filename = secure_filename(file.filename)
         lesson.raw_text = form.text_content.data
-        lesson.content_url = form.content_url.data
         if filename != '':
             lesson_dir = lesson.get_directory()
             os.remove(os.path.join(lesson_dir, lesson.content_pdf_path))
+            lesson.content_pdf_path = filename
             file.save(os.path.join(lesson_dir, filename))
-        db.session.add(lesson)
         db.session.commit()
         return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
     return render_template('admin/edit_lesson.html', form=form, lesson=lesson)
@@ -163,6 +167,16 @@ def view_exercise(exercise_id):
     validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
     return render_template('admin/exercise.html', exercise=exercise)
 
+
+@bp.route('/activate_exercise/<string:exercise_id>', methods=['GET', 'POST'])
+@login_required
+def activate_exercise(exercise_id):
+    exercise: Exercise = Exercise.query.filter_by(id=exercise_id).first()
+    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
+    exercise.is_published = True
+    db.session.commit()
+    flash('Opublikowano', 'message')
+    return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
 
 @bp.route('/test/<int:exercise_id>', methods=['GET', 'POST'])
 @login_required
@@ -246,7 +260,11 @@ def view_solution(solution_id):
     solution_form = SolutionForm(obj=solution, email=solution.author.email,
                                  admin_ref=(solution.status == solution.Status['REFUSED']))
     if request.method == 'POST' and solution_form.validate_on_submit():
-        modify_solution(solution, solution_form.admin_ref.data, solution_form.points.data)
+        form_points = solution_form.points.data
+        if form_points > solution.exercise.get_max_points():
+            flash('Za duża ilość punktów', 'error')
+            return render_template('admin/solution.html', form=solution_form, solution=solution)
+        modify_solution(solution, solution_form.admin_ref.data, form_points)
         accept_best_solution(solution.user_id, solution.exercise)
         flash('Zapisano zmiany', 'message')
     return render_template('admin/solution.html', form=solution_form, solution=solution)
@@ -257,7 +275,8 @@ def view_solution(solution_id):
 def view_logins():
     validate_role(current_user, role['ADMIN'])
     form, logins = LoginInfoForm(), []
-    user_ids, form.email.choices = get_student_ids_emails(current_user.courses)
+    user_ids, emails = get_student_ids_emails(current_user.courses)
+    form.email.choices += emails
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
     return render_template('mod/logins.html', form=form, logins=logins)
@@ -335,6 +354,7 @@ def view_statistics_user():
 
 
 @bp.route('/download')
+@login_required
 def download():
     request_id = request.args.get('id')
     domain = request.args.get('domain')
@@ -350,6 +370,9 @@ def download():
     elif domain == 'export':
         my_object = Export.query.filter_by(id=request_id).first()
         filename = my_object.file_name
+    elif domain == 'lesson':
+        my_object = Lesson.query.filter_by(id=request_id).first()
+        filename = my_object.content_pdf_path
     else:
         abort(404)
     if my_course is not None:

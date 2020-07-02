@@ -13,16 +13,26 @@
     </a>
 {% endblock %}
 {% block app_content %}
-    <div><h2>{{ lesson.name }}</h2></div>
-    <div><h1>{{ lesson.raw_text }}</h1></div>
-    <div><h1><a href="{{ lesson.content_url }}">{{ lesson.content_url }}</a></h1></div>
+    <h2>{{ lesson.name }}</h2>
+    <hr>
+    <h1>{{ lesson.raw_text }}</h1>
+    {% if lesson.content_pdf_path is not none %}
+        <div><h1><a
+                href="{{ url_for('admin.download',domain='lesson', id=lesson.id) }}"
+                target="_blank">{{ lesson.content_pdf_path }}</a>
+        </h1></div>
+    {% endif %}
     {% for exercise in lesson.exercises %}
         <div><h1><a
                 href="{{ url_for('admin.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
         </h1></div>
     {% endfor %}
-    <div><h1><a href="{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}">Dodaj
-        ćwiczenie</a></h1></div>
-    <a href="{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}">Edytuj lekcję</a>
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}'"
+            class="btn btn-success">Dodaj ćwiczenie
+    </button>
+    <button type="button" onclick="window.location.href='{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}'"
+            class="btn btn-info">Edytuj lekcję
+    </button>
 
 {% endblock %}

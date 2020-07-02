@@ -32,10 +32,19 @@
                           target="_blank"> {{ test.input_name }}</a></p></div>
         <div><p>Punkty: {{ test.points }}</p></div>
         <div><p><a href="{{ url_for('admin.delete_test', test_id=test.id) }}"
-                          target="_blank"> Usuń test</a></p></div>
+                   target="_blank"> Usuń test</a></p></div>
         <hr>
     {% endfor %}
-    <div><a href="{{ url_for('admin.add_test', exercise_id = exercise.id) }}">Dodaj test</a></div>
+    {% if not exercise.is_published %}
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+            class="btn btn-success">Opublikuj zadanie
+    </button>
+    {% endif %}
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
+            class="btn btn-info">Dodaj test
+    </button>
     <div>
         <a href="{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}">
             Zobacz rozwiązania</a></div>

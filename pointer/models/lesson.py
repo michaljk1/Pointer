@@ -8,7 +8,6 @@ class Lesson(db.Model):
     name = db.Column(db.String(60), unique=True)
     raw_text = db.Column(db.String(600))
     content_pdf_path = db.Column(db.String(100))
-    content_url = db.Column(db.String(100))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     exercises = db.relationship('Exercise', backref='lesson', lazy='dynamic')
 

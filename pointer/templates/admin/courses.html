@@ -9,5 +9,5 @@
             </h1>
         </div>
     {% endfor %}
-    <div><h1><a href="{{ url_for('admin.add_course') }}">Dodaj kurs</a></h1></div>
+    <button type="button" onclick="window.location.href='{{ url_for('admin.add_course') }}'" class="btn btn-success">Dodaj kurs</button>
 {% endblock %}

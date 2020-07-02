@@ -1,6 +1,6 @@
 import os
 from threading import Thread
-from flask import render_template, url_for, request, send_from_directory, current_app
+from flask import render_template, url_for, request, send_from_directory, current_app, abort
 from flask_login import login_required, current_user
 
 from pointer import db
@@ -53,6 +53,8 @@ def view_lesson(lesson_name):
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
+    if not exercise.is_published:
+        abort(404)
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
     attempts = len(exercise.get_user_solutions(current_user.id))
     solutions = exercise.get_user_solutions(current_user.id)

@@ -3,9 +3,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
     ValidationError, TextAreaField
 from wtforms.fields.html5 import DateField, TimeField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 from pointer.models.usercourse import Course
-from pointer.models.lesson import Lesson
 from pointer.student.forms import SolutionStudentSearchForm
 
 
@@ -15,20 +14,21 @@ class UploadForm(FlaskForm):
 
 
 class CourseForm(FlaskForm):
-    name = StringField('Nazwa kursu')
+    name = StringField('Nazwa kursu', validators=[Length(min=1, message="Wprowadź nazwę")])
     submit_button = SubmitField('Dodaj kurs')
 
     def validate_name(self, name):
-        course = Course.query.filter_by(name=name.data).first()
-        if course is not None:
-            raise ValidationError('Podana nazwa kursu jest już zajęta.')
+        courses = Course.query.all()
+        replaced_name = name.data.replace(" ", "_")
+        for course in courses:
+            if course.name.replace(" ", "_") == replaced_name:
+                raise ValidationError('Podana nazwa kursu jest już zajęta.')
 
 
 class EditLessonForm(FlaskForm):
     text_content = TextAreaField('Treść', render_kw={'cols': '40', 'rows': '13'},
                                  validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
-    content_url = StringField('Link')
     submit_button = SubmitField('Edytuj lekcję')
 
 
@@ -37,7 +37,6 @@ class LessonForm(FlaskForm):
     text_content = TextAreaField('Treść', render_kw={'cols': '40', 'rows': '13'},
                                  validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
-    content_url = StringField('Link')
     submit_button = SubmitField('Dodaj lekcję')
 
 
@@ -82,15 +81,10 @@ class StatisticsUserForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     search_button = SubmitField('Wyszukaj')
 
-
-class EnableAssingmentLink(FlaskForm):
-    activate = BooleanField('Aktywny zapis')
-    submit_button = SubmitField('Zapisz')
-
-
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
     points = FloatField('Punkty')
+    details = StringField('Szczegóły błędu')
     admin_ref = BooleanField('Odrzuć zadanie')
     file_path = StringField('Plik', render_kw={'readonly': True})
     attempt = IntegerField('Próba', render_kw={'readonly': True})

@@ -84,7 +84,7 @@ def login_query(form: LoginInfoForm, user_role: str, ids=None):
     if form.ip_address.data != '':
         query = query.filter(LoginInfo.ip_address == form.ip_address.data)
 
-    if form.email.data != 'All':
+    if form.email.data != 'ALL':
         query = query.filter(User.email == form.email.data)
     elif user_role == role['MODERATOR']:
         query = query.filter(User.role == role['ADMIN'])

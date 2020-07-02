@@ -10,18 +10,20 @@
     </a>
 {% endblock %}
 {% block app_content %}
-    <div><h2>{{ course.name }}</h2></div>
+    <h2>{{ course.name }}</h2>
+    <hr>
     {% for lesson in course.lessons %}
         <div><h1><a
                 href="{{ url_for('admin.view_lesson',lesson_name = lesson.name) }}">{{ lesson.name }}</a>
         </h1></div>
     {% endfor %}
-    <div><h1><a href="{{ url_for('admin.add_lesson', course_name = course.name ) }}">Dodaj lekcję</a></h1></div>
-    <div><h1><a href="{{ url_for('admin.add_student', course_name = course.name ) }}">Dodaj studenta</a></h1></div>
-    <div><h1>{{ url_for('auth.append_course', link = course.link, _external=True) }}</h1></div>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
-        </div>
-    </div>
+    <hr>
+    <button type="button" onclick="window.location.href='{{ url_for('admin.add_lesson', course_name = course.name ) }}'" class="btn btn-success">Dodaj lekcję</button>
+    <button type="button" onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'" class="btn btn-info">Dodaj studenta</button>
+    {% if course.is_open %}
+        <button type="button" onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'" class="btn btn-secondary">Zablokuj zapis</button>
+    {% else %}
+        <button type="button" onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'" class="btn btn-secondary">Aktywuj zapis</button>
+    {% endif %}
+    <p>{{ url_for('auth.append_course', link = course.link, _external=True) }}</p>
 {% endblock %}

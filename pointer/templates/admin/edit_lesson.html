@@ -22,7 +22,6 @@
         {{ form.csrf_token() }}
         {{ wtf.form_field(form.text_content, class='form-control') }}
         {{ form.pdf_content() }}
-        {{ wtf.form_field(form.content_url, class='form-control') }}
         {{ form.submit_button() }}
     </form>
 {% endblock %}
