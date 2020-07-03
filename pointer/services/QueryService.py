@@ -11,28 +11,23 @@ from pointer.models.exercise import Exercise
 
 def get_filtered_by_status(solutions: List[Solution], status: str):
     qualified_solutions = []
+    finish_statuses = [Solution.Status['APPROVED'], Solution.Status['NOT_ACTIVE'], Solution.Status['REFUSED']]
     if status == Solution.Status['ALL']:
         return solutions
     else:
-        if status in [Solution.Status['ACTIVE'], Solution.Status['NOT_ACTIVE']]:
-            filter_visible_by_status(qualified_solutions, solutions, status)
-        elif status == Solution.Status['SEND']:
-            for solution in solutions:
-                if (solution.status in [Solution.Status['ACTIVE'],
-                                        Solution.Status['NOT_ACTIVE']] and not solution.exercise.is_finished()) \
-                        or solution.status == Solution.Status['SEND']:
-                    qualified_solutions.append(solution)
-        else:
+        if status not in finish_statuses:
             for solution in solutions:
                 if solution.status == status:
                     qualified_solutions.append(solution)
+        else:
+            for solution in solutions:
+                if solution.exercise.is_finished():
+                    if solution.status == status:
+                        qualified_solutions.append(solution)
+                else:
+                    if status == Solution.Status['NOT_ACTIVE'] and solution.status in finish_statuses:
+                        qualified_solutions.append(solution)
     return qualified_solutions
-
-
-def filter_visible_by_status(qualified_solutions: List[Solution], solutions: List[Solution], status: str):
-    for solution in solutions:
-        if solution.status == status and solution.exercise.is_finished():
-            qualified_solutions.append(solution)
 
 
 def exercise_admin_query(form, courses=None):

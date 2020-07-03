@@ -19,6 +19,7 @@
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ exercise.name }}</h2></div>
+    <hr>
     <div><h1>{{ exercise.content }}</h1></div>
     <div><h1>Możliwe punkty: {{ exercise.get_max_points() }}</h1></div>
     <div><h1>Termin: {{ exercise.end_date }}</h1></div>
@@ -35,17 +36,24 @@
                    target="_blank"> Usuń test</a></p></div>
         <hr>
     {% endfor %}
-    {% if not exercise.is_published %}
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-            class="btn btn-success">Opublikuj zadanie
-    </button>
-    {% endif %}
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
-            class="btn btn-info">Dodaj test
+            class="btn btn-success">Dodaj test
     </button>
-    <div>
-        <a href="{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}">
-            Zobacz rozwiązania</a></div>
+    {% if exercise.is_published %}
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+                class="btn btn-info">Dezaktywuj zadanie
+        </button>
+    {% else %}
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+                class="btn btn-info">Aktywuj zadanie
+        </button>
+    {% endif %}
+
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
+            class="btn btn-secondary">Zobacz rozwiązania
+    </button>
 {% endblock %}

@@ -15,11 +15,3 @@ def get_student_ids_emails(courses: List[Course]):
     return user_ids, emails
 
 
-def modify_solution(solution: Solution, refused: bool, points: float):
-    if refused:
-        solution.status = Solution.Status['REFUSED']
-    else:
-        solution.status = Solution.Status['SEND']
-    solution.points = points
-    db.session.commit()
-

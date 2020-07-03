@@ -71,7 +71,7 @@ def activate():
 def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data, role=role['STUDENT'])
+        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data, role=role['STUDENT'], index=form.index.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

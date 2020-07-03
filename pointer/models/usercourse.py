@@ -39,13 +39,15 @@ class Course(db.Model):
         points = 0
         for lesson in self.lessons:
             for exercise in lesson.exercises:
-                points += exercise.get_max_points()
+                if exercise.is_published:
+                    points += exercise.get_max_points()
         return points
 
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
+    index = db.Column(db.String(30), index=True, unique=True)
     login = db.Column(db.String(20), index=True, unique=True)
     name = db.Column(db.String(20), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
@@ -83,14 +85,16 @@ class User(UserMixin, db.Model):
     def get_points_for_student(self, course: Course):
         user_points = 0
         for solution in self.solutions:
-            if solution.get_course() == course and solution.status == solution.Status['ACTIVE'] and solution.exercise.is_finished():
+            if solution.get_course() == course and solution.exercise.is_published and solution.status == \
+                    solution.Status['APPROVED'] and solution.exercise.is_finished():
                 user_points += solution.points
         return user_points
 
     def get_points_for_admin(self, course: Course):
         user_points = 0
         for solution in self.solutions:
-            if solution.get_course() == course and solution.status == solution.Status['ACTIVE']:
+            if solution.get_course() == course and solution.exercise.is_published and solution.status == \
+                    solution.Status['APPROVED']:
                 user_points += solution.points
         return user_points
 
@@ -103,7 +107,7 @@ class User(UserMixin, db.Model):
     def verify_confirm_email_token(token):
         try:
             email = jwt.decode(token, current_app.config['SECRET_KEY'],
-                            algorithms=['HS256'])['confirm_email']
+                               algorithms=['HS256'])['confirm_email']
         except:
             return
         return User.query.filter_by(email=email).first()

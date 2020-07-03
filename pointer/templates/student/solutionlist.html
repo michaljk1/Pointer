@@ -25,8 +25,8 @@
                     <td><p>{{ solution.status }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
                     {% else %}
-                        {% if solution.status == solution.Status['ACTIVE'] or solution.status == solution.Status['NOT_ACTIVE'] %}
-                        <td><p> {{ solution.Status['SEND'] }} </p></td>
+                        {% if solution.status == solution.Status['APPROVED'] or solution.status == solution.Status['REFUSED'] or solution.status == solution.Status['NOT_ACTIVE'] %}
+                        <td><p> {{ solution.Status['NOT_ACTIVE'] }} </p></td>
                         {% else %}
                         <td><p>{{ solution.status }}</p></td>
                         {% endif %}

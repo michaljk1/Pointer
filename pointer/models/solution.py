@@ -1,7 +1,6 @@
 import os
-from datetime import datetime
+from sqlalchemy.dialects.mysql import LONGTEXT
 from pointer import db
-from pointer.DefaultUtil import get_current_date
 
 
 class Solution(db.Model):
@@ -15,12 +14,12 @@ class Solution(db.Model):
     ip_address = db.Column(db.String(20), nullable=False)
     os_info = db.Column(db.String(150), nullable=False)
     status = db.Column(db.String(20), nullable=False)
-    details = db.Column(db.TEXT)
+    error_msg = db.Column(LONGTEXT)
     Status = {
         'SEND': 'Oddano',
         'REFUSED': 'Odrzucono',
-        'ACTIVE': 'Aktywne',
-        'ALL': 'Status',
+        'ALL': 'Dowolny',
+        'APPROVED': 'Zaakceptowano',
         'COMPILE_ERROR': 'Błąd kompilacji',
         'RUN_ERROR': 'Błąd uruchomienia',
         'ERROR': 'Error',

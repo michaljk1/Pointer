@@ -14,8 +14,8 @@ class UploadForm(FlaskForm):
 class SolutionStudentSearchForm(FlaskForm):
     course = SelectField('Kurs', choices=[['All', 'Wszystkie kursy']])
     status = SelectField('Status', choices=[[Solution.Status['ALL'], Solution.Status['ALL']],
+                                            [Solution.Status['APPROVED'], Solution.Status['APPROVED']],
                                             [Solution.Status['REFUSED'], Solution.Status['REFUSED']],
-                                            [Solution.Status['ACTIVE'], Solution.Status['ACTIVE']],
                                             [Solution.Status['NOT_ACTIVE'], Solution.Status['NOT_ACTIVE']],
                                             [Solution.Status['SEND'], Solution.Status['SEND']],
                                             [Solution.Status['COMPILE_ERROR'], Solution.Status['COMPILE_ERROR']],
@@ -23,6 +23,4 @@ class SolutionStudentSearchForm(FlaskForm):
                                             [Solution.Status['ERROR'], Solution.Status['ERROR']]])
     lesson = StringField('Lekcja')
     exercise = StringField('Ćwiczenie')
-    points_from = FloatField('Punkty od', [Optional()])
-    points_to = FloatField('Punkty do', [Optional()])
     submit = SubmitField('Wyszukaj')

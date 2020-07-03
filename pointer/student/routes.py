@@ -56,14 +56,14 @@ def view_exercise(exercise_id):
     if not exercise.is_published:
         abort(404)
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
-    attempts = len(exercise.get_user_solutions(current_user.id))
+    attempt_nr = 1+len(exercise.get_user_solutions(current_user.id))
     solutions = exercise.get_user_solutions(current_user.id)
     form = UploadForm()
     if form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
         solution = Solution(user_id=current_user.id, exercise_id=exercise.id, file_path=filename, points=0,
-                            ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempts,
+                            ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempt_nr,
                             status=Solution.Status['SEND'], send_date=get_current_date())
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)

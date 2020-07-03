@@ -18,6 +18,8 @@
         </h1></div>
     {% endfor %}
     <hr>
+    <h1>Link do zapisu:</h1>
+    <p>{{ url_for('auth.append_course', link = course.link, _external=True) }}</p>
     <button type="button" onclick="window.location.href='{{ url_for('admin.add_lesson', course_name = course.name ) }}'" class="btn btn-success">Dodaj lekcję</button>
     <button type="button" onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'" class="btn btn-info">Dodaj studenta</button>
     {% if course.is_open %}
@@ -25,5 +27,4 @@
     {% else %}
         <button type="button" onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'" class="btn btn-secondary">Aktywuj zapis</button>
     {% endif %}
-    <p>{{ url_for('auth.append_course', link = course.link, _external=True) }}</p>
 {% endblock %}

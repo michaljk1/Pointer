@@ -19,7 +19,8 @@ class Exercise(db.Model):
     compile_command = db.Column(db.String(100))
     run_command = db.Column(db.String(100))
     is_published = db.Column(db.Boolean, default=False)
-    timeout = db.Column(db.Integer, default=0, nullable=False)
+    timeout = db.Column(db.Integer, nullable=False)
+    interval = db.Column(db.Integer, nullable=False)
     solutions = db.relationship('Solution', backref='exercise', lazy='dynamic')
     tests = db.relationship('Test', backref='executor', lazy='dynamic')
 

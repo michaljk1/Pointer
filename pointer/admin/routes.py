@@ -1,38 +1,25 @@
-import os
-import shutil
-import string
-import random
 # TODO
-# 1: rich editor, wyniki pdf, numer indeksu, zatwierdzenie zadania, wiadomosc zadania
+# 1: rich editor, wyniki pdf,
 # zmiana w eksporcie z zatwierdzonymi zadaniami
 # 2: timeout testu, maksymalna ilosc pamieci,
 # 4: paginacja, estetyka, breadrcumbry filtrowanie zadań użytkownika
-# 5: mysql -> sqlite, walidacja przy dodawaniu testow
-from datetime import datetime
-
-from flask import render_template, url_for, flash, request, send_from_directory, current_app, abort
+from flask import render_template, url_for, flash, request, send_from_directory, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
-from pointer.admin.AdminUtil import modify_solution, get_student_ids_emails
-from pointer.auth.email import send_course_email
-from pointer.admin.forms import CourseForm, ExerciseForm, LessonForm, AssigneUserForm, SolutionForm, \
-    SolutionAdminSearchForm, TestForm, StatisticsCourseForm, StatisticsUserForm, EditLessonForm
-from werkzeug.utils import redirect, secure_filename
+from pointer.admin.AdminUtil import get_student_ids_emails
+from pointer.admin.forms import StatisticsCourseForm, StatisticsUserForm
+from werkzeug.utils import redirect
 from pointer.mod.forms import LoginInfoForm
 from pointer.models.statistics import Statistics
 from pointer.models.test import Test
 from pointer.models.usercourse import Course, User, role
 from pointer.models.solutionexport import Export
 from pointer.models.lesson import Lesson
-from pointer.models.exercise import Exercise
-
-from pointer import db
 from pointer.models.solution import Solution
-from pointer.services.ExerciseService import accept_best_solution
 from pointer.services.ExportService import create_csv_solution_export, create_csv_statistics_export
-from pointer.services.QueryService import login_query, exercise_admin_query
-from pointer.services.RouteService import validate_exists, validate_role_course, validate_role
+from pointer.services.QueryService import login_query
+from pointer.services.RouteService import validate_role_course, validate_role
 
 
 @bp.route('/logout')
@@ -41,233 +28,6 @@ def logout():
     validate_role(current_user, role['ADMIN'])
     logout_user()
     return redirect(url_for('auth.login'))
-
-
-@bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
-@login_required
-def add_student(course_name):
-    course = Course.query.filter_by(name=course_name).first()
-    validate_role_course(current_user, role['ADMIN'], course)
-    form = AssigneUserForm()
-    for user in User.query.filter(~User.courses.any(name=course.name)).filter(
-            User.role.in_([role['ADMIN'], role['STUDENT']])).all():
-        # TODO do zmiany         User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
-        form.email.choices.append((user.email, user.email))
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        user.courses.append(course)
-        send_course_email(form.email.data, course_name=course.name, role=user.role)
-        db.session.commit()
-        flash('Dodano studenta', 'message')
-    return render_template('admin/add_student.html', form=form, course=course)
-
-
-@bp.route('/')
-@bp.route('/index')
-@bp.route('/courses', methods=['GET'])
-@login_required
-def view_courses():
-    validate_role(current_user, role['ADMIN'])
-    return render_template('admin/courses.html', courses=current_user.courses)
-
-
-@bp.route('/course/<string:course_name>', methods=['GET', 'POST'])
-@login_required
-def view_course(course_name):
-    course = Course.query.filter_by(name=course_name).first()
-    validate_role_course(current_user, role['ADMIN'], course)
-    return render_template('admin/course.html', course=course)
-
-
-@bp.route('/change_open/<int:course_id>', methods=['GET', 'POST'])
-@login_required
-def change_open_course(course_id):
-    course = Course.query.filter_by(id=course_id).first()
-    validate_role_course(current_user, role['ADMIN'], course)
-    course.is_open = not course.is_open
-    db.session.commit()
-    flash('Zapisano zmiany', 'message')
-    return redirect(url_for('admin.view_course', course_name=course.name))
-
-
-@bp.route('/add_course', methods=['GET', 'POST'])
-@login_required
-def add_course():
-    validate_role(current_user, role['ADMIN'])
-    form = CourseForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        new_course = Course(name=form.name.data, is_open=True,
-                            link=''.join(random.choice(string.ascii_lowercase) for i in range(25)))
-        current_user.courses.append(new_course)
-        os.makedirs(new_course.get_directory())
-        db.session.commit()
-        flash('Dodano kurs', 'message')
-        return redirect(url_for('admin.view_courses'))
-    return render_template('admin/add_course.html', form=form)
-
-
-@bp.route('/lesson/<string:lesson_name>/')
-@login_required
-def view_lesson(lesson_name):
-    lesson = Lesson.query.filter_by(name=lesson_name).first()
-    validate_role_course(current_user, role['ADMIN'], lesson.course)
-    return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
-
-
-@bp.route('/<string:course_name>/add_lesson', methods=['GET', 'POST'])
-@login_required
-def add_lesson(course_name):
-    course = Course.query.filter_by(name=course_name).first()
-    validate_role_course(current_user, role['ADMIN'], course)
-    form = LessonForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        lesson_name = form.name.data
-        if not course.is_lesson_name_proper(lesson_name):
-            flash('Wprowadź inną nazwę lekcji', 'error')
-            return redirect(url_for('admin.add_lesson', course_name=course.name))
-        file = request.files['pdf_content']
-        filename = secure_filename(file.filename)
-        if filename == '':
-            filename = None
-        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename,raw_text=form.text_content.data)
-        course.lessons.append(new_lesson)
-        lesson_directory = new_lesson.get_directory()
-        os.makedirs(lesson_directory)
-        if filename is not None:
-            file.save(os.path.join(lesson_directory, filename))
-        db.session.commit()
-        return redirect(url_for('admin.view_lesson', lesson_name=new_lesson.name))
-    return render_template('admin/add_lesson.html', form=form, course=course)
-
-
-@bp.route('/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
-@login_required
-def edit_lesson(lesson_id):
-    lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_role_course(current_user, role['ADMIN'], lesson.course)
-    form = EditLessonForm(text_content=lesson.raw_text)
-    if request.method == 'POST' and form.validate_on_submit():
-        file = request.files['pdf_content']
-        filename = secure_filename(file.filename)
-        lesson.raw_text = form.text_content.data
-        if filename != '':
-            lesson_dir = lesson.get_directory()
-            os.remove(os.path.join(lesson_dir, lesson.content_pdf_path))
-            lesson.content_pdf_path = filename
-            file.save(os.path.join(lesson_dir, filename))
-        db.session.commit()
-        return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
-    return render_template('admin/edit_lesson.html', form=form, lesson=lesson)
-
-
-@bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
-@login_required
-def view_exercise(exercise_id):
-    exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
-    return render_template('admin/exercise.html', exercise=exercise)
-
-
-@bp.route('/activate_exercise/<string:exercise_id>', methods=['GET', 'POST'])
-@login_required
-def activate_exercise(exercise_id):
-    exercise: Exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
-    exercise.is_published = True
-    db.session.commit()
-    flash('Opublikowano', 'message')
-    return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
-
-@bp.route('/test/<int:exercise_id>', methods=['GET', 'POST'])
-@login_required
-def add_test(exercise_id):
-    exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
-    form = TestForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
-        flash('Dodano test', 'message')
-        return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
-    return render_template('admin/add_test.html', exercise=exercise, form=form)
-
-
-@bp.route('/<int:test_id>', methods=['GET', 'POST'])
-@login_required
-def delete_test(test_id):
-    test = Test.query.filter_by(id=test_id).first()
-    exercise_id = test.exercise_id
-    validate_role_course(current_user, role['ADMIN'], test.get_course())
-    shutil.rmtree(test.get_directory(), ignore_errors=True)
-    db.session.delete(test)
-    db.session.commit()
-    flash('Usunięto test', 'message')
-    return redirect(url_for('admin.view_exercise', exercise_id=exercise_id))
-
-
-@bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
-@login_required
-def add_exercise(course_name, lesson_name):
-    course = Course.query.filter_by(name=course_name).first()
-    validate_exists(course)
-    lesson: Lesson = course.get_lesson_by_name(lesson_name)
-    validate_exists(lesson)
-    validate_role_course(current_user, role['ADMIN'], course)
-    form = ExerciseForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        if not lesson.is_exercise_name_proper(form.name.data):
-            flash('Wprowadź inną nazwę lekcji', 'error')
-            return render_template('admin/add_template.html', form=form, lesson=lesson)
-        end_date, end_time = form.end_date.data, form.end_time.data
-        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
-                                minute=end_time.minute)
-        exercise = Exercise(name=form.name.data, content=form.content.data, lesson_id=lesson.id,
-                            max_attempts=form.max_attempts.data, compile_command=form.compile_command.data,
-                            end_date=end_datetime, run_command=form.run_command.data,
-                            program_name=form.program_name.data, timeout=form.timeout.data)
-        lesson.exercises.append(exercise)
-        os.makedirs(exercise.get_directory())
-        exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
-        return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
-    return render_template('admin/add_template.html', form=form, lesson=lesson)
-
-
-@bp.route('/solutions', methods=['GET', 'POST'])
-@login_required
-def view_solutions():
-    validate_role(current_user, role['ADMIN'])
-    course, lesson, exercise = request.args.get('course'), request.args.get('lesson'), request.args.get('exercise')
-    course_db = Course.query.filter_by(name=course).first()
-    solutions = []
-    if course is None or lesson is None or exercise is None or course_db is None or course_db not in current_user.courses:
-        form = SolutionAdminSearchForm()
-    else:
-        form = SolutionAdminSearchForm(course=course, lesson=lesson, exercise=exercise)
-        solutions = exercise_admin_query(form=form, courses=current_user.get_course_names()).all()
-    for course in current_user.courses:
-        form.course.choices.append((course.name, course.name))
-    if request.method == 'POST' and form.validate_on_submit():
-        solutions = exercise_admin_query(form=form, courses=current_user.get_course_names()).all()
-        return render_template('admin/solutions.html', form=form, solutions=solutions)
-    return render_template('admin/solutions.html', form=form, solutions=solutions)
-
-
-@bp.route('/solution/<int:solution_id>', methods=['GET', 'POST'])
-@login_required
-def view_solution(solution_id):
-    solution = Solution.query.filter_by(id=solution_id).first()
-    validate_exists(solution)
-    validate_role_course(current_user, role['ADMIN'], solution.get_course())
-    solution_form = SolutionForm(obj=solution, email=solution.author.email,
-                                 admin_ref=(solution.status == solution.Status['REFUSED']))
-    if request.method == 'POST' and solution_form.validate_on_submit():
-        form_points = solution_form.points.data
-        if form_points > solution.exercise.get_max_points():
-            flash('Za duża ilość punktów', 'error')
-            return render_template('admin/solution.html', form=solution_form, solution=solution)
-        modify_solution(solution, solution_form.admin_ref.data, form_points)
-        accept_best_solution(solution.user_id, solution.exercise)
-        flash('Zapisano zmiany', 'message')
-    return render_template('admin/solution.html', form=solution_form, solution=solution)
 
 
 @bp.route('/logins', methods=['GET', 'POST'])
