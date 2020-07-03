@@ -64,5 +64,5 @@ def view_logins():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         logins = login_query(form, current_user.role).order_by(desc(User.email)).all()
-        return render_template('mod/logins.html', form=form, logins=logins)
-    return render_template('mod/logins.html', form=form, logins=[])
+        return render_template('adminmod/logins.html', form=form, logins=logins)
+    return render_template('adminmod/logins.html', form=form, logins=[])

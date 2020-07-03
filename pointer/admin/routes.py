@@ -1,8 +1,8 @@
 # TODO
 # 1: rich editor, wyniki pdf,
 # zmiana w eksporcie z zatwierdzonymi zadaniami
-# 2: timeout testu, maksymalna ilosc pamieci,
-# 4: paginacja, estetyka, breadrcumbry filtrowanie zadań użytkownika
+# 2: maksymalna ilosc pamieci,
+# 4: paginacja, estetyka
 from flask import render_template, url_for, flash, request, send_from_directory, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
@@ -39,7 +39,7 @@ def view_logins():
     form.email.choices += emails
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
-    return render_template('mod/logins.html', form=form, logins=logins)
+    return render_template('adminmod/logins.html', form=form, logins=logins)
 
 
 @bp.route('/export_solutions/')
