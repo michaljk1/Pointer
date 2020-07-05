@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin.view_solutions') }}">
@@ -14,7 +14,7 @@
         </thead>
         <tbody>
         {% for export in exports %}
-            <tr class="pointercurs">
+            <tr style="cursor: pointer">
                 <td><p><a href="{{ url_for('admin.download', id=export.id, domain = 'export') }}"
                           target="_blank">{{ export.file_name }}</a></p></td>
                 <td><p>{{ export.generation_date }}</p></td>

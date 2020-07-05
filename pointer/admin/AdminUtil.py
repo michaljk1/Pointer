@@ -13,3 +13,4 @@ def get_student_ids_emails(courses: List[Course]):
                 user_ids.append(member.id)
                 emails.append((member.email, member.email))
     return user_ids, emails
+

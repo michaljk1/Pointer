@@ -12,7 +12,8 @@ def execute_solution_thread(app, solution_id):
             solution = Solution.query.filter_by(id=solution_id).first()
             if compile(solution):
                 grade(solution)
-            solution.status = Solution.Status['NOT_ACTIVE']
+            if solution.status == Solution.Status['SEND']:
+                solution.status = Solution.Status['NOT_ACTIVE']
             db.session.commit()
         except:
             solution.status = Solution.Status['ERROR']

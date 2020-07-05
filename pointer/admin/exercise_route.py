@@ -64,9 +64,7 @@ def delete_test(test_id):
 @login_required
 def add_exercise(course_name, lesson_name):
     course = Course.query.filter_by(name=course_name).first()
-    validate_exists(course)
     lesson: Lesson = course.get_lesson_by_name(lesson_name)
-    validate_exists(lesson)
     validate_role_course(current_user, role['ADMIN'], course)
     form = ExerciseForm()
     if request.method == 'POST' and form.validate_on_submit():

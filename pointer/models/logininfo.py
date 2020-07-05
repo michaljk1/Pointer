@@ -8,7 +8,7 @@ class LoginInfo(db.Model):
     login_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), nullable=False)
     Status = {
-        'SUCCESS': 'Success',
+        'SUCCESS': 'Sukces',
         'ERROR': 'Error',
         'ALL': 'Dowolny'
     }

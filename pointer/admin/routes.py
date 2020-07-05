@@ -8,7 +8,7 @@ from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
 from pointer.admin.AdminUtil import get_student_ids_emails
-from pointer.admin.forms import StatisticsCourseForm, StatisticsUserForm
+from pointer.admin.forms import StatisticsForm
 from werkzeug.utils import redirect
 from pointer.mod.forms import LoginInfoForm
 from pointer.models.statistics import Statistics
@@ -74,43 +74,32 @@ def view_exports():
 @login_required
 def view_statistics():
     validate_role(current_user, role['ADMIN'])
-    statistics_list = []
-    for course in current_user.courses:
-        for member in course.members:
-            if member.role == role['STUDENT']:
-                statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-    return render_template('admin/statistics.html', statisticsList=statistics_list)
-
-
-@bp.route('/statistics/by_course', methods=['GET', 'POST'])
-@login_required
-def view_statistics_course():
-    validate_role(current_user, role['ADMIN'])
-    form = StatisticsCourseForm()
-    statistics_list = []
+    form = StatisticsForm()
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
-    if request.method == 'POST' and form.validate_on_submit():
-        course = Course.query.filter_by(name=form.course.data).first()
-        for member in course.members:
-            if member.role == role['STUDENT']:
-                statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-    return render_template('admin/statistics_course.html', statisticsList=statistics_list, form=form)
-
-
-@bp.route('/statistics/by_user', methods=['GET', 'POST'])
-@login_required
-def view_statistics_user():
-    validate_role(current_user, role['ADMIN'])
-    form = StatisticsUserForm()
+    form.email.choices += get_student_ids_emails(current_user.courses)[1]
     statistics_list = []
-    form.email.choices = get_student_ids_emails(current_user.courses)[1]
     if request.method == 'POST' and form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        for course in user.courses:
-            if course in current_user.courses:
-                statistics_list.append(Statistics(course=course, user=user, is_admin=True))
-    return render_template('admin/statistics_user.html', statisticsList=statistics_list, form=form)
+        if form.email.data != 'ALL':
+            user = User.query.filter_by(email=form.email.data).first()
+            if form.course.data != 'ALL':
+                course = Course.query.filter_by(name=form.course.data).first()
+                if course in user.courses and course in current_user.courses:
+                    statistics_list.append(Statistics(course=course, user=user, is_admin=True))
+            else:
+                for course in user.courses:
+                    if course in current_user.courses:
+                        statistics_list.append(Statistics(course=course, user=user, is_admin=True))
+        else:
+            if form.course.data != 'ALL':
+                course = Course.query.filter_by(name=form.course.data).first()
+                for member in course.get_students():
+                    statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+            else:
+                for course in current_user.courses:
+                    for member in course.get_students():
+                        statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+    return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
 
 
 @bp.route('/download')

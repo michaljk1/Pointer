@@ -17,19 +17,49 @@
             "user_points": statistics.user_points,
             "percent_value": statistics.get_percent_value()
             }) %}
-            <tr>
+            {% set idx = loop.index %}
+            <tr class='{{ idx }}' style="cursor: pointer"
+                onclick="showDetails($(this).attr('class'))">
                 <td><p>{{ statistics.user_email }}</p></td>
                 <td><p>{{ statistics.course_name }}</p></td>
                 <td><p>{{ statistics.user_points }}</p></td>
                 <td><p>{{ statistics.course_points }}</p></td>
                 <td><p>{{ statistics.get_percent_value() }}%</p></td>
             </tr>
+
+            {% if statistics.solutions|length > 0 %}
+                {% for solution in statistics.solutions %}
+                    <tr class='{{ idx }}details'
+                        style="display:none; background-color: antiquewhite">
+                        <td>{{ solution.author.email }}</td>
+                        <td>{{ solution.get_course().name }}</td>
+                        <td>{{ solution.exercise.lesson.name }}</td>
+                        <td>{{ solution.exercise.name }}</td>
+                        <td>{{ solution.points }} pkt</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>
-        <button type="button" onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_json = statistics_json)}}'"
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_json = statistics_json) }}'"
             class="btn btn-warning">Export CSV
     </button>
+    <script>
+        function showDetails(param1) {
+            var detailClass = param1 + 'details';
+            var elems = document.getElementsByClassName(detailClass);
+            if (elems[0].style.display === 'none') {
+                for (i = 0; i < elems.length; i++) {
+                    elems[i].style.display = 'table-row';
+                }
+            } else {
+                for (i = 0; i < elems.length; i++) {
+                    elems[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
 
 {% endif %}
-

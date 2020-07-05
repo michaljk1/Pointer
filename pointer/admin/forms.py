@@ -8,20 +8,15 @@ from pointer.models.usercourse import Course
 from pointer.student.forms import SolutionStudentSearchForm
 
 
-class UploadForm(FlaskForm):
-    file = FileField('Wybierz plik')
-    submit_button = SubmitField('Zapisz')
-
-
 class CourseForm(FlaskForm):
     name = StringField('Nazwa kursu', validators=[Length(min=1, message="Wprowadź nazwę")])
     submit_button = SubmitField('Dodaj kurs')
 
     def validate_name(self, name):
         courses = Course.query.all()
-        replaced_name = name.data.replace(" ", "_")
+        replaced_name = name.data.replace(" ", "_").lower()
         for course in courses:
-            if course.name.replace(" ", "_") == replaced_name:
+            if course.name.replace(" ", "_").lower() == replaced_name:
                 raise ValidationError('Podana nazwa kursu jest już zajęta.')
 
 
@@ -69,22 +64,9 @@ class SelectStudentForm(FlaskForm):
     submit_button = SubmitField('Przypisz użytkownika')
 
 
-class ViewStudentStatsForm(FlaskForm):
-    email = SelectField('Statystyki', choices=[])
-    submit_button = SubmitField('Przejdź')
-
-
-class StatisticsCourseForm(FlaskForm):
-    course = SelectField('Kurs', choices=[])
-    search_button = SubmitField('Wyszukaj')
-
-
-class CSVForm(FlaskForm):
-    submit_button = SubmitField('Eksport CSV')
-
-
-class StatisticsUserForm(FlaskForm):
-    email = SelectField('Użytkownik', choices=[])
+class StatisticsForm(FlaskForm):
+    course = SelectField('Kurs', choices=[['ALL', 'Dowolny']], validators=[DataRequired()])
+    email = SelectField('Student', choices=[['ALL', 'Dowolny']], validators=[DataRequired()])
     search_button = SubmitField('Wyszukaj')
 
 
@@ -99,7 +81,6 @@ class SolutionForm(FlaskForm):
     ip_address = StringField('ip address', render_kw={'readonly': True})
     os_info = StringField('os info', render_kw={'readonly': True})
     submit = SubmitField('Zmień punktację')
-
 
 
 class SolutionAdminSearchForm(SolutionStudentSearchForm):

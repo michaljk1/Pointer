@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin.view_solutions') }}">
@@ -16,7 +16,7 @@
         {{ wtf.form_field(form.surname, class='form-control') }}
         {{ wtf.form_field(form.points_from, class='form-control') }}
         {{ wtf.form_field(form.points_to, class='form-control') }}
-        <p>{{ form.submit() }}</p>
+        {{ wtf.form_field(form.submit, class='btn btn-primary') }}
     </form>
     {% set solution_ids = [] %}
     {% if solutions|length > 0 %}

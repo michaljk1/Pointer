@@ -31,8 +31,9 @@ class Course(db.Model):
         return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
 
     def is_lesson_name_proper(self, lesson_name):
+        lesson_name = lesson_name.replace(" ", "_").lower()
         for lesson in self.lessons:
-            if lesson.name.replace(" ", "_") == lesson_name.replace(" ", "_"):
+            if lesson.name.replace(" ", "_").lower() == lesson_name:
                 return False
         return True
 

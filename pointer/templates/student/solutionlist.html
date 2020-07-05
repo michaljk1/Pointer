@@ -11,7 +11,7 @@
             </thead>
             <tbody>
             {% for solution in solutions %}
-                <tr class="pointercurs">
+                <tr style="cursor: pointer">
                     <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}"
                               target="_blank">{{ solution.file_path }}</a></p></td>
                     <td><p><a href="{{ url_for('student.view_course', course_name=solution.get_course().name) }}"
