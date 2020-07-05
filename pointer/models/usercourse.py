@@ -20,6 +20,13 @@ class Course(db.Model):
     link = db.Column(db.String(25), unique=True)
     is_open = db.Column(db.Boolean, default=True)
 
+    def get_students(self):
+        students = []
+        for member in self.members:
+            if member.role == role['STUDENT']:
+                students.append(member)
+        return students
+
     def get_directory(self):
         return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
 
@@ -36,7 +43,7 @@ class Course(db.Model):
         return None
 
     def get_course_points(self):
-        points = 0
+        points = 0.0
         for lesson in self.lessons:
             for exercise in lesson.exercises:
                 if exercise.is_published:
@@ -82,21 +89,24 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
-    def get_points_for_student(self, course: Course):
-        user_points = 0
+    def get_solutions_with_points_for_student(self, course: Course):
+        user_points, approved_solutions = 0.0, []
         for solution in self.solutions:
             if solution.get_course() == course and solution.exercise.is_published and solution.status == \
                     solution.Status['APPROVED'] and solution.exercise.is_finished():
+                approved_solutions.append(solution)
                 user_points += solution.points
-        return user_points
+        return approved_solutions, user_points
 
-    def get_points_for_admin(self, course: Course):
-        user_points = 0
+    def get_solutions_with_points_for_admin(self, course: Course):
+        user_points, approved_solutions = 0.0, []
         for solution in self.solutions:
             if solution.get_course() == course and solution.exercise.is_published and solution.status == \
                     solution.Status['APPROVED']:
+                approved_solutions.append(solution)
                 user_points += solution.points
-        return user_points
+        return approved_solutions, user_points
+
 
     def get_admin_directory(self):
         if self.role == role['ADMIN']:

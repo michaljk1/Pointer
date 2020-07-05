@@ -12,19 +12,35 @@
 {% block app_content %}
     <h2>{{ course.name }}</h2>
     <hr>
-    {% for lesson in course.lessons %}
-        <div><h1><a
-                href="{{ url_for('admin.view_lesson',lesson_name = lesson.name) }}">{{ lesson.name }}</a>
-        </h1></div>
-    {% endfor %}
+    <div class="container_content">
+        {% for lesson in course.lessons %}
+            <div><h1><a
+                    href="{{ url_for('admin.view_lesson',lesson_name = lesson.name) }}">{{ lesson.name }}</a>
+            </h1></div>
+        {% endfor %}
     <hr>
     <h1>Link do zapisu:</h1>
     <p>{{ url_for('auth.append_course', link = course.link, _external=True) }}</p>
-    <button type="button" onclick="window.location.href='{{ url_for('admin.add_lesson', course_name = course.name ) }}'" class="btn btn-success">Dodaj lekcję</button>
-    <button type="button" onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'" class="btn btn-info">Dodaj studenta</button>
-    {% if course.is_open %}
-        <button type="button" onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'" class="btn btn-secondary">Zablokuj zapis</button>
-    {% else %}
-        <button type="button" onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'" class="btn btn-secondary">Aktywuj zapis</button>
-    {% endif %}
+
+    <div class="bottom_div">
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.add_lesson', course_name = course.name ) }}'"
+                class="btn btn-success">Dodaj lekcję
+        </button>
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'"
+                class="btn btn-info">Dodaj studenta
+        </button>
+        {% if course.is_open %}
+            <button type="button"
+                    onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"
+                    class="btn btn-warning">Zablokuj zapis
+            </button>
+        {% else %}
+            <button type="button"
+                    onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"
+                    class="btn btn-warning">Aktywuj zapis
+            </button>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -21,7 +21,7 @@ class Solution(db.Model):
         'ALL': 'Dowolny',
         'APPROVED': 'Zaakceptowano',
         'COMPILE_ERROR': 'Błąd kompilacji',
-        'RUN_ERROR': 'Błąd uruchomienia',
+        'TEST_ERROR': 'Błąd testu',
         'ERROR': 'Error',
         'NOT_ACTIVE': 'Nieaktywne'
     }

@@ -64,9 +64,14 @@ class TestForm(FlaskForm):
     submit_button = SubmitField('Dodaj test')
 
 
-class AssigneUserForm(FlaskForm):
+class SelectStudentForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
     submit_button = SubmitField('Przypisz użytkownika')
+
+
+class ViewStudentStatsForm(FlaskForm):
+    email = SelectField('Statystyki', choices=[])
+    submit_button = SubmitField('Przejdź')
 
 
 class StatisticsCourseForm(FlaskForm):

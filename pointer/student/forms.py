@@ -19,7 +19,7 @@ class SolutionStudentSearchForm(FlaskForm):
                                             [Solution.Status['NOT_ACTIVE'], Solution.Status['NOT_ACTIVE']],
                                             [Solution.Status['SEND'], Solution.Status['SEND']],
                                             [Solution.Status['COMPILE_ERROR'], Solution.Status['COMPILE_ERROR']],
-                                            [Solution.Status['RUN_ERROR'], Solution.Status['RUN_ERROR']],
+                                            [Solution.Status['TEST_ERROR'], Solution.Status['TEST_ERROR']],
                                             [Solution.Status['ERROR'], Solution.Status['ERROR']]])
     lesson = StringField('Lekcja')
     exercise = StringField('Ćwiczenie')

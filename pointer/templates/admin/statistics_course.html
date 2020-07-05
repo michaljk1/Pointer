@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_statistics') }}"> Statystki </a>
+    <a href="{{ url_for('admin.view_statistics') }}"><pb> Statystki </pb></a>
     /
-    <a href="{{ url_for('admin.view_statistics_course') }}"> Kurs </a>
+    <a href="{{ url_for('admin.view_statistics_course') }}"><pb> Kurs </pb></a>
 {% endblock %}
 {% block app_content %}
     <div class="row">

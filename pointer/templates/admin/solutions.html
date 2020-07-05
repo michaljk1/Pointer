@@ -30,26 +30,32 @@
             <th>Punkty</th>
             <th>IP</th>
             <th>Status</th>
-            <th> </th>
+            <th></th>
             </thead>
             <tbody>
             {% for solution in solutions %}
                 {% do solution_ids.append(solution.id) %}
-                <tr>
-                    <td><p>{{ solution.author.email }}</p></td>
-                    <td><p><a href="{{ url_for('admin.view_course', course_name=solution.get_course().name) }}"
-                              target="_blank">{{ solution.get_course().name }}</a></p></td>
-                    <td><p><a href="{{ url_for('admin.view_lesson', lesson_name=solution.exercise.lesson.name) }}"
-                              target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
-                    <td><p><a href="{{ url_for('admin.view_exercise', exercise_id=solution.exercise.id) }}"
-                              target="_blank">{{ solution.exercise.name }}</a></p></td>
-                    <td><p>{{ solution.send_date }}</p></td>
-                    <td><p>{{ solution.points }}</p></td>
-                    <td><p>{{ solution.ip_address }}</p></td>
-                    <td><p>{{ solution.status }}</p></td>
-                    <td><p><a href="{{ url_for('admin.view_solution', solution_id = solution.id) }}"
-                              target="_blank"> Edytuj </a></p></td>
-                </tr>
+                {% if solution.status == solution.Status['APPROVED'] %}
+                    <tr style="background-color:#7FFF00">
+                        {% elif solution.status == solution.Status['REFUSED']%}
+                           <tr style="background-color:#E9967A">
+                        {% else %}
+                    <tr>
+                {% endif %}
+            <td><p>{{ solution.author.email }}</p></td>
+            <td><p><a href="{{ url_for('admin.view_course', course_name=solution.get_course().name) }}"
+                      target="_blank">{{ solution.get_course().name }}</a></p></td>
+            <td><p><a href="{{ url_for('admin.view_lesson', lesson_name=solution.exercise.lesson.name) }}"
+                      target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
+            <td><p><a href="{{ url_for('admin.view_exercise', exercise_id=solution.exercise.id) }}"
+                      target="_blank">{{ solution.exercise.name }}</a></p></td>
+            <td><p>{{ solution.send_date }}</p></td>
+            <td><p>{{ solution.points }}</p></td>
+            <td><p>{{ solution.ip_address }}</p></td>
+            <td><p>{{ solution.status }}</p></td>
+            <td><p><a href="{{ url_for('admin.view_solution', solution_id = solution.id) }}"
+                      target="_blank"> Edytuj </a></p></td>
+            </tr>
             {% endfor %}
             </tbody>
         </table>

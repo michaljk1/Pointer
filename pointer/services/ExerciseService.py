@@ -56,7 +56,7 @@ def grade(solution: Solution):
             outs = process.communicate(timeout=solution.exercise.timeout)[0]
             error_file.close()
             if os.path.getsize(error_file.name) > 0:
-                solution.status = Solution.Status['RUN_ERROR']
+                solution.status = Solution.Status['TEST_ERROR']
                 with open(error_file.name) as f:
                     solution.error_msg = f.read().split("run.sh")[1][2:].split("$RUN_COMMAND")[0]
                 break

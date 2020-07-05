@@ -5,7 +5,7 @@ from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from pointer.admin import bp
 from pointer.auth.email import send_course_email
-from pointer.admin.forms import CourseForm, AssigneUserForm
+from pointer.admin.forms import CourseForm, SelectStudentForm, ViewStudentStatsForm
 from werkzeug.utils import redirect
 from pointer.models.usercourse import Course, User, role
 from pointer import db
@@ -26,7 +26,13 @@ def view_courses():
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
-    return render_template('admin/course.html', course=course)
+    form = ViewStudentStatsForm()
+    for student in course.get_students():
+        form.email.choices.append((student.email, student.email))
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        user.courses.append(course)
+    return render_template('admin/course.html', course=course, form=form)
 
 
 @bp.route('/<string:course_name>/add_student', methods=['GET', 'POST'])
@@ -34,7 +40,7 @@ def view_course(course_name):
 def add_student(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
-    form = AssigneUserForm()
+    form = SelectStudentForm()
     for user in User.query.filter(~User.courses.any(name=course.name)).filter(
             User.role.in_([role['ADMIN'], role['STUDENT']])).all():
         # TODO do zmiany         User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():

@@ -2,7 +2,7 @@
 # 1: rich editor, wyniki pdf,
 # zmiana w eksporcie z zatwierdzonymi zadaniami
 # 2: maksymalna ilosc pamieci,
-# 4: paginacja, estetyka
+# 4: paginacja
 from flask import render_template, url_for, flash, request, send_from_directory, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc

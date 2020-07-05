@@ -1,10 +1,17 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_statistics') }}"><pb> Statystki </pb></a>
+    <a href="{{ url_for('admin.view_statistics') }}">
+        <pb> Statystki</pb>
+    </a>
 {% endblock %}
 {% block app_content %}
-    <div><a href="{{ url_for('admin.view_statistics_user') }}"> Statystyki studenta </a></div>
-    <div><a href="{{ url_for('admin.view_statistics_course') }}"> Statystyki kursu </a></div>
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.view_statistics_user') }}'"
+            class="btn btn-success">Statystyki studenta
+    </button>
+    <button type="button" onclick="window.location.href='{{ url_for('admin.view_statistics_course') }}'"
+            class="btn btn-info">Statystyki kursu
+    </button>
     {% include "admin/statistics_list.html" %}
 {% endblock %}

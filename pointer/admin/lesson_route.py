@@ -33,7 +33,7 @@ def add_lesson(course_name):
         filename = secure_filename(file.filename)
         if filename == '':
             filename = None
-        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename,raw_text=form.text_content.data)
+        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, raw_text=form.text_content.data)
         course.lessons.append(new_lesson)
         lesson_directory = new_lesson.get_directory()
         os.makedirs(lesson_directory)

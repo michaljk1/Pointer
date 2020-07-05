@@ -1,13 +1,22 @@
 {% extends "base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('admin.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
 {% endblock %}
 {% block app_content %}
-    {% for course in courses %}
-        <div>
-            <h1><a href="{{ url_for('admin.view_course', course_name = course.name ) }}">{{ course.name }}</a>
-            </h1>
-        </div>
-    {% endfor %}
-    <button type="button" onclick="window.location.href='{{ url_for('admin.add_course') }}'" class="btn btn-success">Dodaj kurs</button>
+    <div class="container_content">
+        {% for course in courses %}
+            <div>
+                <h1><a href="{{ url_for('admin.view_course', course_name = course.name ) }}">{{ course.name }}</a>
+                </h1>
+            </div>
+        {% endfor %}
+    </div>
+    <hr>
+    <div class="bottom_div">
+        <button type="button" onclick="window.location.href='{{ url_for('admin.add_course') }}'"
+                class="btn btn-success btn-lg">Dodaj kurs
+        </button>
+    </div>
 {% endblock %}

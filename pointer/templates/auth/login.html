@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('auth.login') }}"><pb>Logowanie</pb></a>
+    <a href="{{ url_for('auth.login') }}">
+        <pb>Logowanie</pb>
+    </a>
 {% endblock %}
 {% block app_content %}
     <div class="row">
         <div class="col-md-4">
-            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+            {{ wtf.quick_form(form, button_map={'submit': 'success'}) }}
         </div>
-    </div>
-    <p><a href="{{ url_for('auth.activate') }}">Wyślij link aktywacyjny</a></p>
+        </div>
+    <button type="button"
+            onclick="window.location.href='{{ url_for('auth.activate') }}'"
+            class="btn btn-info">Wyślij link aktywacyjny
+    </button>
 {% endblock %}

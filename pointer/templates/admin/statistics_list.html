@@ -27,7 +27,9 @@
         {% endfor %}
         </tbody>
     </table>
-    <h1><a href="{{ url_for('admin.export_statistics', statistics_json = statistics_json)}}">Export CSV</a></h1>
+        <button type="button" onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_json = statistics_json)}}'"
+            class="btn btn-warning">Export CSV
+    </button>
 
 {% endif %}
 
