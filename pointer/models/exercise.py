@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from sqlalchemy.dialects.mysql import LONGTEXT
 from werkzeug.utils import secure_filename
 
 from pointer import db
@@ -12,12 +13,12 @@ class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
-    content = db.Column(db.String(500))
+    content = db.Column(LONGTEXT)
     end_date = db.Column(db.DateTime)
     max_attempts = db.Column(db.Integer, default=3)
     program_name = db.Column(db.String(50))
     compile_command = db.Column(db.String(100))
-    run_command = db.Column(db.String(100))
+    run_command = db.Column(db.String(100), nullable=False)
     is_published = db.Column(db.Boolean, default=False)
     timeout = db.Column(db.Integer, nullable=False)
     interval = db.Column(db.Integer, nullable=False)

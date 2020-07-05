@@ -33,7 +33,7 @@ def add_lesson(course_name):
         filename = secure_filename(file.filename)
         if filename == '':
             filename = None
-        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, raw_text=form.text_content.data)
+        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_text=request.form.get('editordata'))
         course.lessons.append(new_lesson)
         lesson_directory = new_lesson.get_directory()
         os.makedirs(lesson_directory)
@@ -49,11 +49,11 @@ def add_lesson(course_name):
 def edit_lesson(lesson_id):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
-    form = EditLessonForm(text_content=lesson.raw_text)
+    form = EditLessonForm(text_content=lesson.content_text)
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['pdf_content']
         filename = secure_filename(file.filename)
-        lesson.raw_text = form.text_content.data
+        lesson.content_text = request.form.get('editordata')
         if filename != '':
             lesson_dir = lesson.get_directory()
             os.remove(os.path.join(lesson_dir, lesson.content_pdf_path))

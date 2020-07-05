@@ -1,12 +1,14 @@
 import os
 
+from sqlalchemy.dialects.mysql import LONGTEXT
+
 from pointer import db
 
 
 class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60), unique=True)
-    raw_text = db.Column(db.String(600))
+    name = db.Column(db.String(60))
+    content_text = db.Column(LONGTEXT)
     content_pdf_path = db.Column(db.String(100))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     exercises = db.relationship('Exercise', backref='lesson', lazy='dynamic')

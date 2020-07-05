@@ -15,8 +15,10 @@
 {% block app_content %}
     <h2>{{ lesson.name }}</h2>
     <hr>
-    <h1>{{ lesson.raw_text }}</h1>
-    {% if lesson.content_pdf_path is not none %}
+    {% if lesson.content_text != None %}
+        {{ lesson.content_text|safe }}
+    {% endif %}
+    {% if lesson.content_pdf_path != None %}
         <div><h1><a
                 href="{{ url_for('admin.download',domain='lesson', id=lesson.id) }}"
                 target="_blank">{{ lesson.content_pdf_path }}</a>

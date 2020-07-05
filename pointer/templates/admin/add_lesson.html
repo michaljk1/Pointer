@@ -14,18 +14,17 @@
     </a>
 {% endblock %}
 {% block app_content %}
-    <form method="post">
-        <textarea id="summernote" name="editordata"></textarea>
-    </form>
-    <script>
-        $(document).ready(function () {
-            $('#summernote').summernote();
-        });
-    </script>
+
     <form action="" method="post" enctype="multipart/form-data" class="form" role="form">
         {{ form.csrf_token() }}
         {{ wtf.form_field(form.name, class='form-control') }}
-        {{ wtf.form_field(form.text_content, class='form-control') }}
+        <textarea id="summernote" name="editordata"></textarea>
+        <script>
+            $(document).ready(function () {
+                $('#summernote').summernote();
+                $('.dropdown-toggle').dropdown();
+            });
+        </script>
         {{ form.pdf_content() }}
         {{ form.submit_button() }}
     </form>

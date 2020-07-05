@@ -29,15 +29,12 @@ class EditLessonForm(FlaskForm):
 
 class LessonForm(FlaskForm):
     name = StringField('Nazwa lekcji', validators=[DataRequired()])
-    text_content = TextAreaField('Treść', render_kw={'cols': '40', 'rows': '13'},
-                                 validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
     submit_button = SubmitField('Dodaj lekcję')
 
 
 class ExerciseForm(FlaskForm):
     name = StringField('Nazwa', validators=[DataRequired()])
-    content = StringField('Treść', validators=[DataRequired()])
     max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired()])
     end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()])
     end_time = TimeField('Godzina')

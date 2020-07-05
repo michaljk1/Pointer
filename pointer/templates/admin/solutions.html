@@ -36,9 +36,9 @@
             {% for solution in solutions %}
                 {% do solution_ids.append(solution.id) %}
                 {% if solution.status == solution.Status['APPROVED'] %}
-                    <tr style="background-color:#7FFF00">
+                    <tr style="background-color:#EAFAF1">
                         {% elif solution.status == solution.Status['REFUSED']%}
-                           <tr style="background-color:#E9967A">
+                           <tr style="background-color:#FDEDEC">
                         {% else %}
                     <tr>
                 {% endif %}

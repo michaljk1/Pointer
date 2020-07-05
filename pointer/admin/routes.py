@@ -1,5 +1,5 @@
 # TODO
-# 1: rich editor, wyniki pdf,
+# 1: edycja cwiczenia, wyniki pdf,
 # zmiana w eksporcie z zatwierdzonymi zadaniami
 # 2: maksymalna ilosc pamieci,
 # 4: paginacja

@@ -8,7 +8,7 @@
 {% endblock %}
 {% block app_content %}
     <div><h2>{{ lesson.name }}</h2></div>
-        <div><h1>{{ lesson.raw_text }}</h1></div>
+    {{ lesson.content_text|safe }}
     {% if lesson.content_pdf_path is not none %}
     <div><h1><a
             href="{{ url_for('student.download_content', lesson_id=lesson.id) }}" target="_blank">{{ lesson.content_pdf_path }}</a>
