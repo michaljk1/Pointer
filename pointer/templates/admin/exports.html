@@ -6,7 +6,7 @@
     </a>
 {% endblock %}
 {% block app_content %}
-<table id="example" class="display" style="width:100%">
+<table id="paginatedTable" class="display" style="width:100%">
     <thead>
         <th class="th-sm">Plik</th>
         <th class="th-sm">Data</th>
@@ -23,11 +23,24 @@
         {% endfor %}
         </tbody>
     </table>
-<script>
-$(document).ready(function() {
-    $('#example').DataTable( {
-        "pagingType": "full_numbers"
-    } );
-} );
-</script>
+    <script>
+        $(document).ready(function () {
+            $('#paginatedTable').DataTable({
+                "dom": 'lrtip',
+                "pagingType": "full_numbers",
+                "language": {
+                    "lengthMenu": "Pokaż _MENU_ rekordów",
+                    "zeroRecords": "Brak odpowiadających rekordów",
+                    "search": "Wyszukaj:",
+                    "info": "_START_ - _END_ z _TOTAL_ rekordów",
+                    "paginate": {
+                        "first": "Pierwsza strona",
+                        "last": "Ostatnia strona",
+                        "next": "Następna",
+                        "previous": "Poprzednia"
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -26,6 +26,7 @@
             });
         </script>
         {{ form.pdf_content() }}
-        {{ form.submit_button() }}
+        <hr>
+        {{ wtf.form_field(form.submit_button, class='btn btn-success') }}
     </form>
 {% endblock %}

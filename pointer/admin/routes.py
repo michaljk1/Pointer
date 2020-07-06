@@ -1,7 +1,6 @@
 # TODO
 # 1: edycja cwiczenia, maksymalna ilosc pamieci
 # zmiana w eksporcie z zatwierdzonymi zadaniami,  wyniki pdf
-# 4: paginacja
 from flask import render_template, url_for, flash, request, send_from_directory, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc

@@ -64,22 +64,7 @@
         <div class="form-group col-md-6">
             {{ wtf.form_field(form.interval, class='form-control') }}
         </div>
-        {{ wtf.form_field(form.submit_button, class='btn btn-success') }}
+        {{ wtf.form_field(form.submit_button, class='btn btn-success', style='text-align:left') }}
     </form>
 {% endblock %}
 
-{#class ExerciseForm(FlaskForm):#}
-{#name = StringField('Nazwa', validators=[DataRequired()])#}
-{#content = StringField('Treść', validators=[DataRequired()])#}
-{#max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired()])#}
-{#end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()])#}
-{#end_time = TimeField('Godzina')#}
-{#compile_command = StringField('compile command')#}
-{#run_command = StringField('run_command', validators=[DataRequired()])#}
-{#output = FileField('Output', validators=[DataRequired()])#}
-{#input = FileField('Input', validators=[DataRequired()])#}
-{#max_points = FloatField('Liczba punktów', validators=[DataRequired()])#}
-{#program_name = StringField('Nazwa testowanego pliku', validators=[DataRequired()])#}
-{#timeout = IntegerField('Timeout w sekundach')#}
-{#interval = IntegerField('Przerwa pomiędzy wysłaniem zadań')#}
-{#submit_button = SubmitField('Dodaj ćwiczenie')#}

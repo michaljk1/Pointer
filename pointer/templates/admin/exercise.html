@@ -18,13 +18,12 @@
 
 {% endblock %}
 {% block app_content %}
-    <div><h2>{{ exercise.name }}</h2></div>
+    <h2>{{ exercise.name }}</h2>
     <hr>
-    <div><h1>{{ exercise.content|safe }}</h1></div>
-    <div><h1>Możliwe punkty: {{ exercise.get_max_points() }}</h1></div>
-    <div><h1>Termin: {{ exercise.end_date }}</h1></div>
-    <div><h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1></div>
-    <div><h1>Testy: </h1></div>
+    <h1>{{ exercise.content|safe }}</h1>
+    <h1>Możliwe punkty: {{ exercise.get_max_points() }}</h1>
+    <h1>Termin: {{ exercise.end_date }}</h1>
+    <h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1>
     <hr>
     {% for test in exercise.tests %}
         <div><p>Output: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.output_name) }}"

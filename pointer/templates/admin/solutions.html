@@ -21,7 +21,7 @@
     <hr>
     {% set solution_ids = [] %}
     {% if solutions|length > 0 %}
-        <table id="example" class="display" style="width:100%">
+        <table id="paginatedTable" class="display" style="width:100%">
             <thead>
             <th>Autor</th>
             <th>Kurs</th>
@@ -66,13 +66,14 @@
     {% endif %}
     <script>
         $(document).ready(function () {
-            $('#example').DataTable({
+            $('#paginatedTable').DataTable({
+                "dom": 'lrtip',
                 "pagingType": "full_numbers",
                 "language": {
                     "lengthMenu": "Pokaż _MENU_ rekordów",
                     "zeroRecords": "Brak odpowiadających rekordów",
                     "search": "Wyszukaj:",
-                    "info": "Rekordy od _START_ do _END_ z _TOTAL_",
+                    "info": "_START_ - _END_ z _TOTAL_ rekordów",
                     "paginate": {
                         "first": "Pierwsza strona",
                         "last": "Ostatnia strona",

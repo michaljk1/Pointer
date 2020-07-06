@@ -14,8 +14,9 @@
             {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
         </div>
     </div>
+    <hr>
     {% if logins|length > 0 %}
-    <table id="example" class="display" style="width:100%">
+    <table id="paginatedTable" class="display" style="width:100%">
             <thead>
             <th>Użytkownik</th>
             <th>IP</th>
@@ -35,10 +36,23 @@
         </table>
     {% endif %}
     <script>
-$(document).ready(function() {
-    $('#example').DataTable( {
-        "pagingType": "full_numbers"
-    } );
-} );
-</script>
+        $(document).ready(function () {
+            $('#paginatedTable').DataTable({
+                "dom": 'lrtip',
+                "pagingType": "full_numbers",
+                "language": {
+                    "lengthMenu": "Pokaż _MENU_ rekordów",
+                    "zeroRecords": "Brak odpowiadających rekordów",
+                    "search": "Wyszukaj:",
+                    "info": "_START_ - _END_ z _TOTAL_ rekordów",
+                    "paginate": {
+                        "first": "Pierwsza strona",
+                        "last": "Ostatnia strona",
+                        "next": "Następna",
+                        "previous": "Poprzednia"
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

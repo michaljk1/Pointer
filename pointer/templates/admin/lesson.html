@@ -29,12 +29,14 @@
                 href="{{ url_for('admin.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
         </h1></div>
     {% endfor %}
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}'"
-            class="btn btn-success">Dodaj ćwiczenie
-    </button>
-    <button type="button" onclick="window.location.href='{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}'"
-            class="btn btn-info">Edytuj lekcję
-    </button>
-
+    <hr>
+    <div class="bottom_div">
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}'"
+                class="btn btn-success btn-lg">Dodaj ćwiczenie
+        </button>
+        <button type="button" onclick="window.location.href='{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}'"
+                class="btn btn-info btn-lg">Edytuj lekcję
+        </button>
+    </div>
 {% endblock %}
