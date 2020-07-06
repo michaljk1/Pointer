@@ -38,22 +38,22 @@
         </button>
         <hr>
     {% endfor %}
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
-            class="btn btn-success">Dodaj test
-    </button>
+
     {% if exercise.is_published %}
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-                class="btn btn-info">Dezaktywuj zadanie
+                class="btn btn-warning">Dezaktywuj zadanie
         </button>
     {% else %}
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-                class="btn btn-info">Aktywuj zadanie
+                class="btn btn-success">Aktywuj zadanie
         </button>
     {% endif %}
-
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
+            class="btn btn-info">Dodaj test
+    </button>
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
             class="btn btn-secondary">Zobacz rozwiązania

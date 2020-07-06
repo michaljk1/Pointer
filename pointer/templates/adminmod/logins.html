@@ -15,7 +15,7 @@
         </div>
     </div>
     {% if logins|length > 0 %}
-        <table class="table">
+    <table id="example" class="display" style="width:100%">
             <thead>
             <th>Użytkownik</th>
             <th>IP</th>
@@ -34,4 +34,11 @@
             </tbody>
         </table>
     {% endif %}
+    <script>
+$(document).ready(function() {
+    $('#example').DataTable( {
+        "pagingType": "full_numbers"
+    } );
+} );
+</script>
 {% endblock %}

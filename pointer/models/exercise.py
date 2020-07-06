@@ -61,3 +61,4 @@ class Exercise(db.Model):
                                 minute=self.end_date.minute, tzinfo=current_datetime.tzinfo)
         return current_datetime > end_datetime
 
+

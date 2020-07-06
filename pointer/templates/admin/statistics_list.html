@@ -1,7 +1,7 @@
 {% set statistics_json = [] %}
 {% if statisticsList|length > 0 %}
-    <table class="table">
-        <thead>
+
+    <table id="example" class="display" style="width:100%">
         <th>Student</th>
         <th>Kurs</th>
         <th>Punkty</th>
@@ -46,6 +46,13 @@
             onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_json = statistics_json) }}'"
             class="btn btn-warning">Export CSV
     </button>
+        <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                "pagingType": "full_numbers"
+            });
+        });
+    </script>
     <script>
         function showDetails(param1) {
             var detailClass = param1 + 'details';

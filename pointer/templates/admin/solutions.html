@@ -18,9 +18,10 @@
         {{ wtf.form_field(form.points_to, class='form-control') }}
         {{ wtf.form_field(form.submit, class='btn btn-primary') }}
     </form>
+    <hr>
     {% set solution_ids = [] %}
     {% if solutions|length > 0 %}
-        <table class="table">
+        <table id="example" class="display" style="width:100%">
             <thead>
             <th>Autor</th>
             <th>Kurs</th>
@@ -37,8 +38,8 @@
                 {% do solution_ids.append(solution.id) %}
                 {% if solution.status == solution.Status['APPROVED'] %}
                     <tr style="background-color:#EAFAF1">
-                        {% elif solution.status == solution.Status['REFUSED']%}
-                           <tr style="background-color:#FDEDEC">
+                        {% elif solution.status == solution.Status['REFUSED'] %}
+                    <tr style="background-color:#FDEDEC">
                         {% else %}
                     <tr>
                 {% endif %}
@@ -63,4 +64,23 @@
             <pb> CSV</pb>
         </a>
     {% endif %}
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                "pagingType": "full_numbers",
+                "language": {
+                    "lengthMenu": "Pokaż _MENU_ rekordów",
+                    "zeroRecords": "Brak odpowiadających rekordów",
+                    "search": "Wyszukaj:",
+                    "info": "Rekordy od _START_ do _END_ z _TOTAL_",
+                    "paginate": {
+                        "first": "Pierwsza strona",
+                        "last": "Ostatnia strona",
+                        "next": "Następna",
+                        "previous": "Poprzednia"
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

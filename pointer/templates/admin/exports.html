@@ -6,11 +6,11 @@
     </a>
 {% endblock %}
 {% block app_content %}
-    <table class="table">
-        <thead>
-        <th>Plik</th>
-        <th>Data</th>
-        <th>Format</th>
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <th class="th-sm">Plik</th>
+        <th class="th-sm">Data</th>
+        <th class="th-sm">Format</th>
         </thead>
         <tbody>
         {% for export in exports %}
@@ -23,4 +23,11 @@
         {% endfor %}
         </tbody>
     </table>
+<script>
+$(document).ready(function() {
+    $('#example').DataTable( {
+        "pagingType": "full_numbers"
+    } );
+} );
+</script>
 {% endblock %}
