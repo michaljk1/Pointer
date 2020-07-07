@@ -93,7 +93,7 @@
         {% endwith %}
         {% with errors = get_flashed_messages(category_filter=["error"]) %}
             {% if errors %}
-                <div class="alert alert-info" style="color:red;" role="alert">{{ errors[0] }}</div>
+                <div class="alert alert-warning" role="alert">{{ errors[0] }}</div>
             {% endif %}
         {% endwith %}
         <div class="container3">

@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import ValidationError, DataRequired, Email
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from pointer.models.usercourse import User
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Hasło', validators=[DataRequired()])
+    email = StringField('Email/Login', validators=[DataRequired(message='Wprowadź dane')])
+    password = PasswordField('Hasło', validators=[DataRequired(message='Wprowadź dane')])
     remember_me = BooleanField('Zapisz')
     submit = SubmitField('Zaloguj się')
 
@@ -21,21 +21,26 @@ class ConfirmEmailForm(FlaskForm):
             raise ValidationError('Podany adres email nie istnieje')
 
 
-class RegistrationForm(FlaskForm):
+class PasswordForm(FlaskForm):
+    password = PasswordField('Hasło', validators=[DataRequired(), Length(min=8, message='Hasło musi zawierać minimum 8 znaków')])
+    password2 = PasswordField(
+        'Wprowadź ponownie', validators=[DataRequired(), EqualTo('password', message='Wprowadzone hasła różnią się')])
+
+
+class RegistrationForm(PasswordForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     login = StringField('Login', validators=[DataRequired()])
     name = StringField('Imię', validators=[DataRequired()])
     index = StringField('Nr indeksu', validators=[DataRequired()])
     surname = StringField('Nazwisko', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Zarejestruj się')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError('Podany adres email jest zajęty.')
 
     def validate_login(self, login):
         user = User.query.filter_by(login=login.data).first()
         if user is not None:
-            raise ValidationError('Please use a different login.')
+            raise ValidationError('Podany login jest zajęty.')

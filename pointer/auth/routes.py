@@ -21,7 +21,9 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            flash('Invalid email or password', 'message')
+            user = User.query.filter_by(login=form.email.data).first()
+        if user is None:
+            flash('Nieprawidłowe dane', 'message')
             return redirect(url_for('auth.login'))
         login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.Status['SUCCESS'], user_id=user.id,
                                login_date=get_current_date())

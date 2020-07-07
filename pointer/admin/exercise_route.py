@@ -1,18 +1,15 @@
-import os
 import shutil
-from datetime import datetime
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from pointer.admin import bp
-from pointer.admin.forms import ExerciseForm, TestForm
+from pointer.admin.forms import ExerciseForm, TestForm, ExerciseEditForm
 from werkzeug.utils import redirect
 from pointer.models.test import Test
 from pointer.models.usercourse import Course, role
 from pointer.models.lesson import Lesson
 from pointer.models.exercise import Exercise
-
 from pointer import db
-from pointer.services.RouteService import validate_exists, validate_role_course, validate_role
+from pointer.services.RouteService import validate_exists, validate_role_course
 
 
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
@@ -75,3 +72,17 @@ def add_exercise(course_name, lesson_name):
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
         return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
     return render_template('admin/add_exercise.html', form=form, lesson=lesson)
+
+
+@bp.route('/edit_exercise/<int:exercise_id>', methods=['GET', 'POST'])
+@login_required
+def edit_exercise(exercise_id):
+    exercise = Exercise.query.filter_by(id=exercise_id).first()
+    validate_role_course(current_user, role['ADMIN'], exercise.get_course())
+    form = ExerciseEditForm(obj=exercise)
+    if request.method == 'POST' and form.validate_on_submit():
+        exercise.values_by_form(form, request.form.get('editordata'))
+        db.session.commit()
+        flash('Zapisano zmiany', 'message')
+        return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
+    return render_template('admin/edit_exercise.html', form=form, exercise=exercise)

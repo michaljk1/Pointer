@@ -57,4 +57,9 @@
             onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
             class="btn btn-secondary">Zobacz rozwiązania
     </button>
+    <button type="button"
+            onclick="window.location.href='{{ url_for('admin.edit_exercise', exercise_id = exercise.id) }}'"
+            class="btn btn-secondary">Edytuj ćwiczenie
+    </button>
+
 {% endblock %}

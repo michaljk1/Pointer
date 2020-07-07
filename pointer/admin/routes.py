@@ -1,11 +1,12 @@
 # TODO
-# 1: edycja cwiczenia, maksymalna ilosc pamieci
+# 1maksymalna ilosc pamieci
 # zmiana w eksporcie z zatwierdzonymi zadaniami,  wyniki pdf
-from flask import render_template, url_for, flash, request, send_from_directory, abort
+# zmiana hasla
+from flask import render_template, url_for, flash, request, send_from_directory, abort, jsonify
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
-from pointer.admin.AdminUtil import get_student_ids_emails
+from pointer.admin.AdminUtil import get_students_ids_emails
 from pointer.admin.forms import StatisticsForm
 from werkzeug.utils import redirect
 from pointer.mod.forms import LoginInfoForm
@@ -33,8 +34,8 @@ def logout():
 def view_logins():
     validate_role(current_user, role['ADMIN'])
     form, logins = LoginInfoForm(), []
-    user_ids, emails = get_student_ids_emails(current_user.courses)
-    form.email.choices += emails
+    user_ids, emails = get_students_ids_emails(current_user.courses)
+    form.email.choices += ((email, email) for email in emails)
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
     return render_template('adminmod/logins.html', form=form, logins=logins)
@@ -75,7 +76,7 @@ def view_statistics():
     form = StatisticsForm()
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
-    form.email.choices += get_student_ids_emails(current_user.courses)[1]
+    form.email.choices += ((email, email) for email in get_students_ids_emails(current_user.courses)[1])
     statistics_list = []
     if request.method == 'POST' and form.validate_on_submit():
         if form.email.data != 'ALL':
@@ -97,12 +98,23 @@ def view_statistics():
                 for course in current_user.courses:
                     for member in course.get_students():
                         statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-    return render_template('admin/statistics.html', statisticsList=statistics_list, form=form)
+    statistics_json = []
+    for statistics in statistics_list:
+        statistics_json.append({
+            "user_email": statistics.user_email,
+            "course_name": statistics.course_name,
+            "course_points": statistics.course_points,
+            "user_points": statistics.user_points,
+            "percent_value": statistics.get_percent_value()
+        })
+    return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_json=statistics_json,
+                           form=form)
 
 
 @bp.route('/download')
 @login_required
 def download():
+    validate_role(current_user, role['ADMIN'])
     request_id = request.args.get('id')
     domain = request.args.get('domain')
     my_object, my_course, filename = None, None, None
@@ -120,10 +132,9 @@ def download():
     elif domain == 'lesson':
         my_object = Lesson.query.filter_by(id=request_id).first()
         filename = my_object.content_pdf_path
+        my_course = my_object.get_course()
     else:
         abort(404)
-    if my_course is not None:
+    if domain != 'export':
         validate_role_course(current_user, role['ADMIN'], my_course)
-    else:
-        validate_role(current_user, role['ADMIN'])
     return send_from_directory(directory=my_object.get_directory(), filename=filename)

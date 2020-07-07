@@ -2,7 +2,6 @@ import os
 import subprocess
 
 from pointer import db
-from pointer.models.exercise import Exercise
 from pointer.models.solution import Solution
 import resource
 
@@ -11,7 +10,7 @@ def execute_solution_thread(app, solution_id):
     with app.app_context():
         try:
             solution = Solution.query.filter_by(id=solution_id).first()
-            if compile(solution):
+            if prepare_compilation(solution):
                 grade(solution)
             if solution.status == Solution.Status['SEND']:
                 solution.status = Solution.Status['NOT_ACTIVE']
@@ -21,22 +20,26 @@ def execute_solution_thread(app, solution_id):
             db.session.commit()
 
 
-def compile(solution: Solution):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
+def prepare_compilation(solution):
     compile_command = solution.exercise.compile_command
-    error_file = open(os.path.join(solution.get_directory(), 'compilerror.txt'), 'w+')
     if len(compile_command.split()) > 0:
-        bash_command = [dir_path, '/compile.sh', solution.get_directory(), compile_command]
-        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file)
-        process.wait()
-        error_file.close()
-        if os.path.getsize(error_file.name) > 0:
-            with open(error_file.name) as f:
-                solution.error_msg = f.read()
-            solution.status = Solution.Status['COMPILE_ERROR']
-            return False
-        else:
-            return True
+        return execute_compilation(solution, compile_command)
+    else:
+        return True
+
+
+def execute_compilation(solution: Solution, compile_command: str):
+    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'compile.sh')
+    error_file = open(os.path.join(solution.get_directory(), 'compile_error.txt'), 'w+')
+    bash_command = [script_path, solution.get_directory(), compile_command]
+    process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file)
+    process.wait()
+    error_file.close()
+    if os.path.getsize(error_file.name) > 0:
+        with open(error_file.name) as f:
+            solution.error_msg = f.read()
+        solution.status = Solution.Status['COMPILE_ERROR']
+        return False
     else:
         return True
 
@@ -44,17 +47,14 @@ def compile(solution: Solution):
 def grade(solution: Solution):
     exercise = solution.exercise
     program_name, run_command = exercise.program_name, exercise.run_command
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-
+    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'run.sh')
     for test in exercise.tests.all():
         name = 'error_test_run' + str(test.id) + '.txt'
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
-        test_dir = test.get_directory()
-        input_name, output_name = test_dir + '/' + test.input_name, test_dir + '/' + test.output_name
-        bash_command = [dir_path, '/run.sh', solution.get_directory(), program_name, input_name, output_name,
-                        run_command]
-        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file,
-                                   preexec_fn=limit_virtual_memory)
+        bash_command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
+                        test.get_output_path(), run_command]
+        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file)
+        # , preexec_fn=(lambda x: resource.setrlimit(resource.RLIMIT_AS,(x * 1024 * 1024, resource.RLIM_INFINITY))))
         try:
             outs = process.communicate(timeout=solution.exercise.timeout)[0]
             error_file.close()
@@ -70,9 +70,7 @@ def grade(solution: Solution):
         except subprocess.TimeoutExpired:
             process.kill()
 
-
-def limit_virtual_memory(max_memory=None):
-    max_virtual_memory = max_memory * 1024 * 1024
-    if max_memory is not None:
-        resource.setrlimit(resource.RLIMIT_AS, (max_virtual_memory, resource.RLIM_INFINITY))
-
+#
+# def limit_virtual_memory(max_memory=None):
+#     max_virtual_memory = max_memory
+#     if max_memory is not None:

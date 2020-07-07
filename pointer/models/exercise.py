@@ -61,4 +61,16 @@ class Exercise(db.Model):
                                 minute=self.end_date.minute, tzinfo=current_datetime.tzinfo)
         return current_datetime > end_datetime
 
+    def values_by_form(self, form, content):
+        end_date, end_time = form.end_date.data, form.end_time.data
+        end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
+                                minute=end_time.minute)
+        self.max_attempts = form.max_attempts.data
+        self.compile_command = form.compile_command.data
+        self.end_date = end_datetime
+        self.run_command = form.run_command.data
+        self.program_name = form.program_name.data
+        self.timeout = form.timeout.data
+        self.interval = form.interval.data
+        self.content = content
 

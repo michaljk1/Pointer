@@ -14,7 +14,7 @@ def index():
     elif current_user.role == role['ADMIN']:
         return redirect(url_for('admin.view_courses'))
     elif current_user.role == role['STUDENT']:
-        return redirect(url_for('student.index'))
+        return redirect(url_for('student.view_courses'))
     elif current_user.role == role['MODERATOR']:
         return redirect(url_for('mod.index'))
     else:

@@ -16,3 +16,9 @@ class Test(db.Model):
 
     def get_course(self):
         return self.executor.get_course()
+
+    def get_input_path(self):
+        return os.path.join(self.get_directory(), self.input_name)
+
+    def get_output_path(self):
+        return os.path.join(self.get_directory(), self.output_name)

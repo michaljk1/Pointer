@@ -33,6 +33,13 @@ def send_course_email(email, course_name, role):
                html_body=render_template('email/confirm_course.html', role=role, course_name=course_name))
 
 
+def send_reset_password(email):
+    send_email('[Pointer] Reset hasła',
+               sender=current_app.config['ADMINS'][0],
+               recipients=[email],
+               html_body=render_template('email/reset_password.html'))
+
+
 def get_confirm_email_token(email, expires_in=600):
     return jwt.encode(
         {'confirm_email': email, 'exp': time() + expires_in},

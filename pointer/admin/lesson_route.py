@@ -12,16 +12,16 @@ from pointer.services.RouteService import validate_role_course
 
 @bp.route('/lesson/<string:lesson_name>/')
 @login_required
-def view_lesson(lesson_name):
-    lesson = Lesson.query.filter_by(name=lesson_name).first()
+def view_lesson(lesson_name: str):
+    lesson: Lesson = Lesson.query.filter_by(name=lesson_name).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
     return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
 
 
 @bp.route('/<string:course_name>/add_lesson', methods=['GET', 'POST'])
 @login_required
-def add_lesson(course_name):
-    course = Course.query.filter_by(name=course_name).first()
+def add_lesson(course_name: str):
+    course: Course = Course.query.filter_by(name=course_name).first()
     validate_role_course(current_user, role['ADMIN'], course)
     form = LessonForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -46,7 +46,7 @@ def add_lesson(course_name):
 
 @bp.route('/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
-def edit_lesson(lesson_id):
+def edit_lesson(lesson_id: int):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
     form = EditLessonForm(text_content=lesson.content_text)

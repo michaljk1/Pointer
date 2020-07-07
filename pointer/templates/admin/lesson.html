@@ -31,6 +31,7 @@
     {% endfor %}
     <hr>
     <div class="bottom_div">
+    <hr>
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}'"
                 class="btn btn-success btn-lg">Dodaj ćwiczenie
