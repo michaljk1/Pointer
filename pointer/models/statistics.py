@@ -6,7 +6,7 @@ from pointer.models.usercourse import Course, User, role
 
 
 class Statistics:
-    def __init__(self, course: Course, user: User, is_admin: bool):
+    def __init__(self, course: Course, user: User, is_admin=False):
         if is_admin:
             self.solutions, self.user_points = user.get_solutions_with_points_for_admin(course)
         else:
@@ -20,3 +20,6 @@ class Statistics:
             return round((self.user_points / self.course_points * 100), 2)
         else:
             return float(0)
+
+    def get_solutions_ids(self):
+        return [solution.id for solution in self.solutions]

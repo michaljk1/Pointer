@@ -27,6 +27,15 @@ class PasswordForm(FlaskForm):
         'Wprowadź ponownie', validators=[DataRequired(), EqualTo('password', message='Wprowadzone hasła różnią się')])
 
 
+class ChangePasswordForm(PasswordForm):
+    actual_password = PasswordField('Aktualne hasło')
+    submit = SubmitField('Zmień hasło')
+
+
+class ResetPasswordForm(PasswordForm):
+    submit = SubmitField('Zmień hasło')
+
+
 class RegistrationForm(PasswordForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     login = StringField('Login', validators=[DataRequired()])

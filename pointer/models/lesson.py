@@ -1,7 +1,6 @@
 import os
 
 from sqlalchemy.dialects.mysql import LONGTEXT
-
 from pointer import db
 from pointer.models.exercise import Exercise
 
@@ -30,3 +29,13 @@ class Lesson(db.Model):
         self.exercises.append(exercise)
         os.makedirs(exercise.get_directory())
         return exercise
+
+    def get_course(self):
+        return self.course
+
+    def get_exercises(self):
+        active_exercises = []
+        for exercise in self.exercises:
+            if exercise.is_published:
+                active_exercises.append(exercise)
+        return active_exercises

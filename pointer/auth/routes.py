@@ -1,11 +1,11 @@
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
+
 from pointer.auth import bp
-from pointer.auth.email import send_confirm_email
-from pointer.auth.forms import LoginForm, RegistrationForm, ConfirmEmailForm
+from pointer.auth.email import send_confirm_email, send_reset_password
+from pointer.auth.forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
-
 from pointer.DefaultUtil import get_current_date
 from pointer.models.logininfo import LoginInfo
 from pointer.models.usercourse import User, Course, role
@@ -33,7 +33,7 @@ def login():
             db.session.commit()
             flash('Invalid email or password', 'message')
             return redirect(url_for('auth.login'))
-        #TODO odkomentowac
+        # TODO odkomentowac
         # if not user.is_confirmed:
         #     login_info.status = LoginInfo.Status['ERROR']
         #     db.session.commit()
@@ -66,20 +66,61 @@ def activate():
         send_confirm_email(form.email.data)
         flash('Wysłano link aktywacyjny', 'message')
         return redirect(url_for('auth.login'))
-    return  render_template('auth/activate.html', form=form)
+    return render_template('auth/activate.html', form=form)
 
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data, role=role['STUDENT'], index=form.index.data)
+        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data,
+                    role=role['STUDENT'], index=form.index.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
+
+
+@bp.route('change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        if current_user.check_password(form.actual_password.data):
+            current_user.set_password(form.password.data)
+            db.session.commit()
+            flash('Zmieniono hasło', 'message')
+            return redirect(url_for('default.index'))
+        else:
+            flash('Błędne hasło', 'error')
+    return render_template('auth/change_password.html', form=form)
+
+
+@bp.route('reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    form = ResetPasswordForm()
+    user: User = User.verify_reset_password_token(token)
+    if not user:
+        flash('Nieaktywny link', 'error')
+        return redirect(url_for('default.index'))
+    if request.method == 'POST' and form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Zmieniono hasło', 'message')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html', form=form)
+
+
+@bp.route('send_reset', methods=['GET', 'POST'])
+def send_reset():
+    form = ConfirmEmailForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        send_reset_password(form.email.data)
+        flash('Wysłano wiadomość', 'message')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/activate.html', form=form)
 
 
 @bp.route('link/<string:link>')

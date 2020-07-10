@@ -9,7 +9,7 @@
         <pb> {{ lesson.course.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_name = lesson.name) }}">
+    <a href="{{ url_for('admin.view_lesson', lesson_id = lesson.id) }}">
         <pb> {{ lesson.name }} </pb>
     </a>
     /

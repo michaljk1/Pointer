@@ -46,7 +46,7 @@
             <td><p>{{ solution.author.email }}</p></td>
             <td><p><a href="{{ url_for('admin.view_course', course_name=solution.get_course().name) }}"
                       target="_blank">{{ solution.get_course().name }}</a></p></td>
-            <td><p><a href="{{ url_for('admin.view_lesson', lesson_name=solution.exercise.lesson.name) }}"
+            <td><p><a href="{{ url_for('admin.view_lesson', lesson_id=solution.exercise.lesson.id) }}"
                       target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
             <td><p><a href="{{ url_for('admin.view_exercise', exercise_id=solution.exercise.id) }}"
                       target="_blank">{{ solution.exercise.name }}</a></p></td>
@@ -54,15 +54,21 @@
             <td><p>{{ solution.points }}</p></td>
             <td><p>{{ solution.ip_address }}</p></td>
             <td><p>{{ solution.status }}</p></td>
-            <td><p><a href="{{ url_for('admin.view_solution', solution_id = solution.id) }}"
-                      target="_blank"> Edytuj </a></p></td>
+            <td>
+                <a type="button"
+                        href='{{ url_for('admin.view_solution', solution_id = solution.id) }}'
+                        target="_blank"
+                        class="btn btn-success btn-sm" >+
+                </a>
+            </td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('admin.export_solutions', ids=solution_ids) }}">
-            <pb> CSV</pb>
-        </a>
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.export_solutions', ids=solution_ids) }}'"
+                class="btn btn-warning">Export CSV
+        </button>
     {% endif %}
     <script>
         $(document).ready(function () {

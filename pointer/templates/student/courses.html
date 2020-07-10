@@ -1,9 +1,16 @@
 {% extends "my_base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('student.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('student.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
 {% endblock %}
 {% block app_content %}
+    <h2>Kursy</h2>
+    <hr>
+    <ul>
     {% for course in courses %}
-        <div><h1><a href="{{ url_for('student.view_course', course_name = course.name ) }}">{{ course.name }}</a></h1></div>
+        <li><h1><a href="{{ url_for('student.view_course', course_name = course.name ) }}">{{ course.name }}</a></h1>
+        </li>
     {% endfor %}
+    </ul>
 {% endblock %}

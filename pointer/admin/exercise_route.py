@@ -27,7 +27,7 @@ def activate_exercise(exercise_id):
     validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
     exercise.is_published = not exercise.is_published
     db.session.commit()
-    flash('Opublikowano', 'message')
+    flash('Zapisano zmiany', 'message')
     return redirect(url_for('admin.view_exercise', exercise_id=exercise.id))
 
 
@@ -57,12 +57,11 @@ def delete_test(test_id):
     return redirect(url_for('admin.view_exercise', exercise_id=exercise_id))
 
 
-@bp.route('/<string:course_name>/<string:lesson_name>/add_exercise', methods=['GET', 'POST'])
+@bp.route('/<string:course_name>/lesson/<int:lesson_id>/add_exercise', methods=['GET', 'POST'])
 @login_required
-def add_exercise(course_name, lesson_name):
-    course = Course.query.filter_by(name=course_name).first()
-    lesson: Lesson = course.get_lesson_by_name(lesson_name)
-    validate_role_course(current_user, role['ADMIN'], course)
+def add_exercise(course_name, lesson_id):
+    lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
+    validate_role_course(current_user, role['ADMIN'], lesson.get_course())
     form = ExerciseForm()
     if request.method == 'POST' and form.validate_on_submit():
         if not lesson.is_exercise_name_proper(form.name.data):
@@ -70,7 +69,7 @@ def add_exercise(course_name, lesson_name):
             return render_template('admin/add_exercise.html', form=form, lesson=lesson)
         exercise = lesson.create_exercise(form, request.form.get('editordata'))
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
-        return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
+        return redirect(url_for('admin.view_lesson', lesson_id=lesson.id))
     return render_template('admin/add_exercise.html', form=form, lesson=lesson)
 
 

@@ -76,6 +76,7 @@
                         {% else %}
                             <li><a href="{{ url_for('mod.admin_roles') }}">{{ current_user.email }}</a></li>
                         {% endif %}
+                        <li><a href="{{ url_for('auth.change_password') }}">Zmień hasło</a></li>
                         <li><a href="{{ url_for('auth.logout') }}">Wyloguj się</a></li>
                     {% endif %}
                 </ul>

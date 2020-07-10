@@ -5,6 +5,7 @@ from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from pointer import db, login
+from pointer.models.exercise import Exercise
 
 user_course_assoc = db.Table(
     'user_courses',
@@ -21,14 +22,16 @@ class Course(db.Model):
     is_open = db.Column(db.Boolean, default=True)
 
     def get_students(self):
-        students = []
-        for member in self.members:
-            if member.role == role['STUDENT']:
-                students.append(member)
-        return students
+        return [student for student in self.members if student.role == role['STUDENT']]
 
     def get_directory(self):
         return os.path.join(current_app.instance_path, self.name.replace(" ", "_"))
+
+    def get_exercises(self):
+        exercises = []
+        for lesson in self.lessons:
+            exercises += lesson.get_exercises()
+        return exercises
 
     def is_lesson_name_proper(self, lesson_name):
         lesson_name = lesson_name.replace(" ", "_").lower()
@@ -91,23 +94,26 @@ class User(UserMixin, db.Model):
         return course_names
 
     def get_solutions_with_points_for_student(self, course: Course):
-        user_points, approved_solutions = 0.0, []
-        for solution in self.solutions:
-            if solution.get_course() == course and solution.exercise.is_published and solution.status == \
-                    solution.Status['APPROVED'] and solution.exercise.is_finished():
-                approved_solutions.append(solution)
-                user_points += solution.points
-        return approved_solutions, user_points
+        user_points, user_exercises = 0.0, []
+        for exercise in course.get_exercises():
+            user_solution = exercise.get_user_active_solution(user_id=self.id)
+            if user_solution is not None and exercise.is_finished():
+                user_exercises.append(UserExercise(exercise=exercise, points=user_solution.points))
+                user_points += user_solution.points
+            else:
+                user_exercises.append(UserExercise(exercise=exercise, points=0.0))
+        return user_exercises, user_points
 
     def get_solutions_with_points_for_admin(self, course: Course):
-        user_points, approved_solutions = 0.0, []
-        for solution in self.solutions:
-            if solution.get_course() == course and solution.exercise.is_published and solution.status == \
-                    solution.Status['APPROVED']:
-                approved_solutions.append(solution)
-                user_points += solution.points
-        return approved_solutions, user_points
-
+        user_points, user_exercises = 0.0, []
+        for exercise in course.get_exercises():
+            user_solution = exercise.get_user_active_solution(user_id=self.id)
+            if user_solution is not None:
+                user_exercises.append(UserExercise(exercise=exercise, points=user_solution.points))
+                user_points += user_solution.points
+            else:
+                user_exercises.append(UserExercise(exercise=exercise, points=0.0))
+        return user_exercises, user_points
 
     def get_admin_directory(self):
         if self.role == role['ADMIN']:
@@ -123,11 +129,26 @@ class User(UserMixin, db.Model):
             return
         return User.query.filter_by(email=email).first()
 
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            email = jwt.decode(token, current_app.config['SECRET_KEY'],
+                               algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.filter_by(email=email).first()
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
+
+class UserExercise:
+    def __init__(self, exercise: Exercise, points: float):
+        self.exercise = exercise
+        self.points = points
+        self.course = exercise.get_course()
+        self.lesson = exercise.lesson
 
 role = {
     'ADMIN': 'ADMIN',

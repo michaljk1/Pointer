@@ -8,7 +8,7 @@
         <pb> {{ lesson.course.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_name = lesson.name) }}">
+    <a href="{{ url_for('admin.view_lesson', lesson_id = lesson.id) }}">
         <pb> {{ lesson.name }} </pb>
     </a>
 {% endblock %}
@@ -24,16 +24,17 @@
                 target="_blank">{{ lesson.content_pdf_path }}</a>
         </h1></div>
     {% endif %}
+    <ul>
     {% for exercise in lesson.exercises %}
-        <div><h1><a
+        <li><h1><a
                 href="{{ url_for('admin.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
-        </h1></div>
+        </h1></li>
     {% endfor %}
+    </ul>
     <hr>
     <div class="bottom_div">
-    <hr>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_name = lesson.name ) }}'"
+                onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_id = lesson.id ) }}'"
                 class="btn btn-success btn-lg">Dodaj ćwiczenie
         </button>
         <button type="button" onclick="window.location.href='{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}'"

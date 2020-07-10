@@ -13,12 +13,17 @@
     <h2>{{ course.name }}</h2>
     <hr>
     <div class="container_content">
+    <ul>
         {% for lesson in course.lessons %}
-            <div><h1><a
-                    href="{{ url_for('admin.view_lesson',lesson_name = lesson.name) }}">{{ lesson.name }}</a>
-            </h1></div>
+            <li><h1><a
+                    href="{{ url_for('admin.view_lesson',lesson_id = lesson.id) }}">{{ lesson.name }}</a>
+            </h1></li>
         {% endfor %}
-    <hr>
+        {% if course.lessons.all()|length > 0 %}
+        <hr>
+        {% endif %}
+    </ul>
+
     <h1>Link do zapisu:</h1>
     <p>{{ url_for('auth.append_course', link = course.link, _external=True) }}</p>
 
@@ -31,6 +36,11 @@
                 onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'"
                 class="btn btn-info btn-lg">Dodaj studenta
         </button>
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.delete_student', course_name = course.name ) }}'"
+                class="btn btn-danger btn-lg">Usuń studenta
+        </button>
+
         {% if course.is_open %}
             <button type="button"
                     onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"

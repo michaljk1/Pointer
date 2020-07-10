@@ -18,11 +18,11 @@ class CourseForm(FlaskForm):
         for course in courses:
             if course.name.replace(" ", "_").lower() == replaced_name:
                 raise ValidationError('Podana nazwa kursu jest już zajęta.')
+        if name.data.lower() == 'all':
+            raise ValidationError('Podana nazwa kursu nie jest dostępna.')
 
 
 class EditLessonForm(FlaskForm):
-    text_content = TextAreaField('Treść', render_kw={'cols': '40', 'rows': '13'},
-                                 validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
     submit_button = SubmitField('Zapisz')
 
@@ -60,9 +60,16 @@ class TestForm(FlaskForm):
     submit_button = SubmitField('Dodaj test')
 
 
-class SelectStudentForm(FlaskForm):
+class EmailForm(FlaskForm):
     email = SelectField('Użytkownik', choices=[])
-    submit_button = SubmitField('Przypisz użytkownika')
+
+
+class AddStudentForm(EmailForm):
+    submit_button = SubmitField('Przypisz studenta')
+
+
+class DeleteStudentForm(EmailForm):
+    submit_button = SubmitField('Usuń studenta')
 
 
 class StatisticsForm(FlaskForm):

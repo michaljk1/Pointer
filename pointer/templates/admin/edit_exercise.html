@@ -9,7 +9,7 @@
         <pb> {{ exercise.get_course().name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_name = exercise.lesson.name) }}">
+    <a href="{{ url_for('admin.view_lesson', lesson_id = exercise.lesson.id) }}">
         <pb> {{ exercise.lesson.name }} </pb>
     </a>
     /
@@ -52,11 +52,11 @@
         <div class="form-group col-md-6">
             {{ wtf.form_field(form.timeout, class='form-control') }}
         </div>
-        <div class="f orm-group col-md-6">
+        <div class="form-group col-md-6">
             {{ wtf.form_field(form.interval, class='form-control') }}
         </div>
         <br>
-        {{ wtf.form_field(form.submit_button, class='btn btn-success', style='text-align:left') }}
+        {{ wtf.form_field(form.submit_button, class='btn btn-success') }}
     </form>
 {% endblock %}
 

@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms import SubmitField, SelectField, StringField, FloatField
-from wtforms.validators import Optional, DataRequired
-
+from wtforms import SubmitField, SelectField, StringField
+from wtforms.validators import DataRequired
 from pointer.models.solution import Solution
 
 

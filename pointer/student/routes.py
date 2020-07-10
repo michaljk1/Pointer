@@ -41,10 +41,10 @@ def view_course(course_name):
     return render_template('student/course.html', course=course)
 
 
-@bp.route('/lesson/<string:lesson_name>')
+@bp.route('/lesson/<int:lesson_id>')
 @login_required
-def view_lesson(lesson_name):
-    lesson = Lesson.query.filter_by(name=lesson_name).first()
+def view_lesson(lesson_id):
+    lesson = Lesson.query.filter_by(id=lesson_id).first()
     validate_role_course(current_user, role['STUDENT'], lesson.course)
     return render_template('student/lesson.html', lesson=lesson)
 
@@ -56,15 +56,15 @@ def view_exercise(exercise_id):
     if not exercise.is_published:
         abort(404)
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
-    attempt_nr = 1+len(exercise.get_user_solutions(current_user.id))
+    attempt_nr = 1 + len(exercise.get_user_solutions(current_user.id))
     solutions = exercise.get_user_solutions(current_user.id)
     form = UploadForm()
     if form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
-        solution = Solution(user_id=current_user.id, exercise_id=exercise.id, file_path=filename, points=0,
-                            ip_address=request.remote_addr, os_info=str(request.user_agent), attempt=attempt_nr,
-                            status=Solution.Status['SEND'], send_date=get_current_date())
+        solution = Solution(file_path=filename, points=0, ip_address=request.remote_addr,
+                            os_info=str(request.user_agent), attempt=attempt_nr, status=Solution.Status['SEND'],
+                            send_date=get_current_date())
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
@@ -85,7 +85,8 @@ def view_solutions():
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
-        all_solutions = exercise_student_query(form=form, courses=current_user.get_course_names(), user_id=current_user.id).all()
+        all_solutions = exercise_student_query(form=form, courses=current_user.get_course_names(),
+                                               user_id=current_user.id).all()
         solutions = get_filtered_by_status(all_solutions, form.status.data)
     return render_template('student/solutions.html', form=form, solutions=solutions)
 
@@ -96,7 +97,7 @@ def view_statistics():
     validate_role(current_user, role['STUDENT'])
     statistics_list = []
     for course in current_user.courses:
-        statistics_list.append(Statistics(course=course, user=current_user, is_admin=False))
+        statistics_list.append(Statistics(course=course, user=current_user))
     return render_template('student/statistics.html', statisticsList=statistics_list)
 
 

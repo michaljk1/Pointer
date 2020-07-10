@@ -33,14 +33,14 @@
                 </tr>
 
                 {% if statistics.solutions|length > 0 %}
-                    {% for solution in statistics.solutions %}
+                    {% for user_exercise in statistics.solutions %}
                         <tr class='{{ idx }}details'
-                            style="display:none; background-color: antiquewhite">
-                            <td>{{ solution.author.email }}</td>
-                            <td>{{ solution.get_course().name }}</td>
-                            <td>{{ solution.exercise.lesson.name }}</td>
-                            <td>{{ solution.exercise.name }}</td>
-                            <td>{{ solution.points }} pkt</td>
+                            style="display:none; background-color: #FFEBCD">
+                            <td>{{ statistics.user_email }}</td>
+                            <td>{{ user_exercise.course.name }}</td>
+                            <td>{{ user_exercise.exercise.lesson.name }}</td>
+                            <td>{{ user_exercise.exercise.name }}</td>
+                            <td>{{ user_exercise.points }} pkt</td>
                         </tr>
                     {% endfor %}
                 {% endif %}

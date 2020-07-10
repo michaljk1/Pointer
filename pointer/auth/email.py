@@ -1,5 +1,5 @@
 from threading import Thread
-from flask import render_template, current_app
+from flask import render_template
 from pointer import mail
 from flask_mail import Message
 from flask import current_app
@@ -34,13 +34,20 @@ def send_course_email(email, course_name, role):
 
 
 def send_reset_password(email):
+    token = get_reset_password_token(email)
     send_email('[Pointer] Reset hasła',
                sender=current_app.config['ADMINS'][0],
                recipients=[email],
-               html_body=render_template('email/reset_password.html'))
+               html_body=render_template('email/reset_password.html', token=token))
 
 
 def get_confirm_email_token(email, expires_in=600):
     return jwt.encode(
         {'confirm_email': email, 'exp': time() + expires_in},
+        current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+
+def get_reset_password_token(email, expires_in=600):
+    return jwt.encode(
+        {'reset_password': email, 'exp': time() + expires_in},
         current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')

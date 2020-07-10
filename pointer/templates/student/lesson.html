@@ -1,24 +1,37 @@
 {% extends "my_base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('student.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('student.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
     /
-    <a href="{{ url_for('student.view_course', course_name = lesson.course.name) }}"><pb> {{ lesson.course.name }} </pb></a>
+    <a href="{{ url_for('student.view_course', course_name = lesson.course.name) }}">
+        <pb> {{ lesson.course.name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('student.view_lesson', lesson_name = lesson.name) }}"><pb> {{ lesson.name }} </pb></a>
+    <a href="{{ url_for('student.view_lesson', lesson_id = lesson.id) }}">
+        <pb> {{ lesson.name }} </pb>
+    </a>
 {% endblock %}
 {% block app_content %}
-    <div><h2>{{ lesson.name }}</h2></div>
-    {{ lesson.content_text|safe }}
-    {% if lesson.content_pdf_path is not none %}
-    <div><h1><a
-            href="{{ url_for('student.download_content', lesson_id=lesson.id) }}" target="_blank">{{ lesson.content_pdf_path }}</a>
-    </h1></div>
+    <h2>{{ lesson.name }}</h2>
+    <hr>
+    {% if lesson.content_text != None %}
+        {{ lesson.content_text|safe }}
     {% endif %}
+    {% if lesson.content_pdf_path is not none %}
+        <div><h1><a
+                href="{{ url_for('student.download_content', lesson_id=lesson.id) }}"
+                target="_blank">{{ lesson.content_pdf_path }}</a>
+        </h1></div>
+    {% endif %}
+    <hr>
+    <ul>
     {% for exercise in lesson.exercises %}
         {% if exercise.is_published %}
-        <div><p><a
-                href="{{ url_for('student.view_exercise', course_name = lesson.course.name, lesson_name = lesson.name, exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
-        </p></div>
+            <li><h1><a
+                    href="{{ url_for('student.view_exercise', course_name = lesson.course.name, lesson_name = lesson.name, exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
+            </h1></li>
         {% endif %}
     {% endfor %}
+    </ul>
 {% endblock %}

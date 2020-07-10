@@ -10,10 +10,10 @@ from pointer import db
 from pointer.services.RouteService import validate_role_course
 
 
-@bp.route('/lesson/<string:lesson_name>/')
+@bp.route('/lesson/<int:lesson_id>')
 @login_required
-def view_lesson(lesson_name: str):
-    lesson: Lesson = Lesson.query.filter_by(name=lesson_name).first()
+def view_lesson(lesson_id: int):
+    lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
     validate_role_course(current_user, role['ADMIN'], lesson.course)
     return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
 
@@ -40,7 +40,7 @@ def add_lesson(course_name: str):
         if filename is not None:
             file.save(os.path.join(lesson_directory, filename))
         db.session.commit()
-        return redirect(url_for('admin.view_lesson', lesson_name=new_lesson.name))
+        return redirect(url_for('admin.view_lesson', lesson_id=new_lesson.id))
     return render_template('admin/add_lesson.html', form=form, course=course)
 
 
@@ -60,5 +60,5 @@ def edit_lesson(lesson_id: int):
             lesson.content_pdf_path = filename
             file.save(os.path.join(lesson_dir, filename))
         db.session.commit()
-        return redirect(url_for('admin.view_lesson', lesson_name=lesson.name))
+        return redirect(url_for('admin.view_lesson', lesson_id=lesson.id))
     return render_template('admin/edit_lesson.html', form=form, lesson=lesson)

@@ -1,12 +1,11 @@
 # TODO
 # 1maksymalna ilosc pamieci
 # zmiana w eksporcie z zatwierdzonymi zadaniami,  wyniki pdf
-# zmiana hasla
-from flask import render_template, url_for, flash, request, send_from_directory, abort, jsonify
+from flask import render_template, url_for, flash, request, send_from_directory, abort
 from flask_login import logout_user, login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
-from pointer.admin.AdminUtil import get_students_ids_emails
+from pointer.admin.AdminUtil import get_students_ids_emails, get_statistics
 from pointer.admin.forms import StatisticsForm
 from werkzeug.utils import redirect
 from pointer.mod.forms import LoginInfoForm
@@ -41,31 +40,30 @@ def view_logins():
     return render_template('adminmod/logins.html', form=form, logins=logins)
 
 
-@bp.route('/export_solutions/')
+@bp.route('/export_solutions')
 @login_required
 def export_solutions():
     validate_role(current_user, role['ADMIN'])
     ids = request.args.getlist('ids')
     solutions = Solution.query.filter(Solution.id.in_(ids)).all()
-    create_csv_solution_export(solutions, current_user)
-    flash('Wyeksportowano', 'message')
-    return redirect(url_for('admin.view_exports'))
+    export = create_csv_solution_export(solutions, current_user)
+    return redirect(url_for('admin.download', domain='export', id=export.id))
 
 
-@bp.route('/export_statistics/')
+@bp.route('/export_statistics')
 @login_required
 def export_statistics():
     validate_role(current_user, role['ADMIN'])
-    create_csv_statistics_export(request.args.getlist('statistics_json'), current_user)
+    export = create_csv_statistics_export(request.args.getlist('statistics_json'), current_user)
     flash('Wyeksportowano', 'message')
-    return redirect(url_for('admin.view_exports'))
+    return redirect(url_for('admin.download', domain='export', id=export.id))
 
 
-@bp.route('/view_exports/')
+@bp.route('/view_exports')
 @login_required
 def view_exports():
     validate_role(current_user, role['ADMIN'])
-    exports = Export.query.filter_by(user_id=current_user.id).order_by(desc(Export.generation_date)).all()
+    exports = Export.query.filter_by(user_id=current_user.id).order_by(desc(Export.id)).all()
     return render_template('admin/exports.html', exports=exports)
 
 
@@ -79,25 +77,20 @@ def view_statistics():
     form.email.choices += ((email, email) for email in get_students_ids_emails(current_user.courses)[1])
     statistics_list = []
     if request.method == 'POST' and form.validate_on_submit():
-        if form.email.data != 'ALL':
-            user = User.query.filter_by(email=form.email.data).first()
-            if form.course.data != 'ALL':
-                course = Course.query.filter_by(name=form.course.data).first()
-                if course in user.courses and course in current_user.courses:
-                    statistics_list.append(Statistics(course=course, user=user, is_admin=True))
-            else:
-                for course in user.courses:
-                    if course in current_user.courses:
-                        statistics_list.append(Statistics(course=course, user=user, is_admin=True))
-        else:
-            if form.course.data != 'ALL':
-                course = Course.query.filter_by(name=form.course.data).first()
-                for member in course.get_students():
-                    statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-            else:
+        user = User.query.filter_by(email=form.email.data).first()
+        course = Course.query.filter_by(name=form.course.data).first()
+        if course is None:
+            if user is None:
                 for course in current_user.courses:
                     for member in course.get_students():
                         statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+            else:
+                statistics_list = get_statistics([user], user.courses)
+        else:
+            if user is None:
+                statistics_list = get_statistics(course.get_students(), [course])
+            else:
+                statistics_list = get_statistics([user], [course])
     statistics_json = []
     for statistics in statistics_list:
         statistics_json.append({

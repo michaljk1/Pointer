@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 from pointer import db
 from pointer.DefaultUtil import get_current_date
+from pointer.models.solution import Solution
 from pointer.models.test import Test
 
 
@@ -38,11 +39,13 @@ class Exercise(db.Model):
         return max_points
 
     def get_user_solutions(self, user_id):
-        user_solutions = []
+        return [solution for solution in self.solutions if solution.user_id == user_id]
+
+    def get_user_active_solution(self, user_id):
         for solution in self.solutions:
-            if solution.user_id == user_id:
-                user_solutions.append(solution)
-        return user_solutions
+            if solution.user_id == user_id and solution.status == solution.Status['APPROVED']:
+                return solution
+        return None
 
     def create_test(self, input_file, output_file, points):
         input_name, output_name = secure_filename(input_file.filename), secure_filename(output_file.filename)
