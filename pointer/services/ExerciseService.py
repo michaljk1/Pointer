@@ -6,18 +6,27 @@ from pointer.models.solution import Solution
 import resource
 
 
+# def execute_solution_thread(app, solution_id):
+#     with app.app_context():
+#         try:
+#             solution = Solution.query.filter_by(id=solution_id).first()
+#             if prepare_compilation(solution):
+#                 grade(solution)
+#             if solution.status == Solution.Status['SEND']:
+#                 solution.status = Solution.Status['NOT_ACTIVE']
+#             db.session.commit()
+#         except:
+#             solution.status = Solution.Status['ERROR']
+#             db.session.commit()
+
 def execute_solution_thread(app, solution_id):
     with app.app_context():
-        # try:
         solution = Solution.query.filter_by(id=solution_id).first()
         if prepare_compilation(solution):
             grade(solution)
         if solution.status == Solution.Status['SEND']:
             solution.status = Solution.Status['NOT_ACTIVE']
         db.session.commit()
-    # except:
-    #     solution.status = Solution.Status['ERROR']
-    #     db.session.commit()
 
 
 def prepare_compilation(solution):
@@ -54,8 +63,8 @@ def grade(solution: Solution):
         bash_command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                         test.get_output_path(), run_command]
         process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file,
-            preexec_fn=limit_virtual_memory())
-            # preexec_fn=(lambda x: resource.setrlimit(resource.RLIMIT_AS, (x * 1024 * 1024, resource.RLIM_INFINITY))))
+                                   preexec_fn=limit_virtual_memory())
+        # preexec_fn=(lambda x: resource.setrlimit(resource.RLIMIT_AS, (x * 1024 * 1024, resource.RLIM_INFINITY))))
         try:
             outs = process.communicate(timeout=solution.exercise.timeout)[0]
             error_file.close()

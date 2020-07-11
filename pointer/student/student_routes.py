@@ -8,8 +8,9 @@ from pointer.DefaultUtil import get_current_date, unpack_file, get_offset_aware
 from pointer.models.solution import Solution
 from pointer.services.ExerciseService import execute_solution_thread
 from pointer.services.QueryService import get_filtered_by_status, exercise_student_query
-from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution
+from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution, validate_exercise
 from pointer.student import bp
+from pointer.student.StudentUtil import can_send_solution
 from pointer.student.student_forms import UploadForm, SolutionStudentSearchForm, StudentSolutionForm
 from werkzeug.utils import secure_filename, redirect
 from pointer.models.usercourse import Course, role
@@ -54,7 +55,8 @@ def view_lesson(lesson_id):
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_role_course(current_user, role['STUDENT'], solution.get_course())
-    form = StudentSolutionForm(obj=solution)
+    form = StudentSolutionForm(obj=solution, student_status=solution.get_student_status(),
+                               student_points=solution.get_student_points())
     return render_template('student/solution.html', solution=solution, form=form)
 
 
@@ -62,23 +64,17 @@ def view_solution(solution_id):
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    if not exercise.is_published:
-        abort(404)
+    validate_exercise(exercise)
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
-    attempt_nr = 1 + len(exercise.get_student_solutions(current_user.id))
-    solutions = sorted(exercise.get_student_solutions(current_user.id),  key=lambda sol: sol.send_date, reverse=True)
-    if len(solutions) == 0:
-        send_solution = True
-    else:
-        last_solution = solutions[0]
-        send_solution: bool = (get_current_date() - get_offset_aware(last_solution.send_date)).seconds > exercise.interval
+    solutions = sorted(exercise.get_student_solutions(current_user.id), key=lambda sol: sol.send_date, reverse=True)
+    send_solution = can_send_solution(solutions)
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
         solution = Solution(file_path=filename, points=0, ip_address=request.remote_addr,
-                            os_info=str(request.user_agent), attempt=attempt_nr, status=Solution.Status['SEND'],
-                            send_date=get_current_date())
+                            os_info=str(request.user_agent), attempt=(1 + len(solutions)),
+                            status=Solution.Status['SEND'], send_date=get_current_date())
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
@@ -102,7 +98,8 @@ def view_solutions():
     if request.method == 'POST' and form.validate_on_submit():
         all_solutions = exercise_student_query(form=form, courses=current_user.get_course_names(),
                                                user_id=current_user.id).all()
-        solutions = get_filtered_by_status(all_solutions, form.status.data)
+        solutions = sorted(get_filtered_by_status(all_solutions, form.status.data), key=lambda sol: sol.send_date,
+                           reverse=True)
     return render_template('student/solutions.html', form=form, solutions=solutions)
 
 

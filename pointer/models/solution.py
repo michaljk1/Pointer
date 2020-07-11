@@ -27,6 +27,19 @@ class Solution(db.Model):
         'NOT_ACTIVE': 'Nieaktywne'
     }
 
+    def get_student_status(self):
+        if not self.exercise.is_finished() and self.status in [self.Status['APPROVED'], self.Status['REFUSED'],
+                                                               self.Status['NOT_ACTIVE']]:
+            return self.Status['NOT_ACTIVE']
+        else:
+            return self.status
+
+    def get_student_points(self):
+        if self.exercise.is_finished():
+            return self.points
+        else:
+            return '-'
+
     def get_lesson(self):
         return self.exercise.lesson
 

@@ -22,17 +22,8 @@
                 <td><p><a href="{{ url_for('student.view_exercise', exercise_id=solution.exercise.id) }}"
                           target="_blank">{{ solution.exercise.name }}</a></p></td>
                 <td><p>{{ solution.send_date }}</p></td>
-                {% if solution.exercise.is_finished() %}
-                    <td><p>{{ solution.status }}</p></td>
-                    <td><p>{{ solution.points }}</p></td>
-                {% else %}
-                    {% if solution.status == solution.Status['APPROVED'] or solution.status == solution.Status['REFUSED'] or solution.status == solution.Status['NOT_ACTIVE'] %}
-                        <td><p> {{ solution.Status['NOT_ACTIVE'] }} </p></td>
-                    {% else %}
-                        <td><p>{{ solution.status }}</p></td>
-                    {% endif %}
-                    <td><p> - </p></td>
-                {% endif %}
+                <td><p>{{ solution.get_student_status() }}</p></td>
+                <td><p>{{ solution.get_student_points() }}</p></td>
                 <td>
                     <a type="button"
                        href='{{ url_for('student.view_solution', solution_id = solution.id) }}'

@@ -1,4 +1,6 @@
 from flask import abort, redirect, url_for
+
+from pointer.models.exercise import Exercise
 from pointer.models.usercourse import role
 
 
@@ -19,6 +21,11 @@ def validate_role_course(user, user_role, course):
 
 def validate_role_solution(user, user_role, solution):
     if user.role != user_role or solution.author.email != user.email:
+        abort(404)
+
+
+def validate_exercise(exercise: Exercise):
+    if exercise is None or not exercise.is_published:
         abort(404)
 
 
