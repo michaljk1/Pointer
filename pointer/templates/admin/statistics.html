@@ -32,15 +32,15 @@
                     <td><p>{{ statistics.get_percent_value() }}%</p></td>
                 </tr>
 
-                {% if statistics.solutions|length > 0 %}
-                    {% for user_exercise in statistics.solutions %}
+                {% if statistics.user_exercises|length > 0 %}
+                    {% for user_exercise in statistics.user_exercises %}
                         <tr class='{{ idx }}details'
                             style="display:none; background-color: #FFEBCD">
-                            <td>{{ statistics.user_email }}</td>
-                            <td>{{ user_exercise.course.name }}</td>
                             <td>{{ user_exercise.exercise.lesson.name }}</td>
                             <td>{{ user_exercise.exercise.name }}</td>
-                            <td>{{ user_exercise.points }} pkt</td>
+                            <td>{{ user_exercise.points }}</td>
+                            <td>{{ user_exercise.max_points }}</td>
+                            <td>{{ user_exercise.get_percent_value() }}%</td>
                         </tr>
                     {% endfor %}
                 {% endif %}
@@ -48,7 +48,7 @@
             </tbody>
         </table>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_json = statistics_json) }}'"
+                onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_info = statistics_info) }}'"
                 class="btn btn-warning">Export CSV
         </button>
         <script>

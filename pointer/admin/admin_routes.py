@@ -1,31 +1,21 @@
 # TODO
-# 1maksymalna ilosc pamieci
-# zmiana w eksporcie z zatwierdzonymi zadaniami,  wyniki pdf
-from flask import render_template, url_for, flash, request, send_from_directory, abort
-from flask_login import logout_user, login_required, current_user
+# maksymalna ilosc pamieci, wyniki pdf
+from flask import render_template, url_for, request, send_from_directory, abort
+from flask_login import login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
 from pointer.admin.AdminUtil import get_students_ids_emails, get_statistics
-from pointer.admin.forms import StatisticsForm
+from pointer.admin.admin_forms import StatisticsForm
 from werkzeug.utils import redirect
-from pointer.mod.forms import LoginInfoForm
-from pointer.models.statistics import Statistics
+from pointer.mod.mod_forms import LoginInfoForm
 from pointer.models.test import Test
 from pointer.models.usercourse import Course, User, role
-from pointer.models.solutionexport import Export
+from pointer.models.export import Export
 from pointer.models.lesson import Lesson
 from pointer.models.solution import Solution
 from pointer.services.ExportService import create_csv_solution_export, create_csv_statistics_export
 from pointer.services.QueryService import login_query
 from pointer.services.RouteService import validate_role_course, validate_role
-
-
-@bp.route('/logout')
-@login_required
-def logout():
-    validate_role(current_user, role['ADMIN'])
-    logout_user()
-    return redirect(url_for('auth.login'))
 
 
 @bp.route('/logins', methods=['GET', 'POST'])
@@ -54,8 +44,7 @@ def export_solutions():
 @login_required
 def export_statistics():
     validate_role(current_user, role['ADMIN'])
-    export = create_csv_statistics_export(request.args.getlist('statistics_json'), current_user)
-    flash('Wyeksportowano', 'message')
+    export = create_csv_statistics_export(request.args.getlist('statistics_info'), current_user)
     return redirect(url_for('admin.download', domain='export', id=export.id))
 
 
@@ -75,32 +64,12 @@ def view_statistics():
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
     form.email.choices += ((email, email) for email in get_students_ids_emails(current_user.courses)[1])
-    statistics_list = []
+    statistics_list, statistics_info = [], []
     if request.method == 'POST' and form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         course = Course.query.filter_by(name=form.course.data).first()
-        if course is None:
-            if user is None:
-                for course in current_user.courses:
-                    for member in course.get_students():
-                        statistics_list.append(Statistics(course=course, user=member, is_admin=True))
-            else:
-                statistics_list = get_statistics([user], user.courses)
-        else:
-            if user is None:
-                statistics_list = get_statistics(course.get_students(), [course])
-            else:
-                statistics_list = get_statistics([user], [course])
-    statistics_json = []
-    for statistics in statistics_list:
-        statistics_json.append({
-            "user_email": statistics.user_email,
-            "course_name": statistics.course_name,
-            "course_points": statistics.course_points,
-            "user_points": statistics.user_points,
-            "percent_value": statistics.get_percent_value()
-        })
-    return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_json=statistics_json,
+        statistics_list, statistics_info = get_statistics(user, course, current_user.courses)
+    return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_info=statistics_info,
                            form=form)
 
 

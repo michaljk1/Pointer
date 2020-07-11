@@ -2,7 +2,7 @@ import shutil
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from pointer.admin import bp
-from pointer.admin.forms import ExerciseForm, TestForm, ExerciseEditForm
+from pointer.admin.admin_forms import ExerciseForm, TestForm, ExerciseEditForm
 from werkzeug.utils import redirect
 from pointer.models.test import Test
 from pointer.models.usercourse import Course, role

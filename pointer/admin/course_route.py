@@ -5,7 +5,7 @@ from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from pointer.admin import bp
 from pointer.auth.email import send_course_email
-from pointer.admin.forms import CourseForm, DeleteStudentForm, AddStudentForm
+from pointer.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
 from werkzeug.utils import redirect
 from pointer.models.usercourse import Course, User, role
 from pointer import db

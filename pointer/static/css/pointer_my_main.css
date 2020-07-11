@@ -21,10 +21,10 @@ body {
 }
 
 
-.bottom_div{
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
+.bottom_div {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
 }
 
 h1 {

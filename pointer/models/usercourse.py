@@ -149,6 +149,13 @@ class UserExercise:
         self.points = points
         self.course = exercise.get_course()
         self.lesson = exercise.lesson
+        self.max_points = exercise.get_max_points()
+
+    def get_percent_value(self):
+        if self.max_points > 0:
+            return round((self.points / self.max_points * 100), 2)
+        else:
+            return float(0)
 
 role = {
     'ADMIN': 'ADMIN',

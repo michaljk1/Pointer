@@ -1,7 +1,7 @@
 from typing import List
 
 from pointer import db
-from pointer.mod.forms import LoginInfoForm
+from pointer.mod.mod_forms import LoginInfoForm
 from pointer.models.logininfo import LoginInfo
 from pointer.models.solution import Solution
 from pointer.models.usercourse import User, Course, role

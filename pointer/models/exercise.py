@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import List
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from werkzeug.utils import secure_filename
@@ -38,8 +39,13 @@ class Exercise(db.Model):
             max_points += test.points
         return max_points
 
-    def get_user_solutions(self, user_id):
-        return [solution for solution in self.solutions if solution.user_id == user_id]
+    def get_last_student_solution(self, student_id):
+        student_solutions: List[Solution] = self.get_student_solutions(student_id)
+
+        pass
+
+    def get_student_solutions(self, student_id):
+        return [solution for solution in self.solutions if solution.user_id == student_id]
 
     def get_user_active_solution(self, user_id):
         for solution in self.solutions:
@@ -60,7 +66,8 @@ class Exercise(db.Model):
 
     def is_finished(self):
         current_datetime = get_current_date()
-        end_datetime = datetime(year=self.end_date.year, month=self.end_date.month, day=self.end_date.day, hour=self.end_date.hour,
+        end_datetime = datetime(year=self.end_date.year, month=self.end_date.month, day=self.end_date.day,
+                                hour=self.end_date.hour,
                                 minute=self.end_date.minute, tzinfo=current_datetime.tzinfo)
         return current_datetime > end_datetime
 
@@ -76,4 +83,3 @@ class Exercise(db.Model):
         self.timeout = form.timeout.data
         self.interval = form.interval.data
         self.content = content
-

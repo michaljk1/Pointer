@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 
 from pointer import db
 from pointer.admin import bp
-from pointer.admin.forms import SolutionForm, SolutionAdminSearchForm
+from pointer.admin.admin_forms import SolutionForm, SolutionAdminSearchForm
 from pointer.models.usercourse import Course, role
 from pointer.models.solution import Solution
 from pointer.services.QueryService import exercise_admin_query
@@ -66,7 +66,7 @@ def approve_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_role_course(current_user, role['ADMIN'], solution.get_course())
     solution.status = solution.Status['APPROVED']
-    user_solutions = solution.exercise.get_user_solutions(solution.user_id)
+    user_solutions = solution.exercise.get_student_solutions(solution.user_id)
     user_solutions.remove(solution)
     for user_solution in user_solutions:
         if user_solution.status == Solution.Status['APPROVED']:

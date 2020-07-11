@@ -1,6 +1,6 @@
 {% extends "my_base.html" %}
 
-{% block content %}
-    <h1>Page does not exist</h1>
-    <h1><a href="{{ url_for('default.index') }}">Back</a></h1>
+{% block app_content %}
+    <h2>Podana strona nie istnieje lub jest nieaktywna</h2>
+    <h2><a href="{{ url_for('default.index') }}">Strona główna</a></h2>
 {% endblock %}

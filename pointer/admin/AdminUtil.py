@@ -14,7 +14,26 @@ def get_students_ids_emails(courses: List[Course]):
     return user_ids, emails
 
 
-def get_statistics(users: List[User], courses: List[Course]):
+def get_statistics(user: User, course: Course, admin_courses: List[Course]):
+    statistics_list, statistics_info = [], []
+    if course is None:
+        if user is None:
+            for course in admin_courses:
+                for member in course.get_students():
+                    statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+        else:
+            statistics_list = prepare_statistics([user], user.courses)
+    else:
+        if user is None:
+            statistics_list = prepare_statistics(course.get_students(), [course])
+        else:
+            statistics_list = prepare_statistics([user], [course])
+    for statistics in statistics_list:
+        statistics_info.append([statistics.course_id, statistics.user_id])
+    return statistics_list, statistics_info
+
+
+def prepare_statistics(users: List[User], courses: List[Course]):
     statistics_list = []
     for course in courses:
         for user in users:

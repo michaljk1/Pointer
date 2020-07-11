@@ -2,7 +2,7 @@ import os
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from pointer.admin import bp
-from pointer.admin.forms import LessonForm, EditLessonForm
+from pointer.admin.admin_forms import LessonForm, EditLessonForm
 from werkzeug.utils import redirect, secure_filename
 from pointer.models.usercourse import Course, role
 from pointer.models.lesson import Lesson

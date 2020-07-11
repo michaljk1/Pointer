@@ -5,7 +5,7 @@ from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatF
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired, Length, Optional
 from pointer.models.usercourse import Course
-from pointer.student.forms import SolutionStudentSearchForm
+from pointer.student.student_forms import SolutionStudentSearchForm
 
 
 class CourseForm(FlaskForm):

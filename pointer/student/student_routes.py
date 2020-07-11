@@ -4,13 +4,13 @@ from flask import render_template, url_for, request, send_from_directory, curren
 from flask_login import login_required, current_user
 
 from pointer import db
-from pointer.DefaultUtil import get_current_date, unpack_file
+from pointer.DefaultUtil import get_current_date, unpack_file, get_offset_aware
 from pointer.models.solution import Solution
 from pointer.services.ExerciseService import execute_solution_thread
 from pointer.services.QueryService import get_filtered_by_status, exercise_student_query
 from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution
 from pointer.student import bp
-from pointer.student.forms import UploadForm, SolutionStudentSearchForm
+from pointer.student.student_forms import UploadForm, SolutionStudentSearchForm
 from werkzeug.utils import secure_filename, redirect
 from pointer.models.usercourse import Course, role
 from pointer.models.exercise import Exercise
@@ -56,10 +56,15 @@ def view_exercise(exercise_id):
     if not exercise.is_published:
         abort(404)
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
-    attempt_nr = 1 + len(exercise.get_user_solutions(current_user.id))
-    solutions = exercise.get_user_solutions(current_user.id)
+    attempt_nr = 1 + len(exercise.get_student_solutions(current_user.id))
+    solutions = exercise.get_student_solutions(current_user.id)
+    if len(solutions) == 0:
+        send_solution = True
+    else:
+        last_solution = sorted(solutions, key=lambda user_solution: user_solution.send_date, reverse=True)[0]
+        send_solution: bool = (get_current_date() - get_offset_aware(last_solution.send_date)).seconds > exercise.interval
     form = UploadForm()
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
         solution = Solution(file_path=filename, points=0, ip_address=request.remote_addr,
@@ -74,7 +79,8 @@ def view_exercise(exercise_id):
         db.session.commit()
         Thread(target=execute_solution_thread, args=(current_app._get_current_object(), solution.id)).start()
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
-    return render_template('student/exercise.html', exercise=exercise, form=form, solutions=solutions)
+    return render_template('student/exercise.html', exercise=exercise, form=form, send_solution=send_solution,
+                           solutions=solutions)
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])

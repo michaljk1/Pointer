@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from pointer.auth import bp
 from pointer.auth.email import send_confirm_email, send_reset_password
-from pointer.auth.forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
+from pointer.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 from pointer.DefaultUtil import get_current_date
@@ -137,12 +137,7 @@ def append_course(link):
         flash('Przypisano do kursu')
     else:
         flash('Użytkownik przypisany do kursu')
-    if current_user.role == role['ADMIN']:
-        return redirect(url_for('admin.view_course', course_name=course_by_link.name))
-    elif current_user.role == role['STUDENT']:
-        return redirect(url_for('student.view_course', course_name=course_by_link.name))
-    elif current_user.role == role['MODERATOR']:
-        return redirect(url_for('mod.index'))
+    return redirect(url_for('default.index'))
 
 
 @bp.route('/confirm_email/<token>', methods=['GET', 'POST'])

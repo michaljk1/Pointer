@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import desc
 
 from pointer import db
-from pointer.mod.forms import LoginInfoForm, RoleStudentForm, RoleAdminForm
+from pointer.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm
 from pointer.mod import bp
 from pointer.models.usercourse import role, User
 from pointer.services.QueryService import login_query
