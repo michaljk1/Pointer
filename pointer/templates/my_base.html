@@ -59,8 +59,8 @@
                     {% endif %}
                     {% if not current_user.is_anonymous and current_user.is_moderator() %}
                         <li><a href="{{ url_for('mod.add_domain') }}">Domeny</a></li>
-                        <li><a href="{{ url_for('mod.admin_roles') }}">Dodaj prawa administratora</a></li>
-                        <li><a href="{{ url_for('mod.student_roles') }}">Odbierz prawa administratora</a></li>
+                        <li><a href="{{ url_for('mod.admin_roles') }}">Dodaj administratora</a></li>
+                        <li><a href="{{ url_for('mod.student_roles') }}">Usuń administratora</a></li>
                         <li><a href="{{ url_for('mod.view_logins') }}">Logowania</a></li>
                     {% endif %}
                 </ul>
@@ -75,7 +75,7 @@
                         {% elif current_user.is_student() %}
                             <li><a href="{{ url_for('student.view_courses') }}">{{ current_user.email }}</a></li>
                         {% else %}
-                            <li><a href="{{ url_for('mod.admin_roles') }}">{{ current_user.email }}</a></li>
+                            <li><a href="{{ url_for('mod.add_domain') }}">{{ current_user.email }}</a></li>
                         {% endif %}
                         <li><a href="{{ url_for('auth.change_password') }}">Zmień hasło</a></li>
                         <li><a href="{{ url_for('auth.logout') }}">Wyloguj się</a></li>

@@ -39,11 +39,6 @@ class Exercise(db.Model):
             max_points += test.points
         return max_points
 
-    def get_last_student_solution(self, student_id):
-        student_solutions: List[Solution] = self.get_student_solutions(student_id)
-
-        pass
-
     def get_student_solutions(self, student_id):
         return [solution for solution in self.solutions if solution.user_id == student_id]
 

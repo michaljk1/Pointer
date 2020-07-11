@@ -54,9 +54,11 @@ def view_lesson(lesson_id):
 @login_required
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
+    if solution not in current_user.solutions:
+        abort(404)
     validate_role_course(current_user, role['STUDENT'], solution.get_course())
     form = StudentSolutionForm(obj=solution, student_status=solution.get_student_status(),
-                               student_points=solution.get_student_points())
+                               student_points=solution.get_student_points(), send_date_str=str(solution.send_date))
     return render_template('student/solution.html', solution=solution, form=form)
 
 
@@ -97,7 +99,7 @@ def view_solutions():
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         all_solutions = exercise_student_query(form=form, courses=current_user.get_course_names(),
-                                               user_id=current_user.id).all()
+                                               student_id=current_user.id).all()
         solutions = sorted(get_filtered_by_status(all_solutions, form.status.data), key=lambda sol: sol.send_date,
                            reverse=True)
     return render_template('student/solutions.html', form=form, solutions=solutions)

@@ -37,29 +37,29 @@
         </button>
         <hr>
     {% endfor %}
-
+    <div class="bottom_div">
     {% if exercise.is_published %}
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-                class="btn btn-warning">Dezaktywuj zadanie
+                class="btn btn-dark btn-lg">Dezaktywuj
         </button>
     {% else %}
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-                class="btn btn-success">Aktywuj zadanie
+                class="btn btn-success btn-lg">Aktywuj
         </button>
     {% endif %}
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
-            class="btn btn-info">Dodaj test
+            class="btn btn-primary btn-lg">Dodaj test
     </button>
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
-            class="btn btn-secondary">Zobacz rozwiązania
+            class="btn btn-info btn-lg">Rozwiązania
     </button>
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.edit_exercise', exercise_id = exercise.id) }}'"
-            class="btn btn-secondary">Edytuj ćwiczenie
+            class="btn btn-secondary btn-lg">Edytuj
     </button>
-
+    </div>
 {% endblock %}

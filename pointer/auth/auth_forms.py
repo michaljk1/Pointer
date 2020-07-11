@@ -31,7 +31,7 @@ class PasswordForm(FlaskForm):
     def validate_password(self, password):
         password_str = password.data
         if not (any(x.isupper() for x in password_str) and any(x.islower() for x in password_str)
-                and any(x.isdigit() for x in password_str) and len(password_str) >= 7):
+                and any(x.isdigit() for x in password_str) and len(password_str) >= 8):
             raise ValidationError('Hasło musi zawierać minimum 8 znaków, cyfrę, jedną małą oraz dużą literę')
 
 

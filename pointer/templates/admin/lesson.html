@@ -31,7 +31,6 @@
         </h1></li>
     {% endfor %}
     </ul>
-    <hr>
     <div class="bottom_div">
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_id = lesson.id ) }}'"

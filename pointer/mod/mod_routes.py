@@ -17,7 +17,7 @@ from pointer.services.RouteService import validate_role
 @login_required
 def index():
     validate_role(current_user, role['MODERATOR'])
-    return redirect(url_for('mod.admin_roles'))
+    return redirect(url_for('mod.add_domain'))
 
 
 @bp.route('/add_domain', methods=['GET', 'POST'])

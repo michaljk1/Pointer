@@ -34,22 +34,22 @@
         </button>
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'"
-                class="btn btn-info btn-lg">Dodaj studenta
+                class="btn btn-primary btn-lg">Dodaj studenta
         </button>
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.delete_student', course_name = course.name ) }}'"
-                class="btn btn-danger btn-lg">Usuń studenta
+                class="btn btn-info btn-lg">Usuń studenta
         </button>
 
         {% if course.is_open %}
             <button type="button"
                     onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"
-                    class="btn btn-warning btn-lg">Zablokuj zapis
+                    class="btn btn-secondary btn-lg">Zablokuj zapis
             </button>
         {% else %}
             <button type="button"
                     onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"
-                    class="btn btn-warning btn-lg">Aktywuj zapis
+                    class="btn btn-secondary btn-lg">Aktywuj zapis
             </button>
         {% endif %}
     </div>
