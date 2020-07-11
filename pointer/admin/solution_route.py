@@ -1,6 +1,5 @@
 from flask import render_template, flash, request, redirect, url_for
 from flask_login import login_required, current_user
-
 from pointer import db
 from pointer.admin import bp
 from pointer.admin.admin_forms import SolutionForm, SolutionAdminSearchForm

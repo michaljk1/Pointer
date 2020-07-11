@@ -1,7 +1,5 @@
 import os
-
 from flask import current_app
-
 from pointer import db
 from pointer.models.usercourse import User
 

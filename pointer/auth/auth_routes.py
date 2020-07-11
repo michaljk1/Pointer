@@ -1,6 +1,5 @@
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
-
 from pointer.auth import bp
 from pointer.auth.email import send_confirm_email, send_reset_password
 from pointer.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm

@@ -1,5 +1,4 @@
 import os
-
 from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required
 from sqlalchemy import desc

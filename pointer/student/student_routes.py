@@ -2,9 +2,8 @@ import os
 from threading import Thread
 from flask import render_template, url_for, request, send_from_directory, current_app, abort
 from flask_login import login_required, current_user
-
 from pointer import db
-from pointer.DefaultUtil import get_current_date, unpack_file, get_offset_aware
+from pointer.DefaultUtil import get_current_date, unpack_file
 from pointer.models.solution import Solution
 from pointer.services.ExerciseService import execute_solution_thread
 from pointer.services.QueryService import get_filtered_by_status, exercise_student_query

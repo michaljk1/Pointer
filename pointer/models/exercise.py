@@ -1,13 +1,9 @@
 import os
 from datetime import datetime
-from typing import List
-
 from sqlalchemy.dialects.mysql import LONGTEXT
 from werkzeug.utils import secure_filename
-
 from pointer import db
 from pointer.DefaultUtil import get_current_date
-from pointer.models.solution import Solution
 from pointer.models.test import Test
 
 

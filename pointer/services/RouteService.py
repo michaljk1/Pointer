@@ -1,5 +1,4 @@
 from flask import abort, redirect, url_for
-
 from pointer.models.exercise import Exercise
 from pointer.models.usercourse import role
 

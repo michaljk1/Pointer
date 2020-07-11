@@ -1,5 +1,4 @@
 from typing import List
-
 from pointer.models.statistics import Statistics
 from pointer.models.usercourse import Course, role, User
 

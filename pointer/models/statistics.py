@@ -1,9 +1,4 @@
-import json
-from typing import List
-
-from pointer.models.solution import Solution
-from pointer.models.usercourse import Course, User, role
-
+from pointer.models.usercourse import Course, User
 
 class Statistics:
     def __init__(self, course: Course, user: User, is_admin=False):

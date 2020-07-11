@@ -1,5 +1,4 @@
 import os
-
 import jwt
 from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -156,6 +155,7 @@ class UserExercise:
             return round((self.points / self.max_points * 100), 2)
         else:
             return float(0)
+
 
 role = {
     'ADMIN': 'ADMIN',

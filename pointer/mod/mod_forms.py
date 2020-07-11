@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, StringField, ValidationError
-
 from pointer.models.domain import Domain
 from pointer.models.logininfo import LoginInfo
 

@@ -1,5 +1,4 @@
 import os
-
 from sqlalchemy.dialects.mysql import LONGTEXT
 from pointer import db
 from pointer.models.exercise import Exercise

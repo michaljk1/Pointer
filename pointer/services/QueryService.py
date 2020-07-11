@@ -1,7 +1,5 @@
 from typing import List
-
 from sqlalchemy import desc
-
 from pointer import db
 from pointer.mod.mod_forms import LoginInfoForm
 from pointer.models.logininfo import LoginInfo

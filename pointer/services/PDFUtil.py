@@ -1,5 +1,4 @@
 from typing import List
-
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from pointer.admin.AdminUtil import get_statistics_by_ids

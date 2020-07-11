@@ -1,5 +1,5 @@
 # TODO
-# maksymalna ilosc pamieci
+# maksymalna ilosc pamieci, student statystyki
 from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
 from sqlalchemy import desc

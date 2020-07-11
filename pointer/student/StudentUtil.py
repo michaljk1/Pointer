@@ -1,5 +1,4 @@
 from typing import List
-
 from pointer.DefaultUtil import get_current_date, get_offset_aware
 from pointer.models.solution import Solution
 

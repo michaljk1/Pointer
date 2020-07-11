@@ -1,7 +1,6 @@
 import csv
 import os
 from typing import List
-
 from pointer import db
 from pointer.DefaultUtil import get_current_date
 from pointer.admin.AdminUtil import get_statistics_by_ids
@@ -30,9 +29,6 @@ def get_csv_solution_export(solutions: List[Solution], current_user: User):
 def get_csv_statistics_export(statistics_info, current_user: User):
     current_date = get_current_date()
     filename = ('statystykiCSV' + str(current_date) + '.csv').replace(" ", "_")
-    filename2 = ('statystykiPDF' + str(current_date) + '.pdf').replace(" ", "_")
-    global_filename = os.path.join(current_user.get_admin_directory(), filename2)
-    create_statistic_pdf(statistics_info, global_filename)
     with open(os.path.join(current_user.get_admin_directory(), filename), 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter='|', quoting=csv.QUOTE_MINIMAL)
         statistics: List[Statistics] = get_statistics_by_ids(statistics_info)
