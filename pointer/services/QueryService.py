@@ -1,5 +1,7 @@
 from typing import List
 
+from sqlalchemy import desc
+
 from pointer import db
 from pointer.mod.mod_forms import LoginInfoForm
 from pointer.models.logininfo import LoginInfo
@@ -32,21 +34,30 @@ def get_filtered_by_status(solutions: List[Solution], status: str):
 
 def exercise_admin_query(form, courses=None):
     query = exercise_query(form, courses)
+
     if form.status.data != Solution.Status['ALL'] and form.status.data != 'None':
         query = query.filter(Solution.status == form.status.data)
+
     if form.surname.data is not None and len(form.surname.data) > 0:
         query = query.filter(User.surname == form.surname.data)
+
     if form.name.data is not None and len(form.name.data) > 0:
         query = query.filter(User.name == form.name.data)
+
+    if form.ip_address.data is not None and len(form.ip_address.data) > 0:
+        query = query.filter(Solution.ip_address == form.ip_address.data)
+
     if form.points_from.data is not None:
         query = query.filter(Solution.points >= form.points_from.data)
+
     if form.points_to.data is not None:
         query = query.filter(Solution.points <= form.points_to.data)
-    return query
+
+    return query.order_by(desc(Solution.send_date))
 
 
-def exercise_student_query(form, user_id, courses):
-    return exercise_query(form, courses).filter(User.id == user_id)
+def exercise_student_query(form, student_id, courses):
+    return exercise_query(form, courses).filter(User.id == student_id)
 
 
 def exercise_query(form, courses=None):
@@ -88,5 +99,4 @@ def login_query(form: LoginInfoForm, user_role: str, ids=None):
             query = query.filter(1 == 0)
         else:
             query = query.filter(User.id.in_(ids))
-    # order_by(desc(Course.name, Lesson.name, Exercise.name, Solution.attempt))
     return query

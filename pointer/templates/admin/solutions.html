@@ -16,6 +16,7 @@
         {{ wtf.form_field(form.surname, class='form-control') }}
         {{ wtf.form_field(form.points_from, class='form-control') }}
         {{ wtf.form_field(form.points_to, class='form-control') }}
+        {{ wtf.form_field(form.ip_address, class='form-control') }}
         {{ wtf.form_field(form.submit, class='btn btn-primary') }}
     </form>
     <hr>
@@ -56,9 +57,9 @@
             <td><p>{{ solution.status }}</p></td>
             <td>
                 <a type="button"
-                        href='{{ url_for('admin.view_solution', solution_id = solution.id) }}'
-                        target="_blank"
-                        class="btn btn-success btn-sm" >+
+                   href='{{ url_for('admin.view_solution', solution_id = solution.id) }}'
+                   target="_blank"
+                   class="btn btn-success btn-sm">+
                 </a>
             </td>
             </tr>
@@ -66,14 +67,20 @@
             </tbody>
         </table>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.export_solutions', ids=solution_ids) }}'"
-                class="btn btn-warning">Export CSV
+                onclick="window.location.href='{{ url_for('admin.export_solutions_csv', ids=solution_ids) }}'"
+                class="btn btn-primary">Export CSV
         </button>
+        <a type="button"
+           href='{{ url_for('admin.export_solutions_pdf',  ids=solution_ids) }}'
+           target="_blank"
+           class="btn btn-info">Export PDF
+        </a>
     {% endif %}
     <script>
         $(document).ready(function () {
             $('#paginatedTable').DataTable({
                 "dom": 'lrtip',
+                "aaSorting": [],
                 "pagingType": "full_numbers",
                 "language": {
                     "lengthMenu": "Wyświetl _MENU_ rekordów",

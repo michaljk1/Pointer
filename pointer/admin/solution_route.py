@@ -26,7 +26,6 @@ def view_solutions():
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_admin_query(form=form, courses=current_user.get_course_names()).all()
-        return render_template('admin/solutions.html', form=form, solutions=solutions)
     return render_template('admin/solutions.html', form=form, solutions=solutions)
 
 

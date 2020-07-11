@@ -10,12 +10,13 @@ class Export(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     file_name = db.Column(db.String(100))
-    type = db.Column(db.String(10))
+    type = db.Column(db.String(15))
     format = db.Column(db.String(10))
     generation_date = db.Column(db.DateTime)
+    #TODO Rozwiązania
     formats = {
-        'SOLUTION': 'SOLUTION',
-        'STATISTICS': 'STATISTICS'
+        'SOLUTION': 'Rozwiązani',
+        'STATISTICS': 'Statystyki'
     }
     types = {
         'CSV': 'csv',

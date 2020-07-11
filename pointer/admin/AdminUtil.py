@@ -39,3 +39,13 @@ def prepare_statistics(users: List[User], courses: List[Course]):
         for user in users:
             statistics_list.append(Statistics(course=course, user=user, is_admin=True))
     return statistics_list
+
+
+def get_statistics_by_ids(infos):
+    statistics = []
+    for info in infos:
+        course_id, user_id = info.strip('()').strip('[]').split(',')
+        course = Course.query.filter_by(id=course_id).first()
+        user = User.query.filter_by(id=user_id).first()
+        statistics.append(Statistics(course, user, True))
+    return statistics

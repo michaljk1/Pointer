@@ -98,3 +98,4 @@ class SolutionAdminSearchForm(SolutionStudentSearchForm):
     points_to = FloatField('Punkty do', [Optional()])
     name = StringField('Imię')
     surname = StringField('Nazwisko')
+    ip_address = StringField('IP')

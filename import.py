@@ -11,7 +11,8 @@ commands = [
     "pip install pyjwt",
     "pip install setuptools",
     # "pip install mysqlclient",
-    "pip install pytz"
+    "pip install pytz",
+    "pip install reportlab"
 #    "pip install pdfkit"
     ]
 # sudo apt-get install python3-dev

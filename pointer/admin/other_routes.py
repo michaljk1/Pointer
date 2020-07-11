@@ -13,7 +13,7 @@ from pointer.models.usercourse import Course, User, role
 from pointer.models.export import Export
 from pointer.models.lesson import Lesson
 from pointer.models.solution import Solution
-from pointer.services.ExportService import create_csv_solution_export, create_csv_statistics_export
+from pointer.services.ExportService import get_csv_solution_export, get_csv_statistics_export, get_pdf_solution_export
 from pointer.services.QueryService import login_query
 from pointer.services.RouteService import validate_role_course, validate_role
 
@@ -28,32 +28,6 @@ def view_logins():
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
     return render_template('adminmod/logins.html', form=form, logins=logins)
-
-
-@bp.route('/export_solutions')
-@login_required
-def export_solutions():
-    validate_role(current_user, role['ADMIN'])
-    ids = request.args.getlist('ids')
-    solutions = Solution.query.filter(Solution.id.in_(ids)).all()
-    export = create_csv_solution_export(solutions, current_user)
-    return redirect(url_for('admin.download', domain='export', id=export.id))
-
-
-@bp.route('/export_statistics')
-@login_required
-def export_statistics():
-    validate_role(current_user, role['ADMIN'])
-    export = create_csv_statistics_export(request.args.getlist('statistics_info'), current_user)
-    return redirect(url_for('admin.download', domain='export', id=export.id))
-
-
-@bp.route('/view_exports')
-@login_required
-def view_exports():
-    validate_role(current_user, role['ADMIN'])
-    exports = Export.query.filter_by(user_id=current_user.id).order_by(desc(Export.id)).all()
-    return render_template('admin/exports.html', exports=exports)
 
 
 @bp.route('/statistics', methods=['GET', 'POST'])
@@ -71,7 +45,6 @@ def view_statistics():
         statistics_list, statistics_info = get_statistics(user, course, current_user.courses)
     return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_info=statistics_info,
                            form=form)
-
 
 @bp.route('/download')
 @login_required

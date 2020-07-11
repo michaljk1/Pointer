@@ -21,8 +21,8 @@ class Solution(db.Model):
         'REFUSED': 'Odrzucono',
         'ALL': 'Dowolny',
         'APPROVED': 'Zaakceptowano',
-        'COMPILE_ERROR': 'Błąd kompilacji',
-        'TEST_ERROR': 'Błąd testu',
+        'COMPILE_ERROR': 'Error - kompilacja',
+        'TEST_ERROR': 'Error - testowanie',
         'ERROR': 'Error',
         'NOT_ACTIVE': 'Nieaktywne'
     }

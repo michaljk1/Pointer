@@ -48,9 +48,14 @@
             </tbody>
         </table>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.export_statistics', statistics_info = statistics_info) }}'"
-                class="btn btn-warning">Export CSV
+                onclick="window.location.href='{{ url_for('admin.export_statistics_csv', statistics_info = statistics_info) }}'"
+                class="btn btn-primary">Export CSV
         </button>
+        <a type="button"
+           href='{{ url_for('admin.export_statistics_pdf', statistics_info = statistics_info) }}'
+           target="_blank"
+           class="btn btn-info">Export PDF
+        </a>
         <script>
             function showDetails(param1) {
                 var detailClass = param1 + 'details';
