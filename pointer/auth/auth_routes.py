@@ -31,7 +31,7 @@ def login():
         if not user.check_password(form.password.data):
             login_info.status = LoginInfo.Status['ERROR']
             db.session.commit()
-            flash('Invalid email or password', 'message')
+            flash('Niepoprawne dane', 'error')
             return redirect(url_for('auth.login'))
         # TODO odkomentowac
         # if not user.is_confirmed:
@@ -78,7 +78,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!', 'message')
+        flash('Zarejestrowano, potwierdź adres email', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 

@@ -10,7 +10,7 @@ from pointer.services.ExerciseService import execute_solution_thread
 from pointer.services.QueryService import get_filtered_by_status, exercise_student_query
 from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution
 from pointer.student import bp
-from pointer.student.student_forms import UploadForm, SolutionStudentSearchForm
+from pointer.student.student_forms import UploadForm, SolutionStudentSearchForm, StudentSolutionForm
 from werkzeug.utils import secure_filename, redirect
 from pointer.models.usercourse import Course, role
 from pointer.models.exercise import Exercise
@@ -54,7 +54,8 @@ def view_lesson(lesson_id):
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_role_course(current_user, role['STUDENT'], solution.get_course())
-    return render_template('student/solution.html', solution=solution)
+    form = StudentSolutionForm(obj=solution)
+    return render_template('student/solution.html', solution=solution, form=form)
 
 
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])

@@ -1,17 +1,37 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('student.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('student.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
     /
-    <a href="{{ url_for('student.view_course', course_name = solution.get_course().name) }}"><pb> {{ solution.get_course().name }} </pb></a>
+    <a href="{{ url_for('student.view_course', course_name = solution.get_course().name) }}">
+        <pb> {{ solution.get_course().name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('student.view_lesson', lesson_id = solution.exercise.lesson.id) }}"><pb> {{ solution.exercise.lesson.name }} </pb></a>
+    <a href="{{ url_for('student.view_lesson', lesson_id = solution.exercise.lesson.id) }}">
+        <pb> {{ solution.exercise.lesson.name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('student.view_exercise', exercise_id = solution.exercise.id) }}"><pb> {{ solution.exercise.name }} </pb></a>
+    <a href="{{ url_for('student.view_exercise', exercise_id = solution.exercise.id) }}">
+        <pb> {{ solution.exercise.name }} </pb>
+    </a>
     /
-    <a href="{{ url_for('student.view_solution', solution_id = solution.id) }}"><pb> Szczegóły </pb></a>
+    <a href="{{ url_for('student.view_solution', solution_id = solution.id) }}">
+        <pb> Szczegóły</pb>
+    </a>
 {% endblock %}
 
 {% block app_content %}
- xD
+    <form class="form" role="form">
+        {{ form.csrf_token() }}
+        <h1><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}"
+              target="_blank">{{ solution.file_path }}</a></h1>
+        {{ wtf.form_field(form.points, class='form-control') }}
+        {{ wtf.form_field(form.status, class='form-control') }}
+        {{ wtf.form_field(form.error_msg, class='form-control', style='resize: none') }}
+        {{ wtf.form_field(form.comment, class='form-control', style='resize: none') }}
+        {{ wtf.form_field(form.attempt, class='form-control') }}
+    </form>
+
 {% endblock %}

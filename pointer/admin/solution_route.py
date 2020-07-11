@@ -36,20 +36,21 @@ def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_exists(solution)
     validate_role_course(current_user, role['ADMIN'], solution.get_course())
-    solution_form = SolutionForm(obj=solution, email=solution.author.email,
+    solution_form = SolutionForm(obj=solution, email=solution.author.email, points=solution.points,
                                  admin_ref=(solution.status == solution.Status['REFUSED']))
-    if request.method == 'POST' and solution_form.submit_points.data and solution_form.validate_on_submit():
-        form_points = solution_form.points.data
-        if form_points > solution.exercise.get_max_points():
-            flash('Za duża ilość punktów', 'error')
-            return render_template('admin/solution.html', form=solution_form, solution=solution)
-        solution.points = form_points
+    if request.method == 'POST' and solution_form.validate_on_submit():
+        if solution_form.submit_points.data:
+            form_points = solution_form.points.data
+            if form_points > solution.exercise.get_max_points():
+                flash('Za duża ilość punktów', 'error')
+                return render_template('admin/solution.html', form=solution_form, solution=solution)
+            solution.points = form_points
+            flash('Zmieniono ilość punktów', 'message')
+        if solution_form.submit_comment.data:
+            solution.comment = solution_form.comment.data
+            flash('Dodano komentarz', 'message')
         db.session.commit()
-        flash('Zmieniono ilość punktów', 'message')
-    if request.method == 'POST' and solution_form.submit_comment.data and solution_form.validate_on_submit():
-        solution.comment = solution_form.comment.data
-        db.session.commit()
-        flash('Dodano komentarz', 'message')
+        return redirect(url_for('admin.view_solution', solution_id=solution.id))
     return render_template('admin/solution.html', form=solution_form, solution=solution)
 
 
