@@ -88,7 +88,9 @@ class SolutionForm(FlaskForm):
     attempt = IntegerField('Próba', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})
     os_info = StringField('os info', render_kw={'readonly': True})
-    submit = SubmitField('Zmień punktację')
+    comment = TextAreaField('Komentarz', render_kw={'rows': '5'})
+    submit_comment = SubmitField('Dodaj komentarz')
+    submit_points = SubmitField('Zmień punktację')
 
 
 class SolutionAdminSearchForm(SolutionStudentSearchForm):

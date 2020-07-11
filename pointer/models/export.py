@@ -22,6 +22,9 @@ class Export(db.Model):
         'PDF': 'pdf'
     }
 
+    def get_filename(self):
+        return self.file_name
+
     def get_directory(self):
         user = User.query.filter_by(id=self.user_id).first()
         return os.path.join(current_app.instance_path, user.login)

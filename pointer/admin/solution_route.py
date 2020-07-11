@@ -38,14 +38,18 @@ def view_solution(solution_id):
     validate_role_course(current_user, role['ADMIN'], solution.get_course())
     solution_form = SolutionForm(obj=solution, email=solution.author.email,
                                  admin_ref=(solution.status == solution.Status['REFUSED']))
-    if request.method == 'POST' and solution_form.validate_on_submit():
+    if request.method == 'POST' and solution_form.submit_points.data and solution_form.validate_on_submit():
         form_points = solution_form.points.data
         if form_points > solution.exercise.get_max_points():
             flash('Za duża ilość punktów', 'error')
             return render_template('admin/solution.html', form=solution_form, solution=solution)
         solution.points = form_points
         db.session.commit()
-        flash('Zapisano zmiany', 'message')
+        flash('Zmieniono ilość punktów', 'message')
+    if request.method == 'POST' and solution_form.submit_comment.data and solution_form.validate_on_submit():
+        solution.comment = solution_form.comment.data
+        db.session.commit()
+        flash('Dodano komentarz', 'message')
     return render_template('admin/solution.html', form=solution_form, solution=solution)
 
 

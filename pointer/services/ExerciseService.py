@@ -8,16 +8,16 @@ import resource
 
 def execute_solution_thread(app, solution_id):
     with app.app_context():
-        try:
-            solution = Solution.query.filter_by(id=solution_id).first()
-            if prepare_compilation(solution):
-                grade(solution)
-            if solution.status == Solution.Status['SEND']:
-                solution.status = Solution.Status['NOT_ACTIVE']
-            db.session.commit()
-        except:
-            solution.status = Solution.Status['ERROR']
-            db.session.commit()
+        # try:
+        solution = Solution.query.filter_by(id=solution_id).first()
+        if prepare_compilation(solution):
+            grade(solution)
+        if solution.status == Solution.Status['SEND']:
+            solution.status = Solution.Status['NOT_ACTIVE']
+        db.session.commit()
+    # except:
+    #     solution.status = Solution.Status['ERROR']
+    #     db.session.commit()
 
 
 def prepare_compilation(solution):
@@ -53,8 +53,9 @@ def grade(solution: Solution):
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
         bash_command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                         test.get_output_path(), run_command]
-        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file)
-        # , preexec_fn=(lambda x: resource.setrlimit(resource.RLIMIT_AS,(x * 1024 * 1024, resource.RLIM_INFINITY))))
+        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file,
+            preexec_fn=limit_virtual_memory())
+            # preexec_fn=(lambda x: resource.setrlimit(resource.RLIMIT_AS, (x * 1024 * 1024, resource.RLIM_INFINITY))))
         try:
             outs = process.communicate(timeout=solution.exercise.timeout)[0]
             error_file.close()
@@ -70,7 +71,11 @@ def grade(solution: Solution):
         except subprocess.TimeoutExpired:
             process.kill()
 
+
 #
 # def limit_virtual_memory(max_memory=None):
 #     max_virtual_memory = max_memory
 #     if max_memory is not None:
+def limit_virtual_memory():
+    MAX_VIRTUAL_MEMORY = 10 * 1024 * 1024  # 10 MB
+    resource.setrlimit(resource.RLIMIT_AS, (MAX_VIRTUAL_MEMORY, resource.RLIM_INFINITY))

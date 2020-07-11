@@ -1,45 +1,53 @@
-    {% if solutions|length > 0 %}
-        <table id="paginatedTable" class="display" style="width:100%">
-            <thead>
-            <th>Plik</th>
-            <th>Kurs</th>
-            <th>Lekcja</th>
-            <th>Ćwiczenie</th>
-            <th>Data wysłania</th>
-            <th>Status</th>
-            <th>Punkty</th>
-            </thead>
-            <tbody>
-            {% for solution in solutions %}
-                <tr style="cursor: pointer">
-                    <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}"
-                              target="_blank">{{ solution.file_path }}</a></p></td>
-                    <td><p><a href="{{ url_for('student.view_course', course_name=solution.get_course().name) }}"
-                              target="_blank">{{ solution.get_course().name }}</a></p></td>
-                    <td><p><a href="{{ url_for('student.view_lesson', lesson_id=solution.exercise.lesson.id) }}"
-                              target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
-                    <td><p><a href="{{ url_for('student.view_exercise', exercise_id=solution.exercise.id) }}"
-                              target="_blank">{{ solution.exercise.name }}</a></p></td>
-                    <td><p>{{ solution.send_date }}</p></td>
-                    {% if solution.exercise.is_finished()%}
+{% if solutions|length > 0 %}
+    <table id="paginatedTable" class="display" style="width:100%">
+        <thead>
+        <th>Plik</th>
+        <th>Kurs</th>
+        <th>Lekcja</th>
+        <th>Ćwiczenie</th>
+        <th>Data wysłania</th>
+        <th>Status</th>
+        <th>Punkty</th>
+        <th></th>
+        </thead>
+        <tbody>
+        {% for solution in solutions %}
+            <tr style="cursor: pointer">
+                <td><p><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}"
+                          target="_blank">{{ solution.file_path }}</a></p></td>
+                <td><p><a href="{{ url_for('student.view_course', course_name=solution.get_course().name) }}"
+                          target="_blank">{{ solution.get_course().name }}</a></p></td>
+                <td><p><a href="{{ url_for('student.view_lesson', lesson_id=solution.exercise.lesson.id) }}"
+                          target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
+                <td><p><a href="{{ url_for('student.view_exercise', exercise_id=solution.exercise.id) }}"
+                          target="_blank">{{ solution.exercise.name }}</a></p></td>
+                <td><p>{{ solution.send_date }}</p></td>
+                {% if solution.exercise.is_finished() %}
                     <td><p>{{ solution.status }}</p></td>
                     <td><p>{{ solution.points }}</p></td>
-                    {% else %}
-                        {% if solution.status == solution.Status['APPROVED'] or solution.status == solution.Status['REFUSED'] or solution.status == solution.Status['NOT_ACTIVE'] %}
+                {% else %}
+                    {% if solution.status == solution.Status['APPROVED'] or solution.status == solution.Status['REFUSED'] or solution.status == solution.Status['NOT_ACTIVE'] %}
                         <td><p> {{ solution.Status['NOT_ACTIVE'] }} </p></td>
-                        {% else %}
+                    {% else %}
                         <td><p>{{ solution.status }}</p></td>
-                        {% endif %}
-                    <td><p> - </p></td>
                     {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <script>
+                    <td><p> - </p></td>
+                {% endif %}
+                <td>
+                    <a type="button"
+                       href='{{ url_for('student.view_solution', solution_id = solution.id) }}'
+                       class="btn btn-success btn-sm">+
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script>
         $(document).ready(function () {
             $('#paginatedTable').DataTable({
                 "dom": 'lrtip',
+                "aaSorting": [],
                 "pagingType": "full_numbers",
                 "language": {
                     "lengthMenu": "Wyświetl _MENU_ rekordów",
@@ -57,4 +65,4 @@
         });
     </script>
 
-    {% endif %}
+{% endif %}

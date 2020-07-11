@@ -1,0 +1,17 @@
+{% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('student.view_courses') }}"><pb> Kursy </pb></a>
+    /
+    <a href="{{ url_for('student.view_course', course_name = solution.get_course().name) }}"><pb> {{ solution.get_course().name }} </pb></a>
+    /
+    <a href="{{ url_for('student.view_lesson', lesson_id = solution.exercise.lesson.id) }}"><pb> {{ solution.exercise.lesson.name }} </pb></a>
+    /
+    <a href="{{ url_for('student.view_exercise', exercise_id = solution.exercise.id) }}"><pb> {{ solution.exercise.name }} </pb></a>
+    /
+    <a href="{{ url_for('student.view_solution', solution_id = solution.id) }}"><pb> Szczegóły </pb></a>
+{% endblock %}
+
+{% block app_content %}
+ xD
+{% endblock %}

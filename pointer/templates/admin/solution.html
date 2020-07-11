@@ -18,12 +18,14 @@
         <div style="width: 10%; display: inline-block">
             {{ wtf.form_field(form.points, class='form-control') }}
         </div>
-        {{ wtf.form_field(form.submit, class='btn btn-info') }}
+        {{ wtf.form_field(form.submit_points, class='btn btn-info') }}
         <p>Maksymalna ilość punktów: {{ solution.exercise.get_max_points() }}</p>
         {{ wtf.form_field(form.status, class='form-control') }}
         {% if solution.error_msg != None %}
             {{ wtf.form_field(form.error_msg, class='form-control') }}
         {% endif %}
+        {{ wtf.form_field(form.comment, class='form-control') }}
+        {{ wtf.form_field(form.submit_comment, class='btn btn-info') }}
         {{ wtf.form_field(form.attempt, class='form-control') }}
         {{ wtf.form_field(form.ip_address, class='form-control') }}
         {{ wtf.form_field(form.os_info, class='form-control') }}

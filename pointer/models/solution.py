@@ -12,9 +12,10 @@ class Solution(db.Model):
     file_path = db.Column(db.String(100), nullable=False)
     attempt = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(20), nullable=False)
-    os_info = db.Column(db.String(150), nullable=False)
+    os_info = db.Column(LONGTEXT, nullable=False)
     status = db.Column(db.String(20), nullable=False)
     error_msg = db.Column(LONGTEXT)
+    comment = db.Column(LONGTEXT)
     Status = {
         'SEND': 'Oddano',
         'REFUSED': 'Odrzucono',

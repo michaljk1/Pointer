@@ -49,6 +49,14 @@ def view_lesson(lesson_id):
     return render_template('student/lesson.html', lesson=lesson)
 
 
+@bp.route('/solution/<int:solution_id>')
+@login_required
+def view_solution(solution_id):
+    solution = Solution.query.filter_by(id=solution_id).first()
+    validate_role_course(current_user, role['STUDENT'], solution.get_course())
+    return render_template('student/solution.html', solution=solution)
+
+
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
 @login_required
 def view_exercise(exercise_id):
@@ -57,11 +65,11 @@ def view_exercise(exercise_id):
         abort(404)
     validate_role_course(current_user, role['STUDENT'], exercise.get_course())
     attempt_nr = 1 + len(exercise.get_student_solutions(current_user.id))
-    solutions = exercise.get_student_solutions(current_user.id)
+    solutions = sorted(exercise.get_student_solutions(current_user.id),  key=lambda sol: sol.send_date, reverse=True)
     if len(solutions) == 0:
         send_solution = True
     else:
-        last_solution = sorted(solutions, key=lambda user_solution: user_solution.send_date, reverse=True)[0]
+        last_solution = solutions[0]
         send_solution: bool = (get_current_date() - get_offset_aware(last_solution.send_date)).seconds > exercise.interval
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():

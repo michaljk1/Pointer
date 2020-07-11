@@ -16,6 +16,9 @@ class Lesson(db.Model):
     def get_directory(self):
         return os.path.join(self.course.get_directory(), self.name.replace(" ", "_"))
 
+    def get_filename(self):
+        return self.content_pdf_path
+
     def is_exercise_name_proper(self, exercise_name):
         exercise_name = exercise_name.lower()
         for exercise in self.exercises:
