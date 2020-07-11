@@ -3,10 +3,10 @@ import os
 from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required
 from sqlalchemy import desc
-
 from pointer import db
-from pointer.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm
+from pointer.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm, DomainForm
 from pointer.mod import bp
+from pointer.models.domain import Domain
 from pointer.models.usercourse import role, User
 from pointer.services.QueryService import login_query
 from pointer.services.RouteService import validate_role
@@ -18,6 +18,20 @@ from pointer.services.RouteService import validate_role
 def index():
     validate_role(current_user, role['MODERATOR'])
     return redirect(url_for('mod.admin_roles'))
+
+
+@bp.route('/add_domain', methods=['GET', 'POST'])
+@login_required
+def add_domain():
+    validate_role(current_user, role['MODERATOR'])
+    form = DomainForm()
+    domains = Domain.query.all()
+    if request.method == 'POST' and form.validate_on_submit():
+        domain = Domain(name=form.domain.data)
+        db.session.add(domain)
+        db.session.commit()
+        return redirect(url_for('mod.add_domain'))
+    return render_template('mod/domains.html', form=form, domains=domains)
 
 
 @bp.route('/admin_roles', methods=['GET', 'POST'])

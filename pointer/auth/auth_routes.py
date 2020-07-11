@@ -78,7 +78,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Zarejestrowano, potwierdź adres email', 'message')
+        flash('Rejestracja zakończona, potwierdź adres email', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 
@@ -120,7 +120,7 @@ def send_reset():
         send_reset_password(form.email.data)
         flash('Wysłano wiadomość', 'message')
         return redirect(url_for('auth.login'))
-    return render_template('auth/activate.html', form=form)
+    return render_template('auth/reset_password.html', form=form)
 
 
 @bp.route('link/<string:link>')

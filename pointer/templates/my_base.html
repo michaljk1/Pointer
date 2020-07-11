@@ -58,6 +58,7 @@
                         <li><a href="{{ url_for('student.view_solutions') }}">Rozwiązania</a></li>
                     {% endif %}
                     {% if not current_user.is_anonymous and current_user.is_moderator() %}
+                        <li><a href="{{ url_for('mod.add_domain') }}">Domeny</a></li>
                         <li><a href="{{ url_for('mod.admin_roles') }}">Dodaj prawa administratora</a></li>
                         <li><a href="{{ url_for('mod.student_roles') }}">Odbierz prawa administratora</a></li>
                         <li><a href="{{ url_for('mod.view_logins') }}">Logowania</a></li>

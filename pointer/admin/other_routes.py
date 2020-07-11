@@ -1,19 +1,17 @@
 # TODO
-# maksymalna ilosc pamieci, wyniki pdf
-from flask import render_template, url_for, request, send_from_directory, abort
+# maksymalna ilosc pamieci
+from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 from pointer.admin import bp
 from pointer.admin.AdminUtil import get_students_ids_emails, get_statistics
 from pointer.admin.admin_forms import StatisticsForm
-from werkzeug.utils import redirect
 from pointer.mod.mod_forms import LoginInfoForm
 from pointer.models.test import Test
 from pointer.models.usercourse import Course, User, role
 from pointer.models.export import Export
 from pointer.models.lesson import Lesson
 from pointer.models.solution import Solution
-from pointer.services.ExportService import get_csv_solution_export, get_csv_statistics_export, get_pdf_solution_export
 from pointer.services.QueryService import login_query
 from pointer.services.RouteService import validate_role_course, validate_role
 
@@ -45,6 +43,7 @@ def view_statistics():
         statistics_list, statistics_info = get_statistics(user, course, current_user.courses)
     return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_info=statistics_info,
                            form=form)
+
 
 @bp.route('/download')
 @login_required

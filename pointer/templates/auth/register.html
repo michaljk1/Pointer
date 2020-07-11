@@ -4,9 +4,15 @@
     <a href="{{ url_for('auth.register') }}"><pb>Rejestracja</pb></a>
 {% endblock %}
 {% block app_content %}
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
-        </div>
-    </div>
+        <form action="" method="post" enctype="multipart/form-data" role="form">
+        {{ form.csrf_token() }}
+        {{ wtf.form_field(form.email, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.login, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.name, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.surname, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.index, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.password, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.password2, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.submit, class='btn btn-success') }}
+    </form>
 {% endblock %}

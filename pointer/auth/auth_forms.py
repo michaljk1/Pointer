@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+
+from pointer.models.domain import Domain
 from pointer.models.usercourse import User
 
 
@@ -22,9 +24,15 @@ class ConfirmEmailForm(FlaskForm):
 
 
 class PasswordForm(FlaskForm):
-    password = PasswordField('Hasło', validators=[DataRequired(), Length(min=8, message='Hasło musi zawierać minimum 8 znaków')])
+    password = PasswordField('Hasło', validators=[DataRequired()])
     password2 = PasswordField(
         'Wprowadź ponownie', validators=[DataRequired(), EqualTo('password', message='Wprowadzone hasła różnią się')])
+
+    def validate_password(self, password):
+        password_str = password.data
+        if not (any(x.isupper() for x in password_str) and any(x.islower() for x in password_str)
+                and any(x.isdigit() for x in password_str) and len(password_str) >= 7):
+            raise ValidationError('Hasło musi zawierać minimum 8 znaków, cyfrę, jedną małą oraz dużą literę')
 
 
 class ChangePasswordForm(PasswordForm):
@@ -48,8 +56,21 @@ class RegistrationForm(PasswordForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Podany adres email jest zajęty.')
+        email_domain = email.data.split('@')[1]
+        domains = Domain.query.all()
+        is_proper = False
+        for domain in domains:
+            if email_domain == domain.name:
+                is_proper = True
+        if not is_proper:
+            raise ValidationError('Rejestracja dla danej domeny nie jest możliwa.')
 
     def validate_login(self, login):
         user = User.query.filter_by(login=login.data).first()
         if user is not None:
             raise ValidationError('Podany login jest zajęty.')
+
+    def validate_index(self, index):
+        user = User.query.filter_by(index=index.data).first()
+        if user is not None:
+            raise ValidationError('Podany indeks jest zajęty.')

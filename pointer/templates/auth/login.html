@@ -6,19 +6,21 @@
     </a>
 {% endblock %}
 {% block app_content %}
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form, button_map={'submit': 'success'}) }}
+    <form action="" method="post" enctype="multipart/form-data" role="form">
+        {{ form.csrf_token() }}
+        {{ wtf.form_field(form.email, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.password, class='form-control', style='width: 35%') }}
+        {{ wtf.form_field(form.remember_me, class='form-control') }}
+        <div style="width: 10%; display: inline">
+            {{ wtf.form_field(form.submit, class='btn btn-success') }}
+            <button type="button"
+                    onclick="window.location.href='{{ url_for('auth.activate') }}'"
+                    class="btn btn-primary">Wyślij link aktywacyjny
+            </button>
+            <button type="button"
+                    onclick="window.location.href='{{ url_for('auth.send_reset') }}'"
+                    class="btn btn-info">Zresetuj hasło
+            </button>
         </div>
-    </div>
-    <br>
-    <button type="button"
-            onclick="window.location.href='{{ url_for('auth.activate') }}'"
-            class="btn btn-primary">Wyślij link aktywacyjny
-    </button>
-    <button type="button"
-            onclick="window.location.href='{{ url_for('auth.send_reset') }}'"
-            class="btn btn-info">Zresetuj hasło
-    </button>
-
+    </form>
 {% endblock %}

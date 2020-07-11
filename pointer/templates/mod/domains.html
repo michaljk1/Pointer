@@ -1,0 +1,22 @@
+{% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('mod.add_domain') }}"><pb> Domeny </pb></a>
+{% endblock %}
+{% block app_content %}
+    <h1>Domeny dostępne przy rejestracji:</h1>
+    {% if domains|length == 0 %}
+    <h1>Brak</h1>
+    {% endif %}
+    <ul>
+    {% for domain in domains %}
+        <li><h1>{{ domain.name }}</h1></li>
+    {% endfor %}
+    </ul>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+{% endblock %}
