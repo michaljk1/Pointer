@@ -26,7 +26,8 @@ def get_statistics(user: User, course: Course, admin_courses: List[Course]):
         if user is None:
             statistics_list = prepare_statistics(course.get_students(), [course])
         else:
-            statistics_list = prepare_statistics([user], [course])
+            if course in user.courses:
+                statistics_list = prepare_statistics([user], [course])
     for statistics in statistics_list:
         statistics_info.append([statistics.course_id, statistics.user_id])
     return statistics_list, statistics_info

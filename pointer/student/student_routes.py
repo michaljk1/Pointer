@@ -1,13 +1,14 @@
 import os
 from threading import Thread
-from flask import render_template, url_for, request, send_from_directory, current_app, abort
+from flask import render_template, url_for, request, send_from_directory, current_app
 from flask_login import login_required, current_user
 from pointer import db
 from pointer.DateUtil import get_current_date
 from pointer.models.solution import Solution
 from pointer.services.ExerciseService import execute_solution_thread
 from pointer.services.QueryService import get_filtered_by_status, exercise_student_query
-from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution, validate_exercise
+from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution, \
+    validate_student_exercise, validate_lesson
 from pointer.student import bp
 from pointer.student.StudentUtil import can_send_solution, unpack_file
 from pointer.student.student_forms import UploadForm, SolutionStudentSearchForm, StudentSolutionForm
@@ -45,7 +46,7 @@ def view_course(course_name):
 @login_required
 def view_lesson(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_role_course(current_user, role['STUDENT'], lesson.course)
+    validate_lesson(current_user, role['STUDENT'], lesson)
     return render_template('student/lesson.html', lesson=lesson)
 
 
@@ -53,9 +54,7 @@ def view_lesson(lesson_id):
 @login_required
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    if solution not in current_user.solutions:
-        abort(404)
-    validate_role_course(current_user, role['STUDENT'], solution.get_course())
+    validate_role_solution(current_user, role['STUDENT'], solution)
     form = StudentSolutionForm(obj=solution, student_status=solution.get_student_status(),
                                student_points=solution.get_student_points(), send_date_str=str(solution.send_date))
     return render_template('student/solution.html', solution=solution, form=form)
@@ -65,8 +64,7 @@ def view_solution(solution_id):
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise(exercise)
-    validate_role_course(current_user, role['STUDENT'], exercise.get_course())
+    validate_student_exercise(current_user, role['STUDENT'], exercise)
     solutions = sorted(exercise.get_student_solutions(current_user.id), key=lambda sol: sol.send_date, reverse=True)
     send_solution = can_send_solution(solutions)
     form = UploadForm()
@@ -117,7 +115,7 @@ def view_statistics():
 @login_required
 def download_content(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_role_course(current_user, role['STUDENT'], lesson.course)
+    validate_lesson(current_user, role['STUDENT'], lesson)
     return send_from_directory(directory=lesson.get_directory(), filename=lesson.content_pdf_path)
 
 

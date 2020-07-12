@@ -7,7 +7,7 @@ from werkzeug.utils import redirect, secure_filename
 from pointer.models.usercourse import Course, role
 from pointer.models.lesson import Lesson
 from pointer import db
-from pointer.services.RouteService import validate_role_course
+from pointer.services.RouteService import validate_role_course, validate_lesson
 
 
 @bp.route('/lesson/<int:lesson_id>')
@@ -48,7 +48,7 @@ def add_lesson(course_name: str):
 @login_required
 def edit_lesson(lesson_id: int):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_role_course(current_user, role['ADMIN'], lesson.course)
+    validate_lesson(current_user, role['ADMIN'], lesson)
     form = EditLessonForm(text_content=lesson.content_text)
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['pdf_content']

@@ -5,26 +5,26 @@ from pointer.admin import bp
 from pointer.admin.admin_forms import ExerciseForm, TestForm, ExerciseEditForm
 from werkzeug.utils import redirect
 from pointer.models.test import Test
-from pointer.models.usercourse import Course, role
+from pointer.models.usercourse import role
 from pointer.models.lesson import Lesson
 from pointer.models.exercise import Exercise
 from pointer import db
-from pointer.services.RouteService import validate_exists, validate_role_course
+from pointer.services.RouteService import validate_admin_exercise, validate_test, validate_lesson
 
 
 @bp.route('/exercise/<int:exercise_id>', methods=['GET', 'POST'])
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
+    validate_admin_exercise(current_user, role['ADMIN'], exercise)
     return render_template('admin/exercise.html', exercise=exercise)
 
 
-@bp.route('/activate_exercise/<string:exercise_id>', methods=['GET', 'POST'])
+@bp.route('/activate_exercise/<int:exercise_id>', methods=['GET', 'POST'])
 @login_required
 def activate_exercise(exercise_id):
     exercise: Exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
+    validate_admin_exercise(current_user, role['ADMIN'], exercise)
     exercise.is_published = not exercise.is_published
     db.session.commit()
     flash('Zapisano zmiany', 'message')
@@ -35,7 +35,7 @@ def activate_exercise(exercise_id):
 @login_required
 def add_test(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.lesson.course)
+    validate_admin_exercise(current_user, role['ADMIN'], exercise)
     form = TestForm()
     if request.method == 'POST' and form.validate_on_submit():
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
@@ -48,8 +48,8 @@ def add_test(exercise_id):
 @login_required
 def delete_test(test_id):
     test = Test.query.filter_by(id=test_id).first()
+    validate_test(current_user, role['ADMIN'], test)
     exercise_id = test.exercise_id
-    validate_role_course(current_user, role['ADMIN'], test.get_course())
     shutil.rmtree(test.get_directory(), ignore_errors=True)
     db.session.delete(test)
     db.session.commit()
@@ -61,7 +61,7 @@ def delete_test(test_id):
 @login_required
 def add_exercise(course_name, lesson_id):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_role_course(current_user, role['ADMIN'], lesson.get_course())
+    validate_lesson(current_user, role['ADMIN'], lesson)
     form = ExerciseForm()
     if request.method == 'POST' and form.validate_on_submit():
         if not lesson.is_exercise_name_proper(form.name.data):
@@ -77,7 +77,7 @@ def add_exercise(course_name, lesson_id):
 @login_required
 def edit_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_role_course(current_user, role['ADMIN'], exercise.get_course())
+    validate_admin_exercise(current_user, role['ADMIN'], exercise)
     form = ExerciseEditForm(obj=exercise)
     if request.method == 'POST' and form.validate_on_submit():
         exercise.values_by_form(form, request.form.get('editordata'))

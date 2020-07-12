@@ -5,6 +5,25 @@ body {
     background-color: #0E87A4;
 }
 
+#leftbox {
+    float: right;
+    width: 33%;
+    height: 280px;
+}
+
+/*#middlebox {*/
+/*    float: left;*/
+/*    background: Green;*/
+/*    width: 50%;*/
+/*    height: 280px;*/
+/*}*/
+
+/*#rightbox {*/
+/*    float: right;*/
+/*    width: 25%;*/
+/*    height: 280px;*/
+/*}*/
+
 .container3 {
     background-color: white;
     border-width: 3px;
