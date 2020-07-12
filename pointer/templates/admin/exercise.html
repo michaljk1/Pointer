@@ -38,28 +38,28 @@
         <hr>
     {% endfor %}
     <div class="bottom_div">
-    {% if exercise.is_published %}
+        {% if exercise.is_published %}
+            <button type="button"
+                    onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+                    class="btn btn-dark btn-lg">Dezaktywuj
+            </button>
+        {% else %}
+            <button type="button"
+                    onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+                    class="btn btn-success btn-lg">Opublikuj
+            </button>
+        {% endif %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-                class="btn btn-dark btn-lg">Dezaktywuj
+                onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
+                class="btn btn-primary btn-lg">Dodaj test
         </button>
-    {% else %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
-                class="btn btn-success btn-lg">Aktywuj
+                onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
+                class="btn btn-info btn-lg">Rozwiązania
         </button>
-    {% endif %}
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
-            class="btn btn-primary btn-lg">Dodaj test
-    </button>
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
-            class="btn btn-info btn-lg">Rozwiązania
-    </button>
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.edit_exercise', exercise_id = exercise.id) }}'"
-            class="btn btn-secondary btn-lg">Edytuj
-    </button>
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.edit_exercise', exercise_id = exercise.id) }}'"
+                class="btn btn-secondary btn-lg">Edytuj
+        </button>
     </div>
 {% endblock %}

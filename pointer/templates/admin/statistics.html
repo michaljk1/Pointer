@@ -19,17 +19,23 @@
             <th>Punkty</th>
             <th>Możliwe punkty</th>
             <th>Procentowo</th>
+            <th></th>
             </thead>
             <tbody>
             {% for statistics in statisticsList %}
                 {% set idx = loop.index %}
-                <tr class='{{ idx }}' style="cursor: pointer"
-                    onclick="showDetails($(this).attr('class'))">
+                <tr class='{{ idx }}' style="cursor: pointer">
                     <td><p>{{ statistics.user_email }}</p></td>
                     <td><p>{{ statistics.course_name }}</p></td>
                     <td><p>{{ statistics.user_points }}</p></td>
                     <td><p>{{ statistics.course_points }}</p></td>
                     <td><p>{{ statistics.get_percent_value() }}%</p></td>
+                    <td>
+                        <button
+                                onclick="showDetails($(this).parent().parent().attr('class'))"
+                                class="btn btn-success btn-sm">+
+                        </button>
+                    </td>
                 </tr>
 
                 {% if statistics.user_exercises|length > 0 %}
@@ -41,6 +47,7 @@
                             <td>{{ user_exercise.points }}</td>
                             <td>{{ user_exercise.max_points }}</td>
                             <td>{{ user_exercise.get_percent_value() }}%</td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                 {% endif %}
