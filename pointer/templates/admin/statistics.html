@@ -26,7 +26,7 @@
                 {% set idx = loop.index %}
                 <tr class='{{ idx }}' style="cursor: pointer">
                     <td><p>{{ statistics.user_email }}</p></td>
-                    <td><p>{{ statistics.course_name }}</p></td>
+                    <td><a href="{{ url_for('admin.view_course', course_name=statistics.course_name) }}">{{ statistics.course_name }}</a></td>
                     <td><p>{{ statistics.user_points }}</p></td>
                     <td><p>{{ statistics.course_points }}</p></td>
                     <td><p>{{ statistics.get_percent_value() }}%</p></td>
@@ -42,8 +42,10 @@
                     {% for user_exercise in statistics.user_exercises %}
                         <tr class='{{ idx }}details'
                             style="display:none; background-color: #FFEBCD">
-                            <td>{{ user_exercise.exercise.lesson.name }}</td>
-                            <td>{{ user_exercise.exercise.name }}</td>
+                            <td><a href="{{ url_for('admin.view_lesson', lesson_id=user_exercise.exercise.lesson.id) }}">
+                                {{ user_exercise.exercise.lesson.name }}</a></td>
+                            <td><a href="{{ url_for('admin.view_exercise', exercise_id=user_exercise.exercise.id) }}">
+                                {{ user_exercise.exercise.name }}</a></td>
                             <td>{{ user_exercise.points }}</td>
                             <td>{{ user_exercise.max_points }}</td>
                             <td>{{ user_exercise.get_percent_value() }}%</td>
