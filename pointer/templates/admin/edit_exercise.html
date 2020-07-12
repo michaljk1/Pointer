@@ -25,12 +25,6 @@
     <form action="" method="post" enctype="multipart/form-data" role="form">
         {{ form.csrf_token() }}
         <textarea id="summernote" name="editordata">{{ exercise.content }}</textarea>
-        <script>
-            $(document).ready(function () {
-                $('#summernote').summernote();
-                $('.dropdown-toggle').dropdown();
-            });
-        </script>
         <div class="form-group col-md-6">
             {{ wtf.form_field(form.max_attempts, class='form-control') }}
         </div>
@@ -58,5 +52,6 @@
         <br>
         {{ wtf.form_field(form.submit_button, class='btn btn-success') }}
     </form>
+    <script src="{{ url_for('static', filename='js/load_summernote.js') }}"></script>
 {% endblock %}
 

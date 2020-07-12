@@ -21,14 +21,9 @@
     <form action="" method="post" enctype="multipart/form-data" class="form" role="form">
         {{ form.csrf_token() }}
         <textarea id="summernote" name="editordata">{{ lesson.content_text }}</textarea>
-        <script>
-            $(document).ready(function () {
-                $('#summernote').summernote();
-                $('.dropdown-toggle').dropdown();
-            });
-        </script>
         {{ form.pdf_content() }}
         <hr>
         {{ wtf.form_field(form.submit_button, class='btn btn-success') }}
     </form>
+    <script src="{{ url_for('static', filename='js/load_summernote.js') }}"></script>
 {% endblock %}
