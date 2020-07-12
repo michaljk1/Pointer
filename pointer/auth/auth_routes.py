@@ -5,7 +5,7 @@ from pointer.auth.email import send_confirm_email, send_reset_password
 from pointer.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
-from pointer.DefaultUtil import get_current_date
+from pointer.DateUtil import get_current_date
 from pointer.models.logininfo import LoginInfo
 from pointer.models.usercourse import User, Course, role
 from pointer import db

@@ -17,7 +17,7 @@ def create_statistic_pdf(statistics_info, global_filename):
         set_style_for_statistics_table(table, data)
         elements.append(table)
         # add one line free space
-        elements.append(Paragraph('<font size=0>druciarstwo</font>', getSampleStyleSheet()['Normal']))
+        elements.append(Paragraph('<font size=0>tinkering</font>', getSampleStyleSheet()['Normal']))
     pdf = SimpleDocTemplate(
         title='Statystyki',
         filename=global_filename,

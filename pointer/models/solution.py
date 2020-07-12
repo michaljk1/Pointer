@@ -1,19 +1,20 @@
 import os
 from sqlalchemy.dialects.mysql import LONGTEXT
 from pointer import db
+from pointer.DateUtil import get_current_date
 
 
 class Solution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     exercise_id = db.Column(db.ForeignKey('exercise.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    send_date = db.Column(db.DateTime)
-    points = db.Column(db.Float, nullable=False)
+    send_date = db.Column(db.DateTime, nullable=False)
+    points = db.Column(db.Float, nullable=False, default=0)
     file_path = db.Column(db.String(100), nullable=False)
     attempt = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(20), nullable=False)
     os_info = db.Column(LONGTEXT, nullable=False)
-    status = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='Oddano')
     error_msg = db.Column(LONGTEXT)
     comment = db.Column(LONGTEXT)
     Status = {

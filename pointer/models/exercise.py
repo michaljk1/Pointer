@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.dialects.mysql import LONGTEXT
 from werkzeug.utils import secure_filename
 from pointer import db
-from pointer.DefaultUtil import get_current_date
+from pointer.DateUtil import get_current_date, get_offset_aware
 from pointer.models.test import Test
 
 
@@ -56,16 +56,12 @@ class Exercise(db.Model):
         output_file.save(os.path.join(test_directory, output_name))
 
     def is_finished(self):
-        current_datetime = get_current_date()
-        end_datetime = datetime(year=self.end_date.year, month=self.end_date.month, day=self.end_date.day,
-                                hour=self.end_date.hour,
-                                minute=self.end_date.minute, tzinfo=current_datetime.tzinfo)
-        return current_datetime > end_datetime
+        return get_current_date() > get_offset_aware(self.end_date)
 
     def values_by_form(self, form, content):
         end_date, end_time = form.end_date.data, form.end_time.data
         end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
-                                minute=end_time.minute)
+                                minute=end_time.minute, second=end_time.second)
         self.max_attempts = form.max_attempts.data
         self.compile_command = form.compile_command.data
         self.end_date = end_datetime

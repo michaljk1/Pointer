@@ -9,10 +9,11 @@ class Export(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     file_name = db.Column(db.String(100))
     type = db.Column(db.String(15))
-    format = db.Column(db.String(10))
+    format = db.Column(db.String(15))
     generation_date = db.Column(db.DateTime)
+    #TODO zmien
     formats = {
-        'SOLUTION': 'Rozwiązania',
+        'SOLUTION': 'Rozwiązani',
         'STATISTICS': 'Statystyki'
     }
     types = {

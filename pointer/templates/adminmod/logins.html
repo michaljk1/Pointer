@@ -35,24 +35,5 @@
             </tbody>
         </table>
     {% endif %}
-    <script>
-        $(document).ready(function () {
-            $('#paginatedTable').DataTable({
-                "dom": 'lrtip',
-                "pagingType": "full_numbers",
-                "language": {
-                    "lengthMenu": "Wyświetl _MENU_ rekordów",
-                    "zeroRecords": "Brak odpowiadających rekordów",
-                    "search": "Wyszukaj:",
-                    "info": "_START_ - _END_ z _TOTAL_ rekordów",
-                    "paginate": {
-                        "first": "Pierwsza strona",
-                        "last": "Ostatnia strona",
-                        "next": "Następna",
-                        "previous": "Poprzednia"
-                    }
-                }
-            });
-        });
-    </script>
+     <script src="{{ url_for('static', filename='js/paginated_table.js') }}"></script>
 {% endblock %}

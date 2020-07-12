@@ -2,7 +2,7 @@ import csv
 import os
 from typing import List
 from pointer import db
-from pointer.DefaultUtil import get_current_date
+from pointer.DateUtil import get_current_date
 from pointer.admin.AdminUtil import get_statistics_by_ids
 from pointer.models.solution import Solution
 from pointer.models.export import Export

@@ -3,13 +3,13 @@ from threading import Thread
 from flask import render_template, url_for, request, send_from_directory, current_app, abort
 from flask_login import login_required, current_user
 from pointer import db
-from pointer.DefaultUtil import get_current_date, unpack_file
+from pointer.DateUtil import get_current_date
 from pointer.models.solution import Solution
 from pointer.services.ExerciseService import execute_solution_thread
 from pointer.services.QueryService import get_filtered_by_status, exercise_student_query
 from pointer.services.RouteService import validate_role, validate_role_course, validate_role_solution, validate_exercise
 from pointer.student import bp
-from pointer.student.StudentUtil import can_send_solution
+from pointer.student.StudentUtil import can_send_solution, unpack_file
 from pointer.student.student_forms import UploadForm, SolutionStudentSearchForm, StudentSolutionForm
 from werkzeug.utils import secure_filename, redirect
 from pointer.models.usercourse import Course, role
@@ -73,9 +73,8 @@ def view_exercise(exercise_id):
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['file']
         filename = secure_filename(file.filename)
-        solution = Solution(file_path=filename, points=0, ip_address=request.remote_addr,
-                            os_info=str(request.user_agent), attempt=(1 + len(solutions)),
-                            status=Solution.Status['SEND'], send_date=get_current_date())
+        solution = Solution(file_path=filename, ip_address=request.remote_addr, send_date=get_current_date(),
+                            os_info=str(request.user_agent), attempt=(1 + len(solutions)))
         exercise.solutions.append(solution)
         current_user.solutions.append(solution)
         solution_directory = solution.get_directory()
