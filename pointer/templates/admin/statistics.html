@@ -26,7 +26,9 @@
                 {% set idx = loop.index %}
                 <tr class='{{ idx }}' style="cursor: pointer">
                     <td><p>{{ statistics.user_email }}</p></td>
-                    <td><a href="{{ url_for('admin.view_course', course_name=statistics.course_name) }}">{{ statistics.course_name }}</a></td>
+                    <td>
+                        <a href="{{ url_for('admin.view_course', course_name=statistics.course_name) }}">{{ statistics.course_name }}</a>
+                    </td>
                     <td><p>{{ statistics.user_points }}</p></td>
                     <td><p>{{ statistics.course_points }}</p></td>
                     <td><p>{{ statistics.get_percent_value() }}%</p></td>
@@ -37,22 +39,19 @@
                         </button>
                     </td>
                 </tr>
-
-                {% if statistics.user_exercises|length > 0 %}
-                    {% for user_exercise in statistics.user_exercises %}
-                        <tr class='{{ idx }}details'
-                            style="display:none; background-color: #FFEBCD">
-                            <td><a href="{{ url_for('admin.view_lesson', lesson_id=user_exercise.exercise.lesson.id) }}">
-                                {{ user_exercise.exercise.lesson.name }}</a></td>
-                            <td><a href="{{ url_for('admin.view_exercise', exercise_id=user_exercise.exercise.id) }}">
-                                {{ user_exercise.exercise.name }}</a></td>
-                            <td>{{ user_exercise.points }}</td>
-                            <td>{{ user_exercise.max_points }}</td>
-                            <td>{{ user_exercise.get_percent_value() }}%</td>
-                            <td></td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
+                {% for user_exercise in statistics.user_exercises %}
+                    <tr class='{{ idx }}details'
+                        style="display:none; background-color: #FFEBCD">
+                        <td><a href="{{ url_for('admin.view_lesson', lesson_id=user_exercise.exercise.lesson.id) }}">
+                            {{ user_exercise.exercise.lesson.name }}</a></td>
+                        <td><a href="{{ url_for('admin.view_exercise', exercise_id=user_exercise.exercise.id) }}">
+                            {{ user_exercise.exercise.name }}</a></td>
+                        <td>{{ user_exercise.points }}</td>
+                        <td>{{ user_exercise.max_points }}</td>
+                        <td>{{ user_exercise.get_percent_value() }}%</td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
             {% endfor %}
             </tbody>
         </table>
@@ -65,22 +64,6 @@
            target="_blank"
            class="btn btn-info">Export PDF
         </a>
-        <script>
-            function showDetails(param1) {
-                var detailClass = param1 + 'details';
-                var elems = document.getElementsByClassName(detailClass);
-                if (elems[0].style.display === 'none') {
-                    for (i = 0; i < elems.length; i++) {
-                        elems[i].style.display = 'table-row';
-                    }
-                } else {
-                    for (i = 0; i < elems.length; i++) {
-                        elems[i].style.display = 'none';
-                    }
-                }
-            }
-        </script>
-
     {% endif %}
-
+    <script src="{{ url_for('static', filename='js/statistic_details.js') }}"></script>
 {% endblock %}
