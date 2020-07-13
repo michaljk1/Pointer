@@ -1,0 +1,47 @@
+{% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
+    /
+    <a href="{{ url_for('admin.view_course', course_name = exercise.lesson.course.name) }}">
+        <pb> {{ exercise.lesson.course.name }} </pb>
+    </a>
+    /
+    <a href="{{ url_for('admin.view_lesson', lesson_id = exercise.lesson.id) }}">
+        <pb> {{ exercise.lesson.name }} </pb>
+    </a>
+    /
+    <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}">
+        <pb> {{ exercise.name }} </pb>
+    </a>
+    /
+    <a href="{{ url_for('admin.view_tests', exercise_id = exercise.id) }}">
+        <pb> Testy </pb>
+    </a>
+{% endblock %}
+{% block app_content %}
+    <h2>{{ exercise.name }}</h2>
+    <hr>
+    <h1>Maksymalna liczba punktów: {{ exercise.get_max_points() }}</h1>
+    <hr>
+    {% for test in exercise.tests %}
+        <p>Output: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.output_name) }}"
+                      target="_blank"> {{ test.output_name }}</a></p>
+        <p>Input: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.input_name) }}"
+                     target="_blank"> {{ test.input_name }}</a></p>
+        <div><p>Punkty: {{ test.points }}</p></div>
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.delete_test', test_id = test.id ) }}'"
+                class="btn btn-danger">Usuń test
+        </button>
+        <hr>
+    {% endfor %}
+    <div class="bottom_div">
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
+                class="btn btn-primary btn-lg">Dodaj test
+        </button>
+    </div>
+{% endblock %}

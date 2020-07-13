@@ -69,7 +69,7 @@ def approve_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_role_course(current_user, role['ADMIN'], solution.get_course())
     solution.status = solution.Status['APPROVED']
-    user_solutions = solution.exercise.get_student_solutions(solution.user_id)
+    user_solutions = solution.exercise.get_user_solutions(solution.user_id)
     user_solutions.remove(solution)
     for user_solution in user_solutions:
         if user_solution.status == Solution.Status['APPROVED']:

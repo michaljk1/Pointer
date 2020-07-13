@@ -1,4 +1,5 @@
 {% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin.view_courses') }}">
         <pb> Kursy</pb>
@@ -21,22 +22,21 @@
     <h2>{{ exercise.name }}</h2>
     <hr>
     <h1>{{ exercise.content|safe }}</h1>
-    <h1>Możliwe punkty: {{ exercise.get_max_points() }}</h1>
     <h1>Termin: {{ exercise.end_date }}</h1>
+    <h1>Maksymalna liczba punktów: {{ exercise.get_max_points() }}</h1>
     <h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1>
-    <hr>
-    {% for test in exercise.tests %}
-        <p>Output: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.output_name) }}"
-                      target="_blank"> {{ test.output_name }}</a></p>
-        <p>Input: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.input_name) }}"
-                     target="_blank"> {{ test.input_name }}</a></p>
-        <div><p>Punkty: {{ test.points }}</p></div>
-        <button type="button"
-                onclick="window.location.href='{{ url_for('admin.delete_test', test_id = test.id ) }}'"
-                class="btn btn-danger">Usuń test
-        </button>
+    <button onclick="myFunction()" class="btn btn-info">Moje rozwiązania</button>
+    <div id="myDIV">
+        <div class="row">
+            <div class="col-md-4">
+                {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+            </div>
+        </div>
         <hr>
-    {% endfor %}
+        {% include "admin/solutionlist.html" %}
+
+    </div>
+    <hr>
     <div class="bottom_div">
         {% if exercise.is_published %}
             <button type="button"
@@ -50,16 +50,26 @@
             </button>
         {% endif %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
-                class="btn btn-primary btn-lg">Dodaj test
+                onclick="window.location.href='{{ url_for('admin.view_tests', exercise_id = exercise.id ) }}'"
+                class="btn btn-success btn-lg">Testy
         </button>
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
-                class="btn btn-info btn-lg">Rozwiązania
+                class="btn btn-primary btn-lg">Rozwiązania
         </button>
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.edit_exercise', exercise_id = exercise.id) }}'"
-                class="btn btn-secondary btn-lg">Edytuj
+                class="btn btn-info btn-lg">Edytuj
         </button>
     </div>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("myDIV");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+    </script>
 {% endblock %}

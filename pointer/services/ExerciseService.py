@@ -4,6 +4,7 @@ import subprocess
 from flask import current_app
 
 from pointer import db
+from pointer.models.exercise import Exercise
 from pointer.models.solution import Solution
 import resource
 
@@ -20,6 +21,18 @@ import resource
 #         except:
 #             solution.status = Solution.Status['ERROR']
 #             db.session.commit()
+from pointer.models.usercourse import User
+
+
+# def add_solution(exercise: Exercise, current_user: User, solution :Solution):
+#     exercise.solutions.append(solution)
+#     current_user.solutions.append(solution)
+#     solution_directory = solution.get_directory()
+#     os.makedirs(solution_directory)
+#     file.save(os.path.join(solution_directory, filename))
+#     unpack_file(filename, solution_directory)
+#     db.session.commit()
+
 
 def execute_solution_thread(app, solution_id):
     with app.app_context():
@@ -78,9 +91,11 @@ def grade(solution: Solution):
             else:
                 break
         except subprocess.TimeoutExpired:
+            solution.error_msg = 'Timeout Expired'
             process.kill()
+            break
 
-
+#TODO
 def limit_memory():
     config_memory = current_app.config['MAX_MEMORY']
     max_virtual_memory = 10 * 1024 * 1024  # to MB
