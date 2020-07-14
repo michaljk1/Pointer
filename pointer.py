@@ -1,10 +1,10 @@
-from pointer import create_app
+from app import create_app
 
 app = create_app()
 
 
-from pointer.models.usercourse import User
-from pointer import db
+from app.models.usercourse import User
+from app import db
 with app.app_context():
     mod = User.query.filter_by(role='MODERATOR').all()
     if len(mod) == 0:
