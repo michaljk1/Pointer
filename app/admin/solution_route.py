@@ -3,16 +3,16 @@ from flask_login import login_required, current_user
 from app import db
 from app.admin import bp
 from app.admin.admin_forms import SolutionForm, SolutionAdminSearchForm
-from app.models.usercourse import Course, role
+from app.models.usercourse import Course, User
 from app.models.solution import Solution
 from app.services.QueryService import exercise_admin_query
-from app.services.RouteService import validate_exists, validate_course, validate_role, validate_solution_admin
+from app.services.RouteService import validate_role, validate_solution_admin
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])
 @login_required
 def view_solutions():
-    validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, User.Roles['ADMIN'])
     course, lesson, exercise = request.args.get('course'), request.args.get('lesson'), request.args.get('exercise')
     course_db = Course.query.filter_by(name=course).first()
     solutions = []
@@ -32,7 +32,7 @@ def view_solutions():
 @login_required
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_solution_admin(current_user, role['ADMIN'], solution)
+    validate_solution_admin(current_user, User.Roles['ADMIN'], solution)
     solution_form = SolutionForm(obj=solution, email=solution.author.email, points=solution.points,
                                  admin_ref=(solution.status == solution.Status['REFUSED']))
     if request.method == 'POST' and solution_form.validate_on_submit():
@@ -55,7 +55,7 @@ def view_solution(solution_id):
 @login_required
 def decline_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_solution_admin(current_user, role['ADMIN'], solution)
+    validate_solution_admin(current_user, User.Roles['ADMIN'], solution)
     solution.status = solution.Status['REFUSED']
     db.session.commit()
     flash('Odrzucono zadanie', 'message')
@@ -66,7 +66,7 @@ def decline_solution(solution_id):
 @login_required
 def approve_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_solution_admin(current_user, role['ADMIN'], solution)
+    validate_solution_admin(current_user, User.Roles['ADMIN'], solution)
     solution.status = solution.Status['APPROVED']
     user_solutions = solution.exercise.get_user_solutions(solution.user_id)
     user_solutions.remove(solution)
@@ -82,7 +82,7 @@ def approve_solution(solution_id):
 @login_required
 def reprocess_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_solution_admin(current_user, role['ADMIN'], solution)
+    validate_solution_admin(current_user, User.Roles['ADMIN'], solution)
     if solution.tasks_finished():
         solution.launch_execute('point_solution', 'Pointing solution')
         flash('Uruchomiono ponowne ocenianie', 'message')

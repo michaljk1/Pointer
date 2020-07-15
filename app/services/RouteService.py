@@ -3,7 +3,7 @@ from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.solution import Solution
 from app.models.test import Test
-from app.models.usercourse import role, Course, User
+from app.models.usercourse import Course, User
 
 
 def validate_role(user: User, required_role: str):
@@ -58,9 +58,9 @@ def validate_solution_admin(user: User, required_role: str, solution: Solution):
 
 
 def redirect_for_index_by_role(user_role: str):
-    if user_role == role['STUDENT']:
+    if user_role == User.Roles['STUDENT']:
         return redirect(url_for('student.index'))
-    elif user_role == role['ADMIN']:
+    elif user_role == User.Roles['ADMIN']:
         return redirect(url_for('admin.index'))
-    elif user_role == role['MODERATOR']:
+    elif user_role == User.Roles['MODERATOR']:
         return redirect(url_for('mod.index'))

@@ -6,7 +6,7 @@ from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 from app.DateUtil import get_current_date
 from app.models.logininfo import LoginInfo
-from app.models.usercourse import User, Course, role
+from app.models.usercourse import User, Course
 from app import db
 from app.services.RouteService import validate_exists, redirect_for_index_by_role
 
@@ -41,11 +41,11 @@ def login():
         db.session.commit()
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            if current_user.role == role['ADMIN']:
+            if current_user.role == User.Roles['ADMIN']:
                 next_page = url_for('admin.view_courses')
-            elif current_user.role == role['STUDENT']:
+            elif current_user.role == User.Roles['STUDENT']:
                 next_page = url_for('student.view_courses')
-            elif current_user.role == role['MODERATOR']:
+            elif current_user.role == User.Roles['MODERATOR']:
                 next_page = url_for('mod.index')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
@@ -73,7 +73,7 @@ def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
         user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data,
-                    role=role['STUDENT'], index=form.index.data)
+                    role=User.Roles['STUDENT'], index=form.index.data)
         user.set_password(form.password.data)
         db.session.add(user)
         user.launch_email('send_confirm_email', 'confirm email')

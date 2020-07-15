@@ -3,7 +3,7 @@ from flask_login import current_user
 from werkzeug.utils import redirect
 
 from app.default import bp
-from app.models.usercourse import role
+from app.models.usercourse import User
 
 
 @bp.route('/')
@@ -11,11 +11,11 @@ from app.models.usercourse import role
 def index():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
-    elif current_user.role == role['ADMIN']:
+    elif current_user.role == User.Roles['ADMIN']:
         return redirect(url_for('admin.view_courses'))
-    elif current_user.role == role['STUDENT']:
+    elif current_user.role == User.Roles['STUDENT']:
         return redirect(url_for('student.view_courses'))
-    elif current_user.role == role['MODERATOR']:
+    elif current_user.role == User.Roles['MODERATOR']:
         return redirect(url_for('mod.index'))
     else:
         return redirect(url_for('auth.login'))

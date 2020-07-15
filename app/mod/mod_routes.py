@@ -6,7 +6,7 @@ from app import db
 from app.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm, DomainForm
 from app.mod import bp
 from app.models.domain import Domain
-from app.models.usercourse import role, User
+from app.models.usercourse import User
 from app.services.QueryService import login_query
 from app.services.RouteService import validate_role
 
@@ -15,14 +15,14 @@ from app.services.RouteService import validate_role
 @bp.route('/index')
 @login_required
 def index():
-    validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, User.Roles['MODERATOR'])
     return redirect(url_for('mod.add_domain'))
 
 
 @bp.route('/add_domain', methods=['GET', 'POST'])
 @login_required
 def add_domain():
-    validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, User.Roles['MODERATOR'])
     form = DomainForm()
     domains = Domain.query.all()
     if request.method == 'POST' and form.validate_on_submit():
@@ -36,13 +36,13 @@ def add_domain():
 @bp.route('/admin_roles', methods=['GET', 'POST'])
 @login_required
 def admin_roles():
-    validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, User.Roles['MODERATOR'])
     admin_form = RoleAdminForm()
-    for user in User.query.filter(User.role == role['STUDENT']).all():
+    for user in User.query.filter(User.role == User.Roles['STUDENT']).all():
         admin_form.email.choices.append((user.email, user.email))
     if request.method == 'POST' and admin_form.validate_on_submit():
         user = User.query.filter_by(email=admin_form.email.data).first()
-        user.role = role['ADMIN']
+        user.role = User.Roles['ADMIN']
         directory = user.get_admin_directory()
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -55,13 +55,13 @@ def admin_roles():
 @bp.route('/student_roles', methods=['GET', 'POST'])
 @login_required
 def student_roles():
-    validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, User.Roles['MODERATOR'])
     student_form = RoleStudentForm()
-    for user in User.query.filter(User.role == role['ADMIN']).all():
+    for user in User.query.filter(User.role == User.Roles['ADMIN']).all():
         student_form.email.choices.append((user.email, user.email))
     if request.method == 'POST' and student_form.validate_on_submit():
         user = User.query.filter_by(email=student_form.email.data).first()
-        user.role = role['STUDENT']
+        user.role = User.Roles['STUDENT']
         db.session.commit()
         flash('Nadano prawa studenta', 'message')
         return redirect(url_for('mod.student_roles'))
@@ -71,9 +71,9 @@ def student_roles():
 @bp.route('/logins', methods=['GET', 'POST'])
 @login_required
 def view_logins():
-    validate_role(current_user, role['MODERATOR'])
+    validate_role(current_user, User.Roles['MODERATOR'])
     form = LoginInfoForm()
-    for user in User.query.filter(User.role == role['ADMIN']).all():
+    for user in User.query.filter(User.role == User.Roles['ADMIN']).all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         logins = login_query(form, current_user.role).order_by(desc(User.email)).all()

@@ -4,7 +4,7 @@ from app import db
 from app.mod.mod_forms import LoginInfoForm
 from app.models.logininfo import LoginInfo
 from app.models.solution import Solution
-from app.models.usercourse import User, Course, role
+from app.models.usercourse import User, Course
 from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 
@@ -65,7 +65,7 @@ def exercise_query(form, courses=None):
         join(Lesson, Lesson.id == Exercise.lesson_id). \
         join(Course, Course.id == Lesson.course_id)
 
-    query = query.filter(User.role == role['STUDENT'])
+    query = query.filter(User.role == User.Roles['STUDENT'])
     if form.course.data != 'All':
         query = query.filter(Course.name == form.course.data)
     else:
@@ -92,9 +92,9 @@ def login_query(form: LoginInfoForm, user_role: str, ids=None):
 
     if form.email.data != 'ALL':
         query = query.filter(User.email == form.email.data)
-    elif user_role == role['MODERATOR']:
-        query = query.filter(User.role == role['ADMIN'])
-    elif user_role == role['ADMIN']:
+    elif user_role == User.Roles['MODERATOR']:
+        query = query.filter(User.role == User.Roles['ADMIN'])
+    elif user_role == User.Roles['ADMIN']:
         if ids is None or len(ids) == 0:
             query = query.filter(1 == 0)
         else:

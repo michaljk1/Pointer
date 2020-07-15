@@ -9,7 +9,7 @@ from app.student import bp
 from app.student.StudentUtil import can_send_solution
 from app.student.student_forms import UploadForm, SolutionStudentSearchForm, StudentSolutionForm
 from werkzeug.utils import redirect
-from app.models.usercourse import Course, role
+from app.models.usercourse import Course, User
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.statistics import Statistics
@@ -19,14 +19,14 @@ from app.models.statistics import Statistics
 @bp.route('/index')
 @login_required
 def index():
-    validate_role(current_user, role['STUDENT'])
+    validate_role(current_user, User.Roles['STUDENT'])
     return redirect(url_for('student.view_courses'))
 
 
 @bp.route('/courses', methods=['GET'])
 @login_required
 def view_courses():
-    validate_role(current_user, role['STUDENT'])
+    validate_role(current_user, User.Roles['STUDENT'])
     return render_template('student/courses.html', courses=current_user.courses)
 
 
@@ -34,7 +34,7 @@ def view_courses():
 @login_required
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
-    validate_course(current_user, role['STUDENT'], course)
+    validate_course(current_user, User.Roles['STUDENT'], course)
     return render_template('student/course.html', course=course)
 
 
@@ -42,7 +42,7 @@ def view_course(course_name):
 @login_required
 def view_lesson(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_lesson(current_user, role['STUDENT'], lesson)
+    validate_lesson(current_user, User.Roles['STUDENT'], lesson)
     return render_template('student/lesson.html', lesson=lesson)
 
 
@@ -50,7 +50,7 @@ def view_lesson(lesson_id):
 @login_required
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_solution_student(current_user, role['STUDENT'], solution)
+    validate_solution_student(current_user, User.Roles['STUDENT'], solution)
     form = StudentSolutionForm(obj=solution, student_status=solution.get_student_status(),
                                student_points=solution.get_student_points(), send_date_str=str(solution.send_date))
     return render_template('student/solution.html', solution=solution, form=form)
@@ -60,7 +60,7 @@ def view_solution(solution_id):
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise_student(current_user, role['STUDENT'], exercise)
+    validate_exercise_student(current_user, User.Roles['STUDENT'], exercise)
     solutions = sorted(exercise.get_user_solutions(current_user.id), key=lambda sol: sol.send_date, reverse=True)
     send_solution = can_send_solution(solutions)
     form = UploadForm()
@@ -75,7 +75,7 @@ def view_exercise(exercise_id):
 @bp.route('/solutions', methods=['GET', 'POST'])
 @login_required
 def view_solutions():
-    validate_role(current_user, role['STUDENT'])
+    validate_role(current_user, User.Roles['STUDENT'])
     form, solutions = SolutionStudentSearchForm(), []
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
@@ -90,7 +90,7 @@ def view_solutions():
 @bp.route('/statistics')
 @login_required
 def view_statistics():
-    validate_role(current_user, role['STUDENT'])
+    validate_role(current_user, User.Roles['STUDENT'])
     statistics_list = []
     for course in current_user.courses:
         statistics_list.append(Statistics(course=course, user=current_user))
@@ -101,7 +101,7 @@ def view_statistics():
 @login_required
 def download_content(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_lesson(current_user, role['STUDENT'], lesson)
+    validate_lesson(current_user, User.Roles['STUDENT'], lesson)
     return send_from_directory(directory=lesson.get_directory(), filename=lesson.content_pdf_path)
 
 
@@ -109,5 +109,5 @@ def download_content(lesson_id):
 @login_required
 def download_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    validate_solution_student(current_user, role['STUDENT'], solution)
+    validate_solution_student(current_user, User.Roles['STUDENT'], solution)
     return send_from_directory(directory=solution.get_directory(), filename=solution.file_path)

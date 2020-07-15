@@ -5,7 +5,7 @@ from app.admin import bp
 from app.admin.admin_forms import ExerciseForm, TestForm, ExerciseEditForm
 from werkzeug.utils import redirect
 from app.models.test import Test
-from app.models.usercourse import role
+from app.models.usercourse import User
 from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 from app import db
@@ -18,7 +18,7 @@ from app.student.student_forms import UploadForm
 @login_required
 def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise_admin(current_user, role['ADMIN'], exercise)
+    validate_exercise_admin(current_user, User.Roles['ADMIN'], exercise)
     solutions = sorted(exercise.get_user_solutions(current_user.id), key=lambda sol: sol.send_date, reverse=True)
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -32,7 +32,7 @@ def view_exercise(exercise_id):
 @login_required
 def activate_exercise(exercise_id):
     exercise: Exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise_admin(current_user, role['ADMIN'], exercise)
+    validate_exercise_admin(current_user, User.Roles['ADMIN'], exercise)
     exercise.is_published = not exercise.is_published
     db.session.commit()
     flash('Zapisano zmiany', 'message')
@@ -43,7 +43,7 @@ def activate_exercise(exercise_id):
 @login_required
 def add_test(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise_admin(current_user, role['ADMIN'], exercise)
+    validate_exercise_admin(current_user, User.Roles['ADMIN'], exercise)
     form = TestForm()
     if request.method == 'POST' and form.validate_on_submit():
         exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
@@ -56,7 +56,7 @@ def add_test(exercise_id):
 @login_required
 def delete_test(test_id):
     test = Test.query.filter_by(id=test_id).first()
-    validate_test(current_user, role['ADMIN'], test)
+    validate_test(current_user, User.Roles['ADMIN'], test)
     exercise_id = test.exercise_id
     shutil.rmtree(test.get_directory(), ignore_errors=True)
     db.session.delete(test)
@@ -69,7 +69,7 @@ def delete_test(test_id):
 @login_required
 def add_exercise(course_name, lesson_id):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_lesson(current_user, role['ADMIN'], lesson)
+    validate_lesson(current_user, User.Roles['ADMIN'], lesson)
     form = ExerciseForm()
     if request.method == 'POST' and form.validate_on_submit():
         if not lesson.is_exercise_name_proper(form.name.data):
@@ -85,7 +85,7 @@ def add_exercise(course_name, lesson_id):
 @login_required
 def edit_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise_admin(current_user, role['ADMIN'], exercise)
+    validate_exercise_admin(current_user, User.Roles['ADMIN'], exercise)
     form = ExerciseEditForm(obj=exercise)
     if request.method == 'POST' and form.validate_on_submit():
         exercise.values_by_form(form, request.form.get('editordata'))
@@ -99,5 +99,5 @@ def edit_exercise(exercise_id):
 @login_required
 def view_tests(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
-    validate_exercise_admin(current_user, role['ADMIN'], exercise)
+    validate_exercise_admin(current_user, User.Roles['ADMIN'], exercise)
     return render_template('admin/tests.html', exercise=exercise)

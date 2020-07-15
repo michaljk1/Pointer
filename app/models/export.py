@@ -11,9 +11,8 @@ class Export(db.Model):
     type = db.Column(db.String(15))
     format = db.Column(db.String(15))
     generation_date = db.Column(db.DateTime)
-    #TODO zmien
     formats = {
-        'SOLUTION': 'Rozwiązani',
+        'SOLUTION': 'Rozwiązania',
         'STATISTICS': 'Statystyki'
     }
     types = {

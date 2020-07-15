@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app.admin import bp
 from app.admin.admin_forms import LessonForm, EditLessonForm
 from werkzeug.utils import redirect, secure_filename
-from app.models.usercourse import Course, role
+from app.models.usercourse import Course, User
 from app.models.lesson import Lesson
 from app import db
 from app.services.RouteService import validate_course, validate_lesson
@@ -14,7 +14,7 @@ from app.services.RouteService import validate_course, validate_lesson
 @login_required
 def view_lesson(lesson_id: int):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_course(current_user, role['ADMIN'], lesson.course)
+    validate_course(current_user, User.Roles['ADMIN'], lesson.course)
     return render_template('admin/lesson.html', lesson=lesson, course=lesson.course)
 
 
@@ -22,7 +22,7 @@ def view_lesson(lesson_id: int):
 @login_required
 def add_lesson(course_name: str):
     course: Course = Course.query.filter_by(name=course_name).first()
-    validate_course(current_user, role['ADMIN'], course)
+    validate_course(current_user, User.Roles['ADMIN'], course)
     form = LessonForm()
     if request.method == 'POST' and form.validate_on_submit():
         lesson_name = form.name.data
@@ -48,7 +48,7 @@ def add_lesson(course_name: str):
 @login_required
 def edit_lesson(lesson_id: int):
     lesson: Lesson = Lesson.query.filter_by(id=lesson_id).first()
-    validate_lesson(current_user, role['ADMIN'], lesson)
+    validate_lesson(current_user, User.Roles['ADMIN'], lesson)
     form = EditLessonForm(text_content=lesson.content_text)
     if request.method == 'POST' and form.validate_on_submit():
         file = request.files['pdf_content']

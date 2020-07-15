@@ -1,13 +1,13 @@
 from typing import List
 from app.models.statistics import Statistics
-from app.models.usercourse import Course, role, User
+from app.models.usercourse import Course, User
 
 
 def get_students_ids_emails(courses: List[Course]):
     user_ids, emails = [], []
     for course in courses:
         for member in course.members:
-            if member.role == role['STUDENT'] and member.id not in user_ids:
+            if member.role == User.Roles['STUDENT'] and member.id not in user_ids:
                 user_ids.append(member.id)
                 emails.append(member.email)
     return user_ids, emails

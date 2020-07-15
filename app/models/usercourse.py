@@ -22,7 +22,7 @@ class Course(db.Model):
     is_open = db.Column(db.Boolean, default=True)
 
     def get_students(self):
-        return [student for student in self.members if student.role == role['STUDENT']]
+        return [student for student in self.members if student.role == User.Roles['STUDENT']]
 
     def get_directory(self):
         return os.path.join(current_app.config['MAIN_DIR'], self.name.replace(" ", "_"))
@@ -61,7 +61,12 @@ class User(UserMixin, db.Model):
     is_confirmed = db.Column(db.Boolean, default=False)
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
-    history_logins = db.relationship('LoginInfo', backref='user', lazy='dynamic')
+    tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    Roles = {
+        'ADMIN': 'ADMIN',
+        'STUDENT': 'STUDENT',
+        'MODERATOR': 'MODERATOR'
+    }
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -73,13 +78,13 @@ class User(UserMixin, db.Model):
         self.password = generate_password_hash(password)
 
     def is_admin(self):
-        return self.role == role['ADMIN']
+        return self.role == User.Roles['ADMIN']
 
     def is_moderator(self):
-        return self.role == role['MODERATOR']
+        return self.role == User.Roles['MODERATOR']
 
     def is_student(self):
-        return self.role == role['STUDENT']
+        return self.role == User.Roles['STUDENT']
 
     def get_course_names(self):
         course_names = []
@@ -135,7 +140,7 @@ class User(UserMixin, db.Model):
     def launch_email(self, name, description):
         rq_job = current_app.email_queue.enqueue('app.tasks.' + name, self.email)
         task = Task(id=rq_job.get_id(), name=name, description=description,
-                    user_id=self.id)
+                    task_type=Task.Type['EMAIL'], user=self)
         db.session.add(task)
         db.session.commit()
         return task
@@ -143,7 +148,7 @@ class User(UserMixin, db.Model):
     def launch_course_email(self, course):
         rq_job = current_app.email_queue.enqueue('app.tasks.send_course_email', self.email, course, self.role)
         task = Task(id=rq_job.get_id(), name='send_course_email', description='append course',
-                    user_id=self.id)
+                    task_type=Task.Type['EMAIL'], user=self)
         db.session.add(task)
         db.session.commit()
         return task
@@ -167,10 +172,3 @@ class UserExercise:
             return round((self.points / self.max_points * 100), 2)
         else:
             return float(0)
-
-
-role = {
-    'ADMIN': 'ADMIN',
-    'STUDENT': 'STUDENT',
-    'MODERATOR': 'MODERATOR'
-}

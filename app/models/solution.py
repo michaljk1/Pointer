@@ -63,7 +63,7 @@ class Solution(db.Model):
     def launch_execute(self, name, description):
         rq_job = current_app.solution_queue.enqueue('app.tasks.' + name, self.id, 4)
         task = Task(id=rq_job.get_id(), name=name, description=description,
-                            solution=self)
+                    task_type=Task.Type['SOLUTION'], solution=self)
         db.session.add(task)
         db.session.commit()
         return task

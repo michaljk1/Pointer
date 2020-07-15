@@ -1,5 +1,3 @@
-# TODO
-# maksymalna ilosc pamieci, student statystyki
 from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
 from sqlalchemy import desc
@@ -8,7 +6,7 @@ from app.admin.AdminUtil import get_students_ids_emails, get_statistics
 from app.admin.admin_forms import StatisticsForm
 from app.mod.mod_forms import LoginInfoForm
 from app.models.test import Test
-from app.models.usercourse import Course, User, role
+from app.models.usercourse import Course, User
 from app.models.export import Export
 from app.models.lesson import Lesson
 from app.models.solution import Solution
@@ -19,7 +17,7 @@ from app.services.RouteService import validate_course, validate_role
 @bp.route('/logins', methods=['GET', 'POST'])
 @login_required
 def view_logins():
-    validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, User.Roles['ADMIN'])
     form, logins = LoginInfoForm(), []
     user_ids, emails = get_students_ids_emails(current_user.courses)
     form.email.choices += ((email, email) for email in emails)
@@ -31,7 +29,7 @@ def view_logins():
 @bp.route('/statistics', methods=['GET', 'POST'])
 @login_required
 def view_statistics():
-    validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, User.Roles['ADMIN'])
     form = StatisticsForm()
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
@@ -48,7 +46,7 @@ def view_statistics():
 @bp.route('/download')
 @login_required
 def download():
-    validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, User.Roles['ADMIN'])
     request_id = request.args.get('id')
     domain = request.args.get('domain')
     my_object, my_course, filename = None, None, None
@@ -70,5 +68,5 @@ def download():
     else:
         abort(404)
     if domain != 'export':
-        validate_course(current_user, role['ADMIN'], my_course)
+        validate_course(current_user, User.Roles['ADMIN'], my_course)
     return send_from_directory(directory=my_object.get_directory(), filename=filename)

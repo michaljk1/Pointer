@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app.admin import bp
 from app.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
 from werkzeug.utils import redirect
-from app.models.usercourse import Course, User, role
+from app.models.usercourse import Course, User
 from app import db
 from app.services.RouteService import validate_course, validate_role
 
@@ -16,7 +16,7 @@ from app.services.RouteService import validate_course, validate_role
 @bp.route('/courses', methods=['GET'])
 @login_required
 def view_courses():
-    validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, User.Roles['ADMIN'])
     return render_template('admin/courses.html', courses=current_user.courses)
 
 
@@ -24,7 +24,7 @@ def view_courses():
 @login_required
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
-    validate_course(current_user, role['ADMIN'], course)
+    validate_course(current_user, User.Roles['ADMIN'], course)
     return render_template('admin/course.html', course=course)
 
 
@@ -32,10 +32,9 @@ def view_course(course_name):
 @login_required
 def add_student(course_name):
     course = Course.query.filter_by(name=course_name).first()
-    validate_course(current_user, role['ADMIN'], course)
+    validate_course(current_user, User.Roles['ADMIN'], course)
     form = AddStudentForm()
-    for user in User.query.filter(~User.courses.any(name=course.name)).filter(User.role == role['STUDENT']).all():
-        # TODO do zmiany         User.role.in_([role['ADMIN'], role['STUDENT']])).filter(User.is_confirmed).all():
+    for user in User.query.filter(~User.courses.any(name=course.name)).filter(User.role == User.Roles['STUDENT']).all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -52,7 +51,7 @@ def add_student(course_name):
 @login_required
 def delete_student(course_name):
     course = Course.query.filter_by(name=course_name).first()
-    validate_course(current_user, role['ADMIN'], course)
+    validate_course(current_user, User.Roles['ADMIN'], course)
     form = DeleteStudentForm()
     for student in course.get_students():
         form.email.choices.append((student.email, student.email))
@@ -69,7 +68,7 @@ def delete_student(course_name):
 @login_required
 def change_open_course(course_id):
     course = Course.query.filter_by(id=course_id).first()
-    validate_course(current_user, role['ADMIN'], course)
+    validate_course(current_user, User.Roles['ADMIN'], course)
     course.is_open = not course.is_open
     db.session.commit()
     flash('Zapisano zmiany', 'message')
@@ -79,7 +78,7 @@ def change_open_course(course_id):
 @bp.route('/add_course', methods=['GET', 'POST'])
 @login_required
 def add_course():
-    validate_role(current_user, role['ADMIN'])
+    validate_role(current_user, User.Roles['ADMIN'])
     form = CourseForm()
     if request.method == 'POST' and form.validate_on_submit():
         new_course = Course(name=form.name.data, is_open=True,
