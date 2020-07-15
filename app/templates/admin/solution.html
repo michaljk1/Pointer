@@ -46,8 +46,10 @@
                 class="btn btn-danger">Odrzuć
         </button>
     {% endif %}
+    {% if solution.tasks_finished() %}
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.reprocess_solution', solution_id = solution.id ) }}'"
             class="btn  btn-primary">Przeprocesuj
     </button>
+    {% endif %}
 {% endblock %}

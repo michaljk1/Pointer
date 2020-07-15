@@ -56,7 +56,8 @@ def edit_lesson(lesson_id: int):
         lesson.content_text = request.form.get('editordata')
         if filename != '':
             lesson_dir = lesson.get_directory()
-            os.remove(os.path.join(lesson_dir, lesson.content_pdf_path))
+            if lesson.content_pdf_path is not None:
+                os.remove(os.path.join(lesson_dir, lesson.content_pdf_path))
             lesson.content_pdf_path = filename
             file.save(os.path.join(lesson_dir, filename))
         db.session.commit()

@@ -53,9 +53,14 @@ class Solution(db.Model):
     def get_directory(self):
         return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))
 
-    def launch_task(self, name, description, *args, **kwargs):
-        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
-                                                *args, **kwargs)
+    def tasks_finished(self):
+        for task in self.tasks:
+            if not task.complete:
+                return False
+        return True
+
+    def launch_task(self, name, description):
+        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id)
         task = Task(id=rq_job.get_id(), name=name, description=description,
                     solution=self)
         db.session.add(task)

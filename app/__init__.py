@@ -46,6 +46,6 @@ def create_app():
     app.register_blueprint(student_bp, url_prefix='/student')
 
     app.redis = Redis.from_url(app.config['REDIS_URL'])
-    app.task_queue = rq.Queue('app-tasks', connection=app.redis)
+    app.task_queue = rq.Queue('pointer-tasks', connection=app.redis)
 
     return app

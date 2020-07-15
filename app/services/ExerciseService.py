@@ -14,6 +14,10 @@ from app.models.usercourse import User
 import resource
 
 
+RUN_SCRIPT_NAME = 'run.sh'
+COMPILE_SCRIPT_NAME = 'compile.sh'
+
+
 def add_solution(exercise: Exercise, current_user: User, file: FileStorage, ip_address: str, attempt_nr: int,
                  os_info: str):
     filename = secure_filename(file.filename)
@@ -22,11 +26,12 @@ def add_solution(exercise: Exercise, current_user: User, file: FileStorage, ip_a
     exercise.solutions.append(solution)
     current_user.solutions.append(solution)
     solution_directory = solution.get_directory()
-    os.makedirs(solution_directory)
+    if not os.path.exists(solution_directory):
+        os.makedirs(solution_directory)
     file.save(os.path.join(solution_directory, solution.file_path))
     unpack_file(solution.file_path, solution_directory)
     db.session.commit()
-    solution.launch_task('point_solution', 'Pointing solution')
+    solution.launch_task('point_solution', 'Queued')
 
 
 def unpack_file(filename, solution_directory):
@@ -42,6 +47,12 @@ def execute_solution(solution_id):
         grade(solution)
     if solution.status == Solution.Status['SEND']:
         solution.status = Solution.Status['NOT_ACTIVE']
+    if solution.status not in [Solution.Status['COMPILE_ERROR'], Solution.Status['TEST_ERROR'],
+                               Solution.Status['ERROR']]:
+        solution.error_msg = None
+    # reprocessing task case
+    if solution.status == Solution.Status['APPROVED']:
+        solution.status = Solution.Status['NOT_ACTIVE']
     db.session.commit()
 
 
@@ -54,7 +65,7 @@ def prepare_compilation(solution):
 
 
 def execute_compilation(solution: Solution, compile_command: str):
-    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'compile.sh')
+    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), COMPILE_SCRIPT_NAME)
     error_file = open(os.path.join(solution.get_directory(), 'compile_error.txt'), 'w+')
     bash_command = [script_path, solution.get_directory(), compile_command]
     process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file)
@@ -72,7 +83,7 @@ def execute_compilation(solution: Solution, compile_command: str):
 def grade(solution: Solution):
     exercise = solution.exercise
     program_name, run_command = exercise.program_name, exercise.run_command
-    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'run.sh')
+    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), RUN_SCRIPT_NAME)
     for test in exercise.tests.all():
         name = 'error_test_run' + str(test.id) + '.txt'
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
@@ -80,24 +91,32 @@ def grade(solution: Solution):
                    test.get_output_path(), run_command]
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
-            outs = process.communicate(timeout=solution.exercise.timeout)[0]
+            outs = process.communicate(timeout=exercise.timeout)[0]
             error_file.close()
             if os.path.getsize(error_file.name) > 0:
                 solution.status = Solution.Status['TEST_ERROR']
                 with open(error_file.name) as f:
-                    solution.error_msg = f.read().split("run.sh")[1][2:].split("$RUN_COMMAND")[0]
+                    solution.error_msg = clear_error_msg(f.read())
                 break
             elif len(outs) == 0:
                 solution.points += test.points
             else:
                 break
         except subprocess.TimeoutExpired:
-            solution.error_msg = 'Timeout Expired'
             process.kill()
+            solution.error_msg = 'Przekroczono limit czasu podczas testowania'
+            solution.status = solution.Status['ERROR']
             break
 
-# TODO
+
+# user should not see directory in error message
+def clear_error_msg(error: str):
+    if RUN_SCRIPT_NAME in error:
+        error = error.split(RUN_SCRIPT_NAME)[1][2:].split("$RUN_COMMAND")[0]
+    return error
+
+
 def limit_memory():
-    config_memory = current_app.config['MAX_MEMORY']
-    max_virtual_memory = 10 * 1024 * 1024  # to MB
-    resource.setrlimit(resource.RLIMIT_AS, (max_virtual_memory, max_virtual_memory))
+    config_memory = current_app.config['MAX_MEMORY_MB']
+    memory_mb = config_memory * 1024 * 1024
+    resource.setrlimit(resource.RLIMIT_AS, (memory_mb, memory_mb))

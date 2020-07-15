@@ -40,7 +40,7 @@ def view_solution(solution_id):
             form_points = solution_form.points.data
             if form_points > solution.exercise.get_max_points():
                 flash('Za duża ilość punktów', 'error')
-                return render_template('admin/solution.html', form=solution_form, solution=solution)
+                return redirect(url_for('admin.view_solution', solution_id=solution.id))
             solution.points = form_points
             flash('Zmieniono ilość punktów', 'message')
         if solution_form.submit_comment.data:
