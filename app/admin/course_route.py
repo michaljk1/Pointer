@@ -4,7 +4,6 @@ import random
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from app.admin import bp
-from app.auth.email import send_course_email
 from app.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
 from werkzeug.utils import redirect
 from app.models.usercourse import Course, User, role
@@ -41,7 +40,8 @@ def add_student(course_name):
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         user.courses.append(course)
-        send_course_email(form.email.data, course_name=course.name, role=user.role)
+        user.launch_course_email(course_name)
+        # send_course_email(form.email.data, course_name=course.name, role=user.role)
         db.session.commit()
         flash('Dodano studenta', 'message')
         return redirect(url_for('admin.add_student', course_name=course.name))

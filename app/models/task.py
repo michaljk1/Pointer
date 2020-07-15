@@ -9,8 +9,14 @@ class Task(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     name = db.Column(db.String(128), index=True)
     description = db.Column(db.String(128))
-    solution_id = db.Column(db.Integer, db.ForeignKey('solution.id'))
+    task_type = db.Column(db.String(20))
     complete = db.Column(db.Boolean, default=False)
+    solution_id = db.Column(db.Integer, db.ForeignKey('solution.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    Type = {
+        'EMAIL': 'Email',
+        'SOLUTION': 'Solution'
+    }
 
     def get_rq_job(self):
         try:

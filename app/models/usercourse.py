@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from app import db, login
 from app.models.exercise import Exercise
+from app.models.task import Task
 
 user_course_assoc = db.Table(
     'user_courses',
@@ -38,12 +39,6 @@ class Course(db.Model):
             if lesson.name.replace(" ", "_").lower() == lesson_name:
                 return False
         return True
-
-    def get_lesson_by_name(self, name):
-        for lesson in self.lessons:
-            if lesson.name == name:
-                return lesson
-        return None
 
     def get_course_points(self):
         points = 0.0
@@ -136,6 +131,23 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.filter_by(email=email).first()
+
+    def launch_email(self, name, description):
+        rq_job = current_app.email_queue.enqueue('app.tasks.' + name, self.email)
+        task = Task(id=rq_job.get_id(), name=name, description=description,
+                    user_id=self.id)
+        db.session.add(task)
+        db.session.commit()
+        return task
+
+    def launch_course_email(self, course):
+        rq_job = current_app.email_queue.enqueue('app.tasks.send_course_email', self.email, course, self.role)
+        task = Task(id=rq_job.get_id(), name='send_course_email', description='append course',
+                    user_id=self.id)
+        db.session.add(task)
+        db.session.commit()
+        return task
+
 
 @login.user_loader
 def load_user(id):

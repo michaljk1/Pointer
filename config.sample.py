@@ -1,15 +1,21 @@
 import os
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
-    SECRET_KEY = ''
-    SQLALCHEMY_DATABASE_URI = 'mysql://name:password@host/databasename'
+    SECRET_KEY = 'sample'
+    SQLALCHEMY_DATABASE_URI = 'sample'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    REDIS_URL = 'sample'
     # Flask-Mail SMTP server settings
-    # Flask-User settings
-    # USER_APP_NAME = "Pointer"      # Shown in and email templates and page footers
-    # USER_ENABLE_EMAIL = True        # Enable email authentication
-    # USER_ENABLE_USERNAME = False    # Disable username authentication
-    # USER_EMAIL_SENDER_NAME = USER_APP_NAME
-    # USER_EMAIL_SENDER_EMAIL = "noreply@example.com"
+    MAIL_SERVER = 'sample'
+    MAIL_PORT = 'sample'
+    MAIL_USE_TLS = 'sample'
+    SERVER_NAME = '127.0.0.1:5000'
+    MAIL_USERNAME = 'sample'
+    MAIL_PASSWORD = 'sample'
+    # MAIL_DEFAULT_SENDER = '"Pointer" <noreply@example.com>'
+    ADMINS = ['sample']
+    MAIN_DIR = '/home/michal/PycharmProjects/Pointer/instance'
+    MAX_MEMORY_MB = 3123#sample

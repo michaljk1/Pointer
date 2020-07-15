@@ -1,7 +1,6 @@
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app.auth import bp
-from app.auth.email import send_confirm_email, send_reset_password
 from app.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
 from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
@@ -62,7 +61,8 @@ def logout():
 def activate():
     form = ConfirmEmailForm()
     if request.method == 'POST' and form.validate_on_submit():
-        send_confirm_email(form.email.data)
+        user = User.query.filter_by(email=form.email.data).first()
+        user.launch_email('send_confirm_email', 'confirm email')
         flash('Wysłano link aktywacyjny', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/activate.html', form=form)
@@ -76,6 +76,7 @@ def register():
                     role=role['STUDENT'], index=form.index.data)
         user.set_password(form.password.data)
         db.session.add(user)
+        user.launch_email('send_confirm_email', 'confirm email')
         db.session.commit()
         flash('Rejestracja zakończona, potwierdź adres email', 'message')
         return redirect(url_for('auth.login'))
@@ -116,7 +117,8 @@ def reset_password(token):
 def send_reset():
     form = ConfirmEmailForm()
     if request.method == 'POST' and form.validate_on_submit():
-        send_reset_password(form.email.data)
+        user = User.query.filter_by(email=form.email.data).first()
+        user.launch_email('send_reset_password', 'reset password')
         flash('Wysłano wiadomość', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)

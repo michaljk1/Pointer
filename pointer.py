@@ -10,6 +10,6 @@ with app.app_context():
     if len(mod) == 0:
         user = User(email='mod@admin.com', login='moderator', name='Moderator', surname='Moderator',
                     role='MODERATOR', is_confirmed=True)
-        user.set_password('admin')
+        user.set_password('Admin123')
         db.session.add(user)
         db.session.commit()

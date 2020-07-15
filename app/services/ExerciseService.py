@@ -31,7 +31,7 @@ def add_solution(exercise: Exercise, current_user: User, file: FileStorage, ip_a
     file.save(os.path.join(solution_directory, solution.file_path))
     unpack_file(solution.file_path, solution_directory)
     db.session.commit()
-    solution.launch_task('point_solution', 'Queued')
+    solution.launch_execute('point_solution', 'Queued')
 
 
 def unpack_file(filename, solution_directory):

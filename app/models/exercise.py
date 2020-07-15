@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+
+from sqlalchemy import TEXT
 from sqlalchemy.dialects.mysql import LONGTEXT
 from werkzeug.utils import secure_filename
 from app import db
@@ -11,7 +13,7 @@ class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
-    content = db.Column(LONGTEXT)
+    content = db.Column(TEXT)
     end_date = db.Column(db.DateTime)
     max_attempts = db.Column(db.Integer, default=3)
     program_name = db.Column(db.String(50))

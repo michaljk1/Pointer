@@ -1,6 +1,7 @@
 import os
 
 from flask import current_app
+from sqlalchemy import TEXT
 from sqlalchemy.dialects.mysql import LONGTEXT
 from app import db
 from app.models.task import Task
@@ -15,11 +16,11 @@ class Solution(db.Model):
     file_path = db.Column(db.String(100), nullable=False)
     attempt = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(20), nullable=False)
-    os_info = db.Column(LONGTEXT, nullable=False)
+    os_info = db.Column(TEXT, nullable=False)
     status = db.Column(db.String(20), nullable=False, default='Oddano')
     tasks = db.relationship('Task', backref='solution', lazy='dynamic')
-    error_msg = db.Column(LONGTEXT)
-    comment = db.Column(LONGTEXT)
+    error_msg = db.Column(TEXT)
+    comment = db.Column(TEXT)
     Status = {
         'SEND': 'Oddano',
         'REFUSED': 'Odrzucono',
@@ -59,10 +60,10 @@ class Solution(db.Model):
                 return False
         return True
 
-    def launch_task(self, name, description):
-        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id)
+    def launch_execute(self, name, description):
+        rq_job = current_app.solution_queue.enqueue('app.tasks.' + name, self.id, 4)
         task = Task(id=rq_job.get_id(), name=name, description=description,
-                    solution=self)
+                            solution=self)
         db.session.add(task)
         db.session.commit()
         return task

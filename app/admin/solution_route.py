@@ -83,6 +83,9 @@ def approve_solution(solution_id):
 def reprocess_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_admin(current_user, role['ADMIN'], solution)
-    solution.launch_task('point_solution', 'Pointing solution')
-    flash('Uruchomiono ponowne ocenianie', 'message')
+    if solution.tasks_finished():
+        solution.launch_execute('point_solution', 'Pointing solution')
+        flash('Uruchomiono ponowne ocenianie', 'message')
+    else:
+        flash('Ćwiczenie jest już oceniane', 'error')
     return redirect(url_for('admin.view_solution', solution_id=solution.id))
