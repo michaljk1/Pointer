@@ -2,7 +2,6 @@ import os
 
 from flask import current_app
 from sqlalchemy import TEXT
-from sqlalchemy.dialects.mysql import LONGTEXT
 from app import db
 from app.models.task import Task
 
@@ -61,7 +60,7 @@ class Solution(db.Model):
         return True
 
     def launch_execute(self, name, description):
-        rq_job = current_app.solution_queue.enqueue('app.tasks.' + name, self.id, 4)
+        rq_job = current_app.solution_queue.enqueue('app.tasks.' + name, self.id)
         task = Task(id=rq_job.get_id(), name=name, description=description,
                     task_type=Task.Type['SOLUTION'], solution=self)
         db.session.add(task)

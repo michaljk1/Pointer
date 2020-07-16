@@ -92,7 +92,7 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
-    def get_solutions_with_points_for_student(self, course: Course):
+    def get_user_exercises_for_student(self, course: Course):
         user_points, user_exercises = 0.0, []
         for exercise in course.get_exercises():
             user_solution = exercise.get_user_active_solution(user_id=self.id)
@@ -103,7 +103,7 @@ class User(UserMixin, db.Model):
                 user_exercises.append(UserExercise(exercise=exercise, points=0.0))
         return user_exercises, user_points
 
-    def get_solutions_with_points_for_admin(self, course: Course):
+    def get_user_exercises_for_admin(self, course: Course):
         user_points, user_exercises = 0.0, []
         for exercise in course.get_exercises():
             user_solution = exercise.get_user_active_solution(user_id=self.id)
@@ -115,7 +115,7 @@ class User(UserMixin, db.Model):
         return user_exercises, user_points
 
     def get_admin_directory(self):
-        if self.role == role['ADMIN']:
+        if self.role == self.Roles['ADMIN']:
             return os.path.join(current_app.config['MAIN_DIR'], self.login)
         return None
 

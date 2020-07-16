@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 from sqlalchemy import TEXT
-from sqlalchemy.dialects.mysql import LONGTEXT
 from werkzeug.utils import secure_filename
 from app import db
 from app.DateUtil import get_current_date, get_offset_aware
@@ -59,6 +58,9 @@ class Exercise(db.Model):
 
     def is_finished(self):
         return get_current_date() > get_offset_aware(self.end_date)
+
+    def get_end_time(self):
+        return str(self.end_date.hour) + ':' + str(self.end_date.minute)
 
     def values_by_form(self, form, content):
         end_date, end_time = form.end_date.data, form.end_time.data

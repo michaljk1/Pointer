@@ -1,5 +1,5 @@
 #TODO
-# refaktor, testowanie, edycja ćwiczenia
+# refaktor, testowanie
 from flask import render_template, url_for, request
 from flask_login import login_required, current_user
 from sqlalchemy import desc

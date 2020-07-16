@@ -3,9 +3,9 @@ from app.models.usercourse import Course, User
 class Statistics:
     def __init__(self, course: Course, user: User, is_admin=False):
         if is_admin:
-            self.user_exercises, self.user_points = user.get_solutions_with_points_for_admin(course)
+            self.user_exercises, self.user_points = user.get_user_exercises_for_admin(course)
         else:
-            self.user_exercises, self.user_points = user.get_solutions_with_points_for_student(course)
+            self.user_exercises, self.user_points = user.get_user_exercises_for_student(course)
         self.course_points = course.get_course_points()
         self.user_email = user.email
         self.user_index = user.index
