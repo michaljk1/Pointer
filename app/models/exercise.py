@@ -1,10 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 from datetime import datetime
-
 from sqlalchemy import TEXT
 from werkzeug.utils import secure_filename
 from app import db
-from app.DateUtil import get_current_date, get_offset_aware
+from app.services.DateUtil import get_current_date, get_offset_aware
 from app.models.test import Test
 
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \

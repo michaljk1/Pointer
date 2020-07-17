@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 import string
 import random
@@ -8,7 +10,7 @@ from app.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
 from werkzeug.utils import redirect
 from app.models.usercourse import Course, User
 from app import db
-from app.services.RouteService import validate_course, validate_role
+from app.services.ValidationUtil import validate_course, validate_role
 
 
 @bp.route('/')
@@ -40,7 +42,6 @@ def add_student(course_name):
         user = User.query.filter_by(email=form.email.data).first()
         user.courses.append(course)
         user.launch_course_email(course_name)
-        # send_course_email(form.email.data, course_name=course.name, role=user.role)
         db.session.commit()
         flash('Dodano studenta', 'message')
         return redirect(url_for('admin.add_student', course_name=course.name))

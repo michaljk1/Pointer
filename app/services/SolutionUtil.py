@@ -1,18 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 import shutil
 import subprocess
-
 from flask import current_app
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
-
 from app import db
-from app.DateUtil import get_current_date
+from app.services.DateUtil import get_current_date
 from app.models.exercise import Exercise
 from app.models.solution import Solution
 from app.models.usercourse import User
 import resource
-
 
 RUN_SCRIPT_NAME = 'run.sh'
 COMPILE_SCRIPT_NAME = 'compile.sh'
@@ -31,7 +30,7 @@ def add_solution(exercise: Exercise, current_user: User, file: FileStorage, ip_a
     file.save(os.path.join(solution_directory, solution.file_path))
     unpack_file(solution.file_path, solution_directory)
     db.session.commit()
-    solution.launch_execute('point_solution', 'Queued')
+    solution.launch_execute('point_solution', 'Pointing solution')
 
 
 def unpack_file(filename, solution_directory):
@@ -53,10 +52,9 @@ def execute_solution(solution_id):
     # reprocessing task case
     if solution.status == Solution.Status['APPROVED']:
         solution.status = Solution.Status['NOT_ACTIVE']
-    db.session.commit()
 
 
-def prepare_compilation(solution):
+def prepare_compilation(solution) -> bool:
     compile_command = solution.exercise.compile_command
     if len(compile_command.split()) > 0:
         return execute_compilation(solution, compile_command)
@@ -64,7 +62,7 @@ def prepare_compilation(solution):
         return True
 
 
-def execute_compilation(solution: Solution, compile_command: str):
+def execute_compilation(solution: Solution, compile_command: str) -> bool:
     script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), COMPILE_SCRIPT_NAME)
     error_file = open(os.path.join(solution.get_directory(), 'compile_error.txt'), 'w+')
     bash_command = [script_path, solution.get_directory(), compile_command]
@@ -110,7 +108,7 @@ def grade(solution: Solution):
 
 
 # user should not see directory in error message
-def clear_error_msg(error: str):
+def clear_error_msg(error: str) -> str:
     if RUN_SCRIPT_NAME in error:
         error = error.split(RUN_SCRIPT_NAME)[1][2:].split("$RUN_COMMAND")[0]
     return error

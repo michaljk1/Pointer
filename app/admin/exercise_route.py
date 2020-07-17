@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import shutil
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
@@ -9,8 +11,8 @@ from app.models.usercourse import User
 from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 from app import db
-from app.services.ExerciseService import add_solution
-from app.services.RouteService import validate_exercise_admin, validate_test, validate_lesson
+from app.services.SolutionUtil import add_solution
+from app.services.ValidationUtil import validate_exercise_admin, validate_test, validate_lesson
 from app.student.student_forms import UploadForm
 
 

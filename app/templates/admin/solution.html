@@ -49,7 +49,7 @@
     {% if solution.tasks_finished() %}
     <button type="button"
             onclick="window.location.href='{{ url_for('admin.reprocess_solution', solution_id = solution.id ) }}'"
-            class="btn  btn-primary">Przeprocesuj
+            class="btn  btn-primary">Przetestuj ponownie
     </button>
     {% endif %}
 {% endblock %}

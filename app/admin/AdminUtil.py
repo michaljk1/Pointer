@@ -3,7 +3,7 @@ from app.models.statistics import Statistics
 from app.models.usercourse import Course, User
 
 
-def get_students_ids_emails(courses: List[Course]):
+def get_students_ids_emails(courses: List[Course]) -> (List[int], List[str]):
     user_ids, emails = [], []
     for course in courses:
         for member in course.members:
@@ -13,39 +13,25 @@ def get_students_ids_emails(courses: List[Course]):
     return user_ids, emails
 
 
-def get_statistics(user: User, course: Course, admin_courses: List[Course]):
+def get_statistics(user: User, course: Course, admin_courses: List[Course]) -> (List[object], List[List[int]]):
     statistics_list, statistics_info = [], []
     if course is None:
+        # statistics for all students in all admin courses
         if user is None:
             for course in admin_courses:
                 for member in course.get_students():
-                    statistics_list.append(Statistics(course=course, user=member, is_admin=True))
+                    statistics_list.append(Statistics(course=course, user=member, for_admin=True))
+        # statistics for all students in all admin courses
         else:
-            statistics_list = prepare_statistics([user], user.courses)
+            statistics_list = Statistics.prepare_statistics([user], user.courses)
     else:
         if user is None:
-            statistics_list = prepare_statistics(course.get_students(), [course])
+            statistics_list = Statistics.prepare_statistics(course.get_students(), [course])
         else:
             if course in user.courses:
-                statistics_list = prepare_statistics([user], [course])
+                statistics_list = [Statistics(course=course, user=user, for_admin=True)]
+    # fill info about course and user id needed for regenerating during export
     for statistics in statistics_list:
         statistics_info.append([statistics.course_id, statistics.user_id])
     return statistics_list, statistics_info
 
-
-def prepare_statistics(users: List[User], courses: List[Course]):
-    statistics_list = []
-    for course in courses:
-        for user in users:
-            statistics_list.append(Statistics(course=course, user=user, is_admin=True))
-    return statistics_list
-
-
-def get_statistics_by_ids(infos):
-    statistics = []
-    for info in infos:
-        course_id, user_id = info.strip('()').strip('[]').split(',')
-        course = Course.query.filter_by(id=course_id).first()
-        user = User.query.filter_by(id=user_id).first()
-        statistics.append(Statistics(course, user, True))
-    return statistics

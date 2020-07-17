@@ -1,5 +1,5 @@
-#TODO
-# refaktor, testowanie
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import render_template, url_for, request
 from flask_login import login_required, current_user
 from sqlalchemy import desc
@@ -8,9 +8,9 @@ from werkzeug.utils import redirect
 from app.models.usercourse import User
 from app.models.export import Export
 from app.models.solution import Solution
-from app.services.ExportService import get_csv_solution_export, get_csv_statistics_export, get_pdf_solution_export, \
+from app.services.ExportUtil import get_csv_solution_export, get_csv_statistics_export, get_pdf_solution_export, \
     get_pdf_statistics_export
-from app.services.RouteService import validate_role
+from app.services.ValidationUtil import validate_role
 
 
 @bp.route('/export_solutions_csv')

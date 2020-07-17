@@ -15,7 +15,6 @@ class Config(object):
     SERVER_NAME = '127.0.0.1:5000'
     MAIL_USERNAME = 'sample'
     MAIL_PASSWORD = 'sample'
-    # MAIL_DEFAULT_SENDER = '"Pointer" <noreply@example.com>'
     ADMINS = ['sample']
     MAIN_DIR = '/home/michal/PycharmProjects/Pointer/instance'
     MAX_MEMORY_MB = 3123#sample

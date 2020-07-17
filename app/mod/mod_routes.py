@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required
@@ -7,8 +9,8 @@ from app.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm, Dom
 from app.mod import bp
 from app.models.domain import Domain
 from app.models.usercourse import User
-from app.services.QueryService import login_query
-from app.services.RouteService import validate_role
+from app.services.QueryUtil import login_query
+from app.services.ValidationUtil import validate_role
 
 
 @bp.route('/')

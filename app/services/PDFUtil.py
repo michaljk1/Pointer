@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from typing import List
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from app.admin.AdminUtil import get_statistics_by_ids
 from app.models.statistics import Statistics
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Paragraph
@@ -10,7 +11,7 @@ from reportlab.lib import colors
 
 def create_statistic_pdf(statistics_info, global_filename):
     elements = []
-    statistics_list: List[Statistics] = get_statistics_by_ids(statistics_info)
+    statistics_list: List[Statistics] = Statistics.get_statistics_by_ids(statistics_info)
     for statistics in statistics_list:
         data = get_pdf_statistics_data(statistics)
         table = Table(data, rowHeights=25, colWidths=[2.5 * inch, 2.5 * inch, 0.75 * inch, 0.75 * inch, 0.75 * inch])

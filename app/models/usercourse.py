@@ -1,10 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 import jwt
 from flask import current_app
+from werkzeug.datastructures import FileStorage
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
+from werkzeug.utils import secure_filename
+
 from app import db, login
-from app.models.exercise import Exercise
+from app.models.lesson import Lesson
 from app.models.task import Task
 
 user_course_assoc = db.Table(
@@ -20,6 +25,18 @@ class Course(db.Model):
     lessons = db.relationship('Lesson', backref='course', lazy='dynamic')
     link = db.Column(db.String(25), unique=True)
     is_open = db.Column(db.Boolean, default=True)
+
+    def add_lesson(self, lesson_name, file: FileStorage, content):
+        filename = secure_filename(file.filename)
+        if filename == '':
+            filename = None
+        new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_text=content)
+        self.lessons.append(new_lesson)
+        lesson_directory = new_lesson.get_directory()
+        os.makedirs(lesson_directory)
+        if filename is not None:
+            file.save(os.path.join(lesson_directory, filename))
+        return new_lesson
 
     def get_students(self):
         return [student for student in self.members if student.role == User.Roles['STUDENT']]
@@ -92,28 +109,6 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
-    def get_user_exercises_for_student(self, course: Course):
-        user_points, user_exercises = 0.0, []
-        for exercise in course.get_exercises():
-            user_solution = exercise.get_user_active_solution(user_id=self.id)
-            if user_solution is not None and exercise.is_finished():
-                user_exercises.append(UserExercise(exercise=exercise, points=user_solution.points))
-                user_points += user_solution.points
-            else:
-                user_exercises.append(UserExercise(exercise=exercise, points=0.0))
-        return user_exercises, user_points
-
-    def get_user_exercises_for_admin(self, course: Course):
-        user_points, user_exercises = 0.0, []
-        for exercise in course.get_exercises():
-            user_solution = exercise.get_user_active_solution(user_id=self.id)
-            if user_solution is not None:
-                user_exercises.append(UserExercise(exercise=exercise, points=user_solution.points))
-                user_points += user_solution.points
-            else:
-                user_exercises.append(UserExercise(exercise=exercise, points=0.0))
-        return user_exercises, user_points
-
     def get_admin_directory(self):
         if self.role == self.Roles['ADMIN']:
             return os.path.join(current_app.config['MAIN_DIR'], self.login)
@@ -157,18 +152,3 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
-
-class UserExercise:
-    def __init__(self, exercise: Exercise, points: float):
-        self.exercise = exercise
-        self.points = points
-        self.course = exercise.get_course()
-        self.lesson = exercise.lesson
-        self.max_points = exercise.get_max_points()
-
-    def get_percent_value(self):
-        if self.max_points > 0:
-            return round((self.points / self.max_points * 100), 2)
-        else:
-            return float(0)

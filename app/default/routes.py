@@ -1,21 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import url_for
 from flask_login import current_user
 from werkzeug.utils import redirect
 
 from app.default import bp
-from app.models.usercourse import User
+from app.default.DefaultUtil import redirect_for_index_by_role
 
 
 @bp.route('/')
 @bp.route('/index')
 def index():
-    if not current_user.is_authenticated:
+    if current_user.is_anonymous:
         return redirect(url_for('auth.login'))
-    elif current_user.role == User.Roles['ADMIN']:
-        return redirect(url_for('admin.view_courses'))
-    elif current_user.role == User.Roles['STUDENT']:
-        return redirect(url_for('student.view_courses'))
-    elif current_user.role == User.Roles['MODERATOR']:
-        return redirect(url_for('mod.index'))
-    else:
-        return redirect(url_for('auth.login'))
+    redirect_for_index_by_role(current_user.role)
+
+

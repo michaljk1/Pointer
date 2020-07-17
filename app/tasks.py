@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import sys
 import jwt
 from rq import get_current_job
@@ -8,7 +10,7 @@ from flask import current_app
 from time import time
 from app import create_app, db
 from app.models.task import Task
-from app.services.ExerciseService import execute_solution
+from app.services.SolutionUtil import execute_solution
 
 app = create_app()
 app.app_context().push()
@@ -87,7 +89,6 @@ def _set_task_progress(progress):
         job.meta['progress'] = progress
         job.save_meta()
         task = Task.query.get(job.get_id())
-        task.description = 'progress'
         if progress >= 100:
             task.complete = True
         db.session.commit()

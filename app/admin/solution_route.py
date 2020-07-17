@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import render_template, flash, request, redirect, url_for
 from flask_login import login_required, current_user
 from app import db
@@ -5,8 +7,8 @@ from app.admin import bp
 from app.admin.admin_forms import SolutionForm, SolutionAdminSearchForm
 from app.models.usercourse import Course, User
 from app.models.solution import Solution
-from app.services.QueryService import exercise_admin_query
-from app.services.RouteService import validate_role, validate_solution_admin
+from app.services.QueryUtil import exercise_admin_query
+from app.services.ValidationUtil import validate_role, validate_solution_admin
 
 
 @bp.route('/solutions', methods=['GET', 'POST'])

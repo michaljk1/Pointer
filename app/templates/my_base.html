@@ -39,7 +39,7 @@
                     <a class="navbar-brand"
                        href="{{ url_for('admin.view_courses') }}">Pointer</a>
                 {% elif not current_user.is_anonymous and current_user.is_student() %}
-                    <a class="navbar-brand" href="{{ url_for('student.index') }}">Pointer</a>
+                    <a class="navbar-brand" href="{{ url_for('student.view_courses') }}">Pointer</a>
                 {% elif not current_user.is_anonymous and current_user.is_moderator() %}
                     <a class="navbar-brand" href="{{ url_for('mod.index') }}">Pointer</a>
                 {% endif %}

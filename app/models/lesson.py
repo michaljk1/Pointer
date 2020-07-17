@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
-
 from sqlalchemy import TEXT
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
 from app import db
 from app.models.exercise import Exercise
 
@@ -42,3 +45,13 @@ class Lesson(db.Model):
             if exercise.is_published:
                 active_exercises.append(exercise)
         return active_exercises
+
+    def edit(self, file: FileStorage, content):
+        filename = secure_filename(file.filename)
+        self.content_text = content
+        if filename != '':
+            lesson_dir = self.get_directory()
+            if self.content_pdf_path is not None:
+                os.remove(os.path.join(lesson_dir, self.content_pdf_path))
+            self.content_pdf_path = filename
+            file.save(os.path.join(lesson_dir, filename))

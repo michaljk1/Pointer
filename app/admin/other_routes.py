@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
 from sqlalchemy import desc
@@ -10,8 +12,8 @@ from app.models.usercourse import Course, User
 from app.models.export import Export
 from app.models.lesson import Lesson
 from app.models.solution import Solution
-from app.services.QueryService import login_query
-from app.services.RouteService import validate_course, validate_role
+from app.services.QueryUtil import login_query
+from app.services.ValidationUtil import validate_course, validate_role
 
 
 @bp.route('/logins', methods=['GET', 'POST'])
