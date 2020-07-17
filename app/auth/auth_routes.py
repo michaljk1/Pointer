@@ -33,22 +33,16 @@ def login():
             db.session.commit()
             flash('Niepoprawne dane', 'error')
             return redirect(url_for('auth.login'))
-        # TODO odkomentowac
-        # if not user.is_confirmed:
-        #     login_info.status = LoginInfo.Status['ERROR']
-        #     db.session.commit()
-        #     flash('Aktywuj swoje konto')
-        #     return redirect(url_for('auth.activate'))
+        if not user.is_confirmed:
+            login_info.status = LoginInfo.Status['ERROR']
+            db.session.commit()
+            flash('Aktywuj swoje konto')
+            return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
         db.session.commit()
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            if current_user.role == User.Roles['ADMIN']:
-                next_page = url_for('admin.view_courses')
-            elif current_user.role == User.Roles['STUDENT']:
-                next_page = url_for('student.view_courses')
-            elif current_user.role == User.Roles['MODERATOR']:
-                next_page = url_for('mod.index')
+            return redirect(url_for('default.index'))
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
 

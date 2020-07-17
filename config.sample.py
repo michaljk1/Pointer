@@ -13,8 +13,18 @@ class Config(object):
     MAIL_PORT = 'sample'
     MAIL_USE_TLS = 'sample'
     SERVER_NAME = '127.0.0.1:5000'
+
+    MAIN_DIR = '/home/michal/PycharmProjects/Pointer/instance'
+    MAX_MEMORY_MB = 3123#sample
+
+    #POINTER EMAIL SENDER
     MAIL_USERNAME = 'sample'
     MAIL_PASSWORD = 'sample'
     ADMINS = ['sample']
-    MAIN_DIR = '/home/michal/PycharmProjects/Pointer/instance'
-    MAX_MEMORY_MB = 3123#sample
+
+    #MODERATOR CREDENTIALS
+    MOD_EMAIL = 'moderator@admin.com'
+    MOD_LOGIN = 'moderator'
+    MOD_NAME = 'modname'
+    MOD_SURNAME = 'modsurname'
+    MOD_PASSWORD = 'Admin123'
