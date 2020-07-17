@@ -27,4 +27,4 @@ class Export(db.Model):
 
     def get_directory(self):
         user = User.query.filter_by(id=self.user_id).first()
-        return os.path.join(current_app.config['MAIN_DIR'], user.login)
+        return os.path.join(current_app.config['INSTANCE_DIR'], user.login)

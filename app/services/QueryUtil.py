@@ -11,7 +11,7 @@ from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 
 
-def get_filtered_by_status(solutions: List[Solution], status: str):
+def get_filtered_by_status(solutions: List[Solution], status: str) -> List[Solution]:
     qualified_solutions = []
     finish_statuses = [Solution.Status['APPROVED'], Solution.Status['NOT_ACTIVE'], Solution.Status['REFUSED']]
     if status == Solution.Status['ALL']:

@@ -12,7 +12,7 @@ from app.models.usercourse import User
 from app.services.PDFUtil import create_statistic_pdf, create_solutions_pdf
 
 
-def get_csv_solution_export(solutions: List[Solution], current_user: User):
+def get_csv_solution_export(solutions: List[Solution], current_user: User) -> Export:
     current_date = get_current_date()
     filename = ('rozwiazaniaCSV' + str(current_date) + '.csv').replace(" ", "_")
     with open(os.path.join(current_user.get_admin_directory(), filename), 'w', newline='') as csv_file:
@@ -27,7 +27,7 @@ def get_csv_solution_export(solutions: List[Solution], current_user: User):
     return export
 
 
-def get_csv_statistics_export(statistics_info, current_user: User):
+def get_csv_statistics_export(statistics_info, current_user: User) -> Export:
     current_date = get_current_date()
     filename = ('statystykiCSV' + str(current_date) + '.csv').replace(" ", "_")
     with open(os.path.join(current_user.get_admin_directory(), filename), 'w', newline='') as csv_file:
@@ -49,7 +49,7 @@ def get_csv_statistics_export(statistics_info, current_user: User):
     return export
 
 
-def get_pdf_solution_export(solutions: List[Solution], current_user: User):
+def get_pdf_solution_export(solutions: List[Solution], current_user: User) -> Export:
     current_date = get_current_date()
     filename = ('rozwiazaniaPDF' + str(current_date) + '.pdf').replace(" ", "_")
     global_filename = os.path.join(current_user.get_admin_directory(), filename)
@@ -61,7 +61,7 @@ def get_pdf_solution_export(solutions: List[Solution], current_user: User):
     return export
 
 
-def get_pdf_statistics_export(statistics_info, current_user: User):
+def get_pdf_statistics_export(statistics_info, current_user: User) -> Export:
     current_date = get_current_date()
     filename = ('statystykiPDF' + str(current_date) + '.pdf').replace(" ", "_")
     global_filename = os.path.join(current_user.get_admin_directory(), filename)

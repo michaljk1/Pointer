@@ -42,7 +42,7 @@ class Course(db.Model):
         return [student for student in self.members if student.role == User.Roles['STUDENT']]
 
     def get_directory(self):
-        return os.path.join(current_app.config['MAIN_DIR'], self.name.replace(" ", "_"))
+        return os.path.join(current_app.config['INSTANCE_DIR'], self.name.replace(" ", "_"))
 
     def get_exercises(self):
         exercises = []
@@ -111,7 +111,7 @@ class User(UserMixin, db.Model):
 
     def get_admin_directory(self):
         if self.role == self.Roles['ADMIN']:
-            return os.path.join(current_app.config['MAIN_DIR'], self.login)
+            return os.path.join(current_app.config['INSTANCE_DIR'], self.login)
         return None
 
     @staticmethod
@@ -133,7 +133,7 @@ class User(UserMixin, db.Model):
         return User.query.filter_by(email=email).first()
 
     def launch_email(self, name, description):
-        rq_job = current_app.email_queue.enqueue('app.tasks.' + name, self.email)
+        rq_job = current_app.email_queue.enqueue('app.redis_tasks.' + name, self.email)
         task = Task(id=rq_job.get_id(), name=name, description=description,
                     task_type=Task.Type['EMAIL'], user=self)
         db.session.add(task)
@@ -141,7 +141,7 @@ class User(UserMixin, db.Model):
         return task
 
     def launch_course_email(self, course):
-        rq_job = current_app.email_queue.enqueue('app.tasks.send_course_email', self.email, course, self.role)
+        rq_job = current_app.email_queue.enqueue('app.redis_tasks.send_course_email', self.email, course, self.role)
         task = Task(id=rq_job.get_id(), name='send_course_email', description='append course',
                     task_type=Task.Type['EMAIL'], user=self)
         db.session.add(task)
