@@ -54,7 +54,8 @@ def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_student(current_user, User.Roles['STUDENT'], solution)
     form = StudentSolutionForm(obj=solution, student_status=solution.get_student_status(),
-                               student_points=solution.get_student_points(), send_date_str=str(solution.send_date))
+                               student_points=solution.get_student_points(),
+                               send_date_str=str(solution.send_date).split('.')[0])
     return render_template('student/solution.html', solution=solution, form=form)
 
 

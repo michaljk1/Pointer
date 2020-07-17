@@ -11,6 +11,7 @@ from app.models.lesson import Lesson
 from app.models.exercise import Exercise
 
 
+# student shouldn't be able to view approved or refused status if exercise is not finished
 def get_filtered_by_status(solutions: List[Solution], status: str) -> List[Solution]:
     qualified_solutions = []
     finish_statuses = [Solution.Status['APPROVED'], Solution.Status['NOT_ACTIVE'], Solution.Status['REFUSED']]
@@ -43,6 +44,12 @@ def exercise_admin_query(form, courses=None):
 
     if form.name.data is not None and len(form.name.data) > 0:
         query = query.filter(User.name == form.name.data)
+
+    if form.index.data is not None and len(form.index.data) > 0:
+        query = query.filter(User.index == form.index.data)
+
+    if form.email.data is not None and len(form.email.data) > 0:
+        query = query.filter(User.email == form.email.data)
 
     if form.ip_address.data is not None and len(form.ip_address.data) > 0:
         query = query.filter(Solution.ip_address == form.ip_address.data)
@@ -83,7 +90,8 @@ def exercise_query(form, courses=None):
     return query
 
 
-def login_query(form: LoginInfoForm, user_role: str, ids=None):
+# admin can see only his courses members login infos, ids = list ids of course members
+def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
     query = db.session.query(LoginInfo).select_from(LoginInfo).join(User, User.id == LoginInfo.user_id)
 
     if form.status.data != LoginInfo.Status['ALL']:
@@ -97,8 +105,8 @@ def login_query(form: LoginInfoForm, user_role: str, ids=None):
     elif user_role == User.Roles['MODERATOR']:
         query = query.filter(User.role == User.Roles['ADMIN'])
     elif user_role == User.Roles['ADMIN']:
-        if ids is None or len(ids) == 0:
+        if members_ids is None or len(members_ids) == 0:
             query = query.filter(1 == 0)
         else:
-            query = query.filter(User.id.in_(ids))
+            query = query.filter(User.id.in_(members_ids))
     return query

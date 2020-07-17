@@ -98,6 +98,8 @@ class SolutionForm(FlaskForm):
 class SolutionAdminSearchForm(SolutionStudentSearchForm):
     points_from = FloatField('Punkty od', [Optional()])
     points_to = FloatField('Punkty do', [Optional()])
+    email = StringField('Email')
+    index = StringField('Indeks')
     name = StringField('Imię')
     surname = StringField('Nazwisko')
     ip_address = StringField('IP')

@@ -21,10 +21,10 @@ from app.services.ValidationUtil import validate_course, validate_role
 def view_logins():
     validate_role(current_user, User.Roles['ADMIN'])
     form, logins = LoginInfoForm(), []
-    user_ids, emails = get_students_ids_emails(current_user.courses)
+    member_ids, emails = get_students_ids_emails(current_user.courses)
     form.email.choices += ((email, email) for email in emails)
     if form.validate_on_submit():
-        logins = login_query(form, current_user.role, ids=user_ids).order_by(desc(User.email)).all()
+        logins = login_query(form, current_user.role, member_ids).order_by(desc(User.email)).all()
     return render_template('adminmod/logins.html', form=form, logins=logins)
 
 

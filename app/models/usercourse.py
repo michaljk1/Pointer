@@ -79,6 +79,7 @@ class User(UserMixin, db.Model):
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    history_logins = db.relationship('LoginInfo', backref='user', lazy='dynamic')
     Roles = {
         'ADMIN': 'ADMIN',
         'STUDENT': 'STUDENT',
