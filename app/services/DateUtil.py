@@ -1,5 +1,4 @@
-# !/usr/bin/env python
-#!/usr/bin/env python3
+# !/usr/bin/env python#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from datetime import datetime
 import pytz
