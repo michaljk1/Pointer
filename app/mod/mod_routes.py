@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 import os
 from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required

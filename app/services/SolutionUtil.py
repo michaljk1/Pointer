@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
 import shutil
@@ -75,6 +75,7 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
         solution.status = Solution.Status['COMPILE_ERROR']
         return False
     else:
+        os.remove(error_file.name)
         return True
 
 
@@ -85,8 +86,9 @@ def grade(solution: Solution):
     for test in exercise.tests.all():
         name = 'error_test_run' + str(test.id) + '.txt'
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
+        output_file_name = program_name + "_output_student.txt"
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
-                   test.get_output_path(), run_command]
+                   test.get_output_path(), run_command, output_file_name]
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
             outs = process.communicate(timeout=exercise.timeout)[0]
@@ -96,10 +98,13 @@ def grade(solution: Solution):
                 with open(error_file.name) as f:
                     solution.error_msg = clear_error_msg(f.read())
                 break
-            elif len(outs) == 0:
-                solution.points += test.points
             else:
-                break
+                os.remove(error_file.name)
+                if len(outs) == 0:
+                    os.remove(os.path.join(solution.get_directory(), output_file_name))
+                    solution.points += test.points
+                else:
+                    break
         except subprocess.TimeoutExpired:
             process.kill()
             solution.error_msg = 'Przekroczono limit czasu podczas testowania'

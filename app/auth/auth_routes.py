@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
@@ -62,10 +62,10 @@ def login():
             login_info.status = LoginInfo.Status['ERROR']
             flash('Niepoprawne dane', 'error')
             return redirect(url_for('auth.login'))
-        if not user.is_confirmed:
-            login_info.status = LoginInfo.Status['ERROR']
-            flash('Aktywuj swoje konto')
-            return redirect(url_for('auth.activate'))
+        # if not user.is_confirmed:
+        #     login_info.status = LoginInfo.Status['ERROR']
+        #     flash('Aktywuj swoje konto')
+        #     return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
         db.session.commit()
         next_page = request.args.get('next')
@@ -104,7 +104,7 @@ def change_password():
 @bp.route('reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     form = ResetPasswordForm()
-    user: User = User.verify_reset_password_token(token)
+    user = User.verify_reset_password_token(token)
     if not user:
         flash('Nieaktywny link', 'error')
         return redirect(url_for('auth.index'))

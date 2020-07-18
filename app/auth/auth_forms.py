@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
@@ -68,6 +68,8 @@ class RegistrationForm(PasswordForm):
                 raise ValidationError('Rejestracja dla danej domeny nie jest możliwa.')
 
     def validate_login(self, login):
+        if ' ' in login.data:
+            raise ValidationError('Login zawiera niedozwolone znaki')
         user = User.query.filter_by(login=login.data).first()
         if user is not None:
             raise ValidationError('Podany login jest zajęty.')
