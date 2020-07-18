@@ -75,6 +75,7 @@ def exercise_query(form, courses=None):
         join(Course, Course.id == Lesson.course_id)
 
     query = query.filter(User.role == User.Roles['STUDENT'])
+
     if form.course.data != 'All':
         query = query.filter(Course.name == form.course.data)
     else:
@@ -82,8 +83,10 @@ def exercise_query(form, courses=None):
             query = query.filter(1 == 0)
         else:
             query = query.filter(Course.name.in_(courses))
+
     if not len(form.lesson.data) == 0:
         query = query.filter(Lesson.name == form.lesson.data)
+
     if not len(form.exercise.data) == 0:
         query = query.filter(Exercise.name == form.exercise.data)
 
