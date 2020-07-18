@@ -1,4 +1,5 @@
 
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from app.models.exercise import Exercise
 from app.models.usercourse import User, Course

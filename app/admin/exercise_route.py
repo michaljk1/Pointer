@@ -1,4 +1,5 @@
 
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import shutil
 from flask import render_template, url_for, flash, request

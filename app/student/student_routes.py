@@ -1,4 +1,5 @@
 
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from flask import render_template, url_for, request, send_from_directory
 from flask_login import login_required, current_user

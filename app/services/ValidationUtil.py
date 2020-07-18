@@ -1,4 +1,5 @@
 
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from flask import abort
 from app.models.exercise import Exercise
