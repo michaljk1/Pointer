@@ -9,7 +9,7 @@ sudo apt-get install python3-venv
 
 create venv
 --------------
-python3 -m venv venv
+python3 -m venv venv\n
 virtualenv -p python3.7 venv
 source venv/bin/activate
 
