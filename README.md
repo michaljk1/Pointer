@@ -5,18 +5,17 @@ sudo apt install python3-rq,
 sudo apt install python3-pip,
 sudo apt install python3-flask,
 sudo pip install python-dotenv,
-sudo apt-get install python3-venv,
+sudo apt-get install python3-venv
 
 create venv
 --------------
 python3 -m venv venv,
 virtualenv -p python3.7 venv,
-source venv/bin/activate,
+source venv/bin/activate
 
 configure project
 --------------
-fill your data and change filename:
-config.sample.py -> config.py
+fill your data
 
 create database
 --------------
