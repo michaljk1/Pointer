@@ -9,17 +9,17 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     REDIS_URL = 'redis://' #local server
     # Flask-Mail SMTP server settings
-    MAIL_SERVER = 'sample'
-    MAIL_PORT = 'sample'
-    MAIL_USE_TLS = 'sample'
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
     SERVER_NAME = '127.0.0.1:5000'
 
-    INSTANCE_DIR = '/home/mich/Pointer/instance'
+    INSTANCE_DIR = '/home/mich/PycharmProjects/Pointer/instance'
     MAX_MEMORY_MB = 5000#sample
 
     #POINTER EMAIL SENDER
     MAIL_USERNAME = 'pointerlicmail@gmail.com'
-    MAIL_PASSWORD = ''
+    MAIL_PASSWORD = 'TeRmalica!1'
     ADMINS = ['pointerlicmail@gmail.com']
 
     #MODERATOR CREDENTIALS

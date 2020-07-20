@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from typing import List
 from app.services.DateUtil import get_current_date, get_offset_aware

@@ -44,8 +44,8 @@ def admin_roles():
     if request.method == 'POST' and admin_form.validate_on_submit():
         user = User.query.filter_by(email=admin_form.email.data).first()
         user.role = User.Roles['ADMIN']
-        directory = user.get_admin_directory()
-        if not os.path.exists(directory):
+        directory = user.get_directory()
+        if directory is not None and not os.path.exists(directory):
             os.makedirs(directory)
         db.session.commit()
         flash('Nadano prawa administratora', 'message')
