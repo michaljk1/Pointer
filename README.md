@@ -34,8 +34,8 @@ fill config data in config.py
 create database
 --------------
 flask db init,
-flask db upgrade,
 flask db migrate,
+flask db upgrade,
 python3 create_mod.py
 
 create queue for emails:
