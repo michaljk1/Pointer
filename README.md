@@ -1,10 +1,16 @@
+download project
+--------------
+sudo apt install git
+git clone https://github.com/michaljk1/Pointer.git
+
 install packages
 --------------
-sudo apt-get install redis-server,
+sudo apt install redis-server,
 sudo apt install python3-rq,
 sudo apt install python3-pip,
 sudo apt install python3-flask,
-sudo pip install python-dotenv,
+sudo pip3 install flask_sqlalchemy,
+sudo pip3 install python-dotenv,
 sudo apt-get install python3-venv
 
 create venv
