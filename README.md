@@ -13,6 +13,11 @@ python3 -m venv venv,
 virtualenv -p python3.7 venv,
 source venv/bin/activate,
 
+configure project
+--------------
+fill your data and change filename:
+config.sample.py -> config.py
+
 create database
 --------------
 flask db init,
