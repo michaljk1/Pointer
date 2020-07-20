@@ -109,7 +109,7 @@ class User(UserMixin, db.Model):
             course_names.append(course.name)
         return course_names
 
-    def get_admin_directory(self):
+    def get_directory(self):
         if self.role == self.Roles['ADMIN']:
             return os.path.join(current_app.config['INSTANCE_DIR'], self.login)
         return None
