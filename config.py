@@ -24,7 +24,6 @@ class Config(object):
 
     #MODERATOR CREDENTIALS
     MOD_EMAIL = 'moderator@admin.com'
-    MOD_LOGIN = 'moderator'
     MOD_NAME = 'modname'
     MOD_SURNAME = 'modsurname'
     MOD_PASSWORD = 'Admin123'

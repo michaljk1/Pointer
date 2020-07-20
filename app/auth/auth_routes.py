@@ -31,7 +31,7 @@ def logout():
 def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = User(email=form.email.data, login=form.login.data, name=form.name.data, surname=form.surname.data,
+        user = User(email=form.email.data, name=form.name.data, surname=form.surname.data,
                     role=User.Roles['STUDENT'], index=form.index.data)
         user.set_password(form.password.data)
         db.session.add(user)
@@ -49,8 +49,6 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user is None:
-            user = User.query.filter_by(login=form.email.data).first()
         if user is None:
             flash('Nieprawidłowe dane', 'message')
             return redirect(url_for('auth.login'))

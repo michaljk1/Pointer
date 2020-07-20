@@ -7,7 +7,7 @@ from app.models.usercourse import User
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email/Login', validators=[DataRequired(message='Wprowadź dane')])
+    email = StringField('Email', validators=[DataRequired(message='Wprowadź dane')])
     password = PasswordField('Hasło', validators=[DataRequired(message='Wprowadź dane')])
     remember_me = BooleanField('Zapisz')
     submit = SubmitField('Zaloguj się')
@@ -46,7 +46,6 @@ class ResetPasswordForm(PasswordForm):
 
 class RegistrationForm(PasswordForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(min=1, max=70)])
-    login = StringField('Login', validators=[DataRequired(), Length(min=1, max=20)])
     name = StringField('Imię', validators=[DataRequired(), Length(min=1, max=20)])
     index = StringField('Nr indeksu', validators=[DataRequired(), Length(min=1, max=30)])
     surname = StringField('Nazwisko', validators=[DataRequired(), Length(min=1, max=40)])
@@ -66,14 +65,10 @@ class RegistrationForm(PasswordForm):
             if not is_proper:
                 raise ValidationError('Rejestracja dla danej domeny nie jest możliwa.')
 
-    def validate_login(self, login):
-        if ' ' in login.data:
-            raise ValidationError('Login zawiera niedozwolone znaki')
-        user = User.query.filter_by(login=login.data).first()
-        if user is not None:
-            raise ValidationError('Podany login jest zajęty.')
 
     def validate_index(self, index):
         user = User.query.filter_by(index=index.data).first()
         if user is not None:
             raise ValidationError('Podany indeks jest zajęty.')
+        if not index.data.isdecimal():
+            raise ValidationError('Wprowadzono niepoprawne znaki')

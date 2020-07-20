@@ -68,8 +68,7 @@ class Course(db.Model):
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
-    index = db.Column(db.String(30), index=True, unique=True)
-    login = db.Column(db.String(20), index=True, unique=True)
+    index = db.Column(db.String(30), index=True, unique=True, nullable=False)
     name = db.Column(db.String(20), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(128), nullable=False)
@@ -111,7 +110,7 @@ class User(UserMixin, db.Model):
 
     def get_directory(self):
         if self.role == self.Roles['ADMIN']:
-            return os.path.join(current_app.config['INSTANCE_DIR'], self.login)
+            return os.path.join(current_app.config['INSTANCE_DIR'], self.index)
         return None
 
     @staticmethod

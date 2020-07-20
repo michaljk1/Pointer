@@ -51,7 +51,7 @@ class Solution(db.Model):
         return self.exercise.lesson.course
 
     def get_directory(self):
-        return os.path.join(self.exercise.get_directory(), self.author.login, str(self.attempt))
+        return os.path.join(self.exercise.get_directory(), self.author.index, str(self.attempt))
 
     def tasks_finished(self):
         for task in self.tasks:
