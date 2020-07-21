@@ -40,18 +40,13 @@ def unpack_file(filename, solution_directory):
 
 def execute_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    solution.points, solution.output_file = 0, None
+    solution.points = 0
+    solution.status = Solution.Status['SEND']
+    solution.output_file, solution.error_msg = None, None
     if prepare_compilation(solution):
         grade(solution)
     if solution.status == Solution.Status['SEND']:
         solution.status = Solution.Status['NOT_ACTIVE']
-    if solution.status not in [Solution.Status['COMPILE_ERROR'], Solution.Status['TEST_ERROR'],
-                               Solution.Status['ERROR']]:
-        solution.error_msg = None
-    # reprocessing task case
-    if solution.status == Solution.Status['APPROVED']:
-        solution.status = Solution.Status['NOT_ACTIVE']
-
 
 def prepare_compilation(solution) -> bool:
     compile_command = solution.exercise.compile_command
@@ -135,6 +130,5 @@ def clear_error_msg(error: str) -> str:
 
 
 def limit_memory():
-    config_memory = current_app.config['MAX_MEMORY_MB']
-    memory_mb = config_memory * 1024 * 1024
+    memory_mb = current_app.config['MAX_MEMORY_MB'] * 1024 * 1024
     resource.setrlimit(resource.RLIMIT_AS, (memory_mb, memory_mb))
