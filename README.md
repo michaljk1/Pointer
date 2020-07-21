@@ -1,8 +1,4 @@
-ensure python 3.7 is installed
---------------
-if not:
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt install python3.7
+ensure python 3.8 is installed
 
 download project
 --------------
@@ -11,19 +7,19 @@ git clone https://github.com/michaljk1/Pointer.git
 
 install packages
 --------------
-sudo apt install redis-server,
-sudo apt install python3-rq,
 sudo apt install python3-pip,
-sudo apt install python3-flask,
 sudo apt install python3-venv,
 sudo apt install python3-virtualenv
 sudo pip3 install python-dotenv
 
+open project directory
+-------------
+cd Pointer
+
 create venv
 --------------
-cd Pointer,
 python3 -m venv venv,
-virtualenv -p python3.7 venv,
+virtualenv -p python3.8 venv,
 source venv/bin/activate,
 pip3 install -r requirements.txt
 
@@ -37,6 +33,11 @@ flask db init,
 flask db migrate,
 flask db upgrade,
 python3 create_mod.py
+
+install redis:
+--------------
+sudo apt install redis-server,
+sudo apt install python3-rq
 
 create queue for emails:
 --------------
