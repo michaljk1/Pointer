@@ -14,7 +14,7 @@ class Config(object):
     MAIL_USE_TLS = True
     SERVER_NAME = '127.0.0.1:5000'
 
-    INSTANCE_DIR = '/home/mich/PycharmProjects/Pointer/instance'
+    INSTANCE_DIR = '/home/michal/PycharmProjects/Pointer/instance'
     MAX_MEMORY_MB = 5000#sample
 
     #POINTER EMAIL SENDER

@@ -41,8 +41,8 @@ class ExerciseEditForm(FlaskForm):
     compile_command = StringField('compile command')
     run_command = StringField('run_command', validators=[DataRequired()])
     program_name = StringField('Nazwa testowanego pliku', validators=[DataRequired()])
-    timeout = IntegerField('Timeout w sekundach')
-    interval = IntegerField('Przerwa pomiędzy wysłaniem zadań')
+    timeout = IntegerField('Timeout(sekundy)')
+    interval = IntegerField('Przerwa pomiędzy wysłaniem zadań(sekundy)')
     submit_button = SubmitField('Zapisz')
 
 

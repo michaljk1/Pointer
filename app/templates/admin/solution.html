@@ -17,8 +17,12 @@
     <form action="" method="post" class="form" role="form">
         {{ form.csrf_token() }}
         {{ wtf.form_field(form.email, class='form-control') }}
-        <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution') }}"
+        <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='solution') }}"
                target="_blank">{{ solution.file_path }}</a></h1>
+        {% if solution.output_file != None %}
+        <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='output') }}"
+               target="_blank">{{ solution.output_file }}</a></h1>
+        {% endif %}
         <div style="width: 10%; display: inline-block">
             {{ wtf.form_field(form.points, class='form-control') }}
         </div>

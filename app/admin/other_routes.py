@@ -57,7 +57,11 @@ def download():
         my_course = my_object.get_course()
     elif domain == 'solution':
         my_object = Solution.query.filter_by(id=request_id).first()
-        filename = my_object.file_path
+        my_type = request.args.get('type')
+        if my_type == 'output':
+            filename = my_object.output_file
+        else:
+            filename = my_object.file_path
         my_course = my_object.get_course()
     elif domain == 'export':
         my_object = Export.query.filter_by(id=request_id).first()
@@ -68,6 +72,9 @@ def download():
         my_course = my_object.get_course()
     else:
         abort(404)
-    if domain != 'export':
+    if domain == 'export':
+        if my_object.user_id != current_user.id:
+            abort(404)
+    else:
         validate_course(current_user, User.Roles['ADMIN'], my_course)
     return send_from_directory(directory=my_object.get_directory(), filename=filename)

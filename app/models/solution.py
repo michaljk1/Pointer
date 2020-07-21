@@ -13,6 +13,7 @@ class Solution(db.Model):
     send_date = db.Column(db.DateTime, nullable=False)
     points = db.Column(db.Float, nullable=False, default=0)
     file_path = db.Column(db.String(100), nullable=False)
+    output_file = db.Column(db.String(100))
     attempt = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(20), nullable=False)
     os_info = db.Column(TEXT, nullable=False)

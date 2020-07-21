@@ -40,7 +40,7 @@ def unpack_file(filename, solution_directory):
 
 def execute_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    solution.points = 0
+    solution.points, solution.output_file = 0, None
     if prepare_compilation(solution):
         grade(solution)
     if solution.status == Solution.Status['SEND']:
@@ -87,10 +87,10 @@ def grade(solution: Solution):
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
         output_file_name = program_name + "_output_student.txt"
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
-                   test.get_output_path(), run_command, output_file_name]
+                   run_command, output_file_name]
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
-            outs = process.communicate(timeout=exercise.timeout)[0]
+            process.communicate(timeout=exercise.timeout)
             error_file.close()
             if os.path.getsize(error_file.name) > 0:
                 solution.status = Solution.Status['TEST_ERROR']
@@ -99,16 +99,32 @@ def grade(solution: Solution):
                 break
             else:
                 os.remove(error_file.name)
-                if len(outs) == 0:
-                    os.remove(os.path.join(solution.get_directory(), output_file_name))
+                solution_output = os.path.join(solution.get_directory(), output_file_name)
+                if files_equal(solution_output, test.get_output_path()):
                     solution.points += test.points
                 else:
+                    solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
             process.kill()
             solution.error_msg = 'Przekroczono limit czasu podczas testowania'
             solution.status = solution.Status['ERROR']
             break
+
+
+def files_equal(solution_output, admin_output) -> bool:
+    admin_out, student_out = open(admin_output).readlines(), open(solution_output).readlines()
+    admin_lines, student_lines = [], []
+    for admin_line in admin_out:
+        admin_lines.append(admin_line.strip())
+    for student_line in student_out:
+        student_lines.append(student_line.strip())
+    if len(admin_lines) != len(student_lines):
+        return False
+    for i in range(0, len(admin_lines)):
+        if admin_lines[i] != student_lines[i]:
+            return False
+    return True
 
 
 # user should not see directory in error message
