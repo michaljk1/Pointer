@@ -16,6 +16,8 @@ class CourseForm(FlaskForm):
     def validate_name(self, name):
         courses = Course.query.all()
         replaced_name = name.data.replace(" ", "_").lower()
+        if '/' in name.data:
+            raise ValidationError('Wprowadzono niepoprawny znak - /.')
         for course in courses:
             if course.name.replace(" ", "_").lower() == replaced_name:
                 raise ValidationError('Podana nazwa kursu jest już zajęta.')
@@ -32,6 +34,10 @@ class LessonForm(FlaskForm):
     name = StringField('Nazwa lekcji', validators=[DataRequired()])
     pdf_content = FileField('Wybierz plik')
     submit_button = SubmitField('Dodaj lekcję')
+
+    def validate_name(self, name):
+        if '/' in name.data:
+            raise ValidationError('Wprowadzono niepoprawny znak - /.')
 
 
 class ExerciseEditForm(FlaskForm):
@@ -52,6 +58,10 @@ class ExerciseForm(ExerciseEditForm):
     input = FileField('Input', validators=[DataRequired()])
     max_points = FloatField('Liczba punktów', validators=[DataRequired()])
     submit_button = SubmitField('Dodaj ćwiczenie')
+
+    def validate_name(self, name):
+        if '/' in name.data:
+            raise ValidationError('Wprowadzono niepoprawny znak - /.')
 
 
 class TestForm(FlaskForm):
