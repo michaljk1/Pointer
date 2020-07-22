@@ -63,12 +63,28 @@ class ExerciseForm(ExerciseEditForm):
         if '/' in name.data:
             raise ValidationError('Wprowadzono niepoprawny znak - /.')
 
+    def validate_input(self, input):
+        if input.data.filename.rsplit('.', 1)[1].lower() != 'txt':
+            raise ValidationError('Oczekiwany format - .txt')
+
+    def validate_output(self, output):
+        if output.data.filename.rsplit('.', 1)[1].lower() != 'txt':
+            raise ValidationError('Oczekiwany format - .txt')
+
 
 class TestForm(FlaskForm):
     max_points = FloatField('Liczba punktów', validators=[DataRequired()])
     output = FileField('Output', validators=[DataRequired()])
     input = FileField('Input', validators=[DataRequired()])
     submit_button = SubmitField('Dodaj test')
+
+    def validate_input(self, input):
+        if input.data.filename.rsplit('.', 1)[1].lower() != 'txt':
+            raise ValidationError('Oczekiwany format - .txt')
+
+    def validate_output(self, output):
+        if output.data.filename.rsplit('.', 1)[1].lower() != 'txt':
+            raise ValidationError('Oczekiwany format - .txt')
 
 
 class EmailForm(FlaskForm):
