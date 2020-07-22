@@ -65,7 +65,7 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
     error_file.close()
     if os.path.getsize(error_file.name) > 0:
         with open(error_file.name) as f:
-            solution.error_msg = f.read()
+            solution.error_msg = clear_error_msg(f.read(), COMPILE_SCRIPT_NAME)
         solution.status = Solution.Status['COMPILE_ERROR']
         return False
     else:
@@ -90,7 +90,7 @@ def grade(solution: Solution):
             if os.path.getsize(error_file.name) > 0:
                 solution.status = Solution.Status['TEST_ERROR']
                 with open(error_file.name) as f:
-                    solution.error_msg = clear_error_msg(f.read())
+                    solution.error_msg = clear_error_msg(f.read(), RUN_SCRIPT_NAME)
                 break
             else:
                 os.remove(error_file.name)
@@ -123,9 +123,9 @@ def files_equal(solution_output, admin_output) -> bool:
 
 
 # user should not see directory in error message
-def clear_error_msg(error: str) -> str:
-    if RUN_SCRIPT_NAME in error:
-        error = error.split(RUN_SCRIPT_NAME)[1][2:].split("$RUN_COMMAND")[0]
+def clear_error_msg(error: str, file_name) -> str:
+    if file_name in error:
+        error = error.split(file_name)[1][2:].split("$RUN_COMMAND")[0]
     return error
 
 
