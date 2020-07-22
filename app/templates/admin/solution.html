@@ -20,9 +20,10 @@
         <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='solution') }}"
                target="_blank">{{ solution.file_path }}</a></h1>
         {% if solution.output_file != None %}
-        <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='output') }}"
-               target="_blank">{{ solution.output_file }}</a></h1>
+            <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='output') }}"
+                   target="_blank">{{ solution.output_file }}</a></h1>
         {% endif %}
+        <h1>Oddano: {{ solution.send_date.strftime('%Y-%m-%d %H:%M:%S') }}</h1>
         <div style="width: 10%; display: inline-block">
             {{ wtf.form_field(form.points, class='form-control') }}
         </div>
@@ -51,9 +52,9 @@
         </button>
     {% endif %}
     {% if solution.tasks_finished() %}
-    <button type="button"
-            onclick="window.location.href='{{ url_for('admin.reprocess_solution', solution_id = solution.id ) }}'"
-            class="btn  btn-primary">Przetestuj ponownie
-    </button>
+        <button type="button"
+                onclick="window.location.href='{{ url_for('admin.reprocess_solution', solution_id = solution.id ) }}'"
+                class="btn  btn-primary">Przetestuj ponownie
+        </button>
     {% endif %}
 {% endblock %}

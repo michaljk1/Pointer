@@ -30,7 +30,6 @@ class StudentSolutionForm(FlaskForm):
     error_msg = TextAreaField('Szczegóły błędu', render_kw={'rows': '10', 'readonly': True})
     student_status = StringField('Status', render_kw={'readonly': True})
     student_points = FloatField('Punkty', render_kw={'readonly': True})
-    send_date_str = StringField('Data wysłania', render_kw={'readonly': True})
     file_path = StringField('Plik', render_kw={'readonly': True})
     attempt = IntegerField('Próba', render_kw={'readonly': True})
     comment = TextAreaField('Komentarz', render_kw={'rows': '5', 'readonly': True})
