@@ -51,3 +51,7 @@ rq worker pointer-solutions
 run application
 --------------
 flask run
+
+email info
+--------------
+for development and test purposes users with not confirmed emails are able to use pointer, uncomment 62-65 lines in app/auth/auth_routes.py file for production
