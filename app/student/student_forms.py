@@ -22,7 +22,7 @@ class SolutionStudentSearchForm(FlaskForm):
                                             [Solution.Status['TEST_ERROR'], Solution.Status['TEST_ERROR']],
                                             [Solution.Status['ERROR'], Solution.Status['ERROR']]])
     lesson = StringField('Lekcja')
-    exercise = StringField('Ćwiczenie')
+    exercise = StringField('Zadanie')
     submit = SubmitField('Wyszukaj')
 
 

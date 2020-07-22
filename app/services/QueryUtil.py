@@ -35,6 +35,9 @@ def get_filtered_by_status(solutions: List[Solution], status: str) -> List[Solut
 def exercise_admin_query(form, courses=None):
     query = exercise_query(form, courses)
 
+    if form.is_published.data:
+        query = query.filter(Exercise.is_published == True)
+
     if form.status.data != Solution.Status['ALL'] and form.status.data != 'None':
         query = query.filter(Solution.status == form.status.data)
 
@@ -63,8 +66,9 @@ def exercise_admin_query(form, courses=None):
 
 
 def exercise_student_query(form, student_id, courses):
-    return exercise_query(form, courses).filter(User.id == student_id)
-
+    query = exercise_query(form, courses).filter(User.id == student_id)
+    query = query.filter(Exercise.is_published == True)
+    return query
 
 def exercise_query(form, courses=None):
     query = db.session.query(Solution).select_from(Solution, User, Course, Lesson, Exercise). \
