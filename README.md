@@ -9,7 +9,7 @@ install packages
 --------------
 sudo apt install python3-pip,
 sudo apt install python3-venv,
-sudo apt install python3-virtualenv
+sudo apt install python3-virtualenv,
 sudo pip3 install python-dotenv
 
 open project directory
