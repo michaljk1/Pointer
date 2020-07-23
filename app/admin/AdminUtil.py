@@ -23,7 +23,7 @@ def get_statistics(user: User, course: Course, admin_courses: List[Course]) -> (
                     statistics_list.append(Statistics(course=course, user=member, for_admin=True))
         # statistics for all students in all admin courses
         else:
-            statistics_list = Statistics.prepare_statistics([user], user.courses)
+            statistics_list = Statistics.prepare_statistics([user], list(set(admin_courses).intersection(set(user.courses))))
     else:
         if user is None:
             statistics_list = Statistics.prepare_statistics(course.get_students(), [course])
