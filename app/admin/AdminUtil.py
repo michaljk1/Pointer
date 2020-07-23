@@ -21,7 +21,7 @@ def get_statistics(user: User, course: Course, admin_courses: List[Course]) -> (
             for course in admin_courses:
                 for member in course.get_students():
                     statistics_list.append(Statistics(course=course, user=member, for_admin=True))
-        # statistics for all students in all admin courses
+        # statistics for student in intersection of user and admin courses
         else:
             statistics_list = Statistics.prepare_statistics([user], list(set(admin_courses).intersection(set(user.courses))))
     else:
