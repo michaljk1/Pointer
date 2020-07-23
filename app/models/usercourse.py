@@ -111,7 +111,7 @@ class User(UserMixin, db.Model):
 
     def get_directory(self):
         if self.role == self.Roles['ADMIN']:
-            return os.path.join(current_app.config['INSTANCE_DIR'], self.index)
+            return os.path.join(current_app.config['INSTANCE_DIR'], 'admins', self.index)
         return None
 
     @staticmethod

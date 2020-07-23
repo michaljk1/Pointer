@@ -121,7 +121,7 @@ class SolutionForm(FlaskForm):
 
 
 class SolutionAdminSearchForm(SolutionStudentSearchForm):
-    is_published = BooleanField('Tylko aktywne zadania', default=True)
+    is_published = BooleanField('Tylko opublikowane zadania', default=True)
     points_from = FloatField('Punkty od', [Optional()])
     points_to = FloatField('Punkty do', [Optional()])
     email = StringField('Email')
