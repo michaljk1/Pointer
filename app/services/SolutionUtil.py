@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
-import shutil
 import subprocess
+import resource
 from flask import current_app
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
@@ -10,7 +10,7 @@ from app.services.DateUtil import get_current_date
 from app.models.exercise import Exercise
 from app.models.solution import Solution
 from app.models.usercourse import User
-import resource
+from app.services.FileUtil import unpack_file, create_directory
 
 RUN_SCRIPT_NAME = 'run.sh'
 COMPILE_SCRIPT_NAME = 'compile.sh'
@@ -24,18 +24,11 @@ def add_solution(exercise: Exercise, current_user: User, file: FileStorage, ip_a
     exercise.solutions.append(solution)
     current_user.solutions.append(solution)
     solution_directory = solution.get_directory()
-    if not os.path.exists(solution_directory):
-        os.makedirs(solution_directory)
+    create_directory(solution_directory)
     file.save(os.path.join(solution_directory, solution.file_path))
     unpack_file(solution.file_path, solution_directory)
     db.session.commit()
     solution.launch_execute('point_solution', 'Pointing solution')
-
-
-def unpack_file(filename, solution_directory):
-    if filename.endswith('.tar.gz') or filename.endswith('.gzip') or filename.endswith('.zip') or filename.endswith(
-            '.tar'):
-        shutil.unpack_archive(os.path.join(solution_directory, filename), solution_directory)
 
 
 def execute_solution(solution_id):
@@ -47,6 +40,7 @@ def execute_solution(solution_id):
         grade(solution)
     if solution.status == Solution.Status['SEND']:
         solution.status = Solution.Status['NOT_ACTIVE']
+
 
 def prepare_compilation(solution) -> bool:
     compile_command = solution.exercise.compile_command
@@ -77,7 +71,8 @@ def grade(solution: Solution):
     exercise = solution.exercise
     program_name, run_command = exercise.program_name, exercise.run_command
     script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), RUN_SCRIPT_NAME)
-    for test in exercise.tests.all():
+    sorted_tests = sorted(exercise.tests.all(), key=lambda t: t.create_date)
+    for test in sorted_tests:
         name = 'error_test_run' + str(test.id) + '.txt'
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
         output_file_name = program_name + "_output_student.txt"
@@ -86,6 +81,7 @@ def grade(solution: Solution):
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
             process.communicate(timeout=exercise.timeout)
+            process.wait()
             error_file.close()
             if os.path.getsize(error_file.name) > 0:
                 solution.status = Solution.Status['TEST_ERROR']

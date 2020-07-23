@@ -5,6 +5,7 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from app import db
 from app.models.exercise import Exercise
+from app.services.FileUtil import create_directory
 
 
 class Lesson(db.Model):
@@ -32,7 +33,7 @@ class Lesson(db.Model):
         exercise = Exercise(name=form.name.data, lesson_id=self.id)
         exercise.values_by_form(form, content)
         self.exercises.append(exercise)
-        os.makedirs(exercise.get_directory())
+        create_directory(exercise.get_directory())
         return exercise
 
     def get_course(self):

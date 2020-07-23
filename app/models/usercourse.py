@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 from app import db, login
 from app.models.lesson import Lesson
 from app.models.task import Task
+from app.services.FileUtil import create_directory
 
 user_course_assoc = db.Table(
     'user_courses',
@@ -32,7 +33,7 @@ class Course(db.Model):
         new_lesson = Lesson(name=lesson_name, content_pdf_path=filename, content_text=content)
         self.lessons.append(new_lesson)
         lesson_directory = new_lesson.get_directory()
-        os.makedirs(lesson_directory)
+        create_directory(lesson_directory)
         if filename is not None:
             file.save(os.path.join(lesson_directory, filename))
         return new_lesson

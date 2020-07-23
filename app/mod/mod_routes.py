@@ -8,6 +8,7 @@ from app.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm, Dom
 from app.mod import bp
 from app.models.domain import Domain
 from app.models.usercourse import User
+from app.services.FileUtil import create_directory
 from app.services.QueryUtil import login_query
 from app.services.ValidationUtil import validate_role
 
@@ -45,8 +46,8 @@ def admin_roles():
         user = User.query.filter_by(email=admin_form.email.data).first()
         user.role = User.Roles['ADMIN']
         directory = user.get_directory()
-        if directory is not None and not os.path.exists(directory):
-            os.makedirs(directory)
+        if directory is not None:
+            create_directory(directory)
         db.session.commit()
         flash('Nadano prawa administratora', 'message')
         return redirect(url_for('mod.admin_roles'))

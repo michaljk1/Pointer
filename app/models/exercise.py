@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from app import db
 from app.services.DateUtil import get_current_date, get_offset_aware
 from app.models.test import Test
+from app.services.FileUtil import create_directory
 
 
 class Exercise(db.Model):
@@ -48,11 +49,11 @@ class Exercise(db.Model):
     def create_test(self, input_file, output_file, points):
         input_name, output_name = secure_filename(input_file.filename), secure_filename(output_file.filename)
         test = Test(points=points, input_name=input_name, output_name=output_name, exercise_id=self.id,
-                    order=len(self.tests.all()))
+                    create_date=get_current_date())
         self.tests.append(test)
         db.session.commit()
         test_directory = test.get_directory()
-        os.makedirs(test_directory)
+        create_directory(test_directory)
         input_file.save(os.path.join(test_directory, input_name))
         output_file.save(os.path.join(test_directory, output_name))
 

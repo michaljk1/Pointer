@@ -9,6 +9,7 @@ from app.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
 from werkzeug.utils import redirect
 from app.models.usercourse import Course, User
 from app import db
+from app.services.FileUtil import create_directory
 from app.services.ValidationUtil import validate_course, validate_role
 
 
@@ -84,7 +85,7 @@ def add_course():
         new_course = Course(name=form.name.data, is_open=True,
                             link=''.join(random.choice(string.ascii_lowercase) for i in range(25)))
         current_user.courses.append(new_course)
-        os.makedirs(new_course.get_directory())
+        create_directory(new_course.get_directory())
         db.session.commit()
         flash('Dodano kurs', 'message')
         return redirect(url_for('admin.view_courses'))

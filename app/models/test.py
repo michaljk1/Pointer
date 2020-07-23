@@ -9,7 +9,7 @@ class Test(db.Model):
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
     points = db.Column(db.Float)
-    order = db.Column(db.Integer)
+    create_date = db.Column(db.DateTime, nullable=False)
 
     def get_directory(self):
         return os.path.join(self.executor.get_directory(), 'tests', 'test'+str(self.id))
