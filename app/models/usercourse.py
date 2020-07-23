@@ -42,7 +42,7 @@ class Course(db.Model):
         return [student for student in self.members if student.role == User.Roles['STUDENT']]
 
     def get_directory(self):
-        return os.path.join(current_app.config['INSTANCE_DIR'], self.name.replace(" ", "_"))
+        return os.path.join(current_app.config['INSTANCE_DIR'], 'courses', self.name.replace(" ", "_"))
 
     def get_exercises(self):
         exercises = []
