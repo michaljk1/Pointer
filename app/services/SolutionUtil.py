@@ -81,7 +81,6 @@ def grade(solution: Solution):
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
             out_process = process.communicate(timeout=exercise.timeout)[0]
-            process.wait()
             error_file.close()
             if os.path.getsize(error_file.name) > 0:
                 solution.status = Solution.Status['TEST_ERROR']
