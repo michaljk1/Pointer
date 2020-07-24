@@ -19,7 +19,7 @@ class Config(object):
 
     #POINTER EMAIL SENDER
     MAIL_USERNAME = 'pointerlicmail@gmail.com'
-    MAIL_PASSWORD = 'TeRmalica!1'
+    MAIL_PASSWORD = ''
     ADMINS = ['pointerlicmail@gmail.com']
 
     #MODERATOR CREDENTIALS
