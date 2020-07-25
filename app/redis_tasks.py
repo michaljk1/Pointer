@@ -29,7 +29,7 @@ def send_confirm_email(email):
     try:
         token = get_confirm_email_token(email)
         mail.send(Message(subject='[Pointer] Potwierdź email',
-                          sender=current_app.config['ADMINS'][0],
+                          sender=current_app.config['MAIL_USERNAME'],
                           recipients=[email],
                           html=render_template('email/confirm_email_request.html', token=token)))
         db.session.commit()
@@ -42,7 +42,7 @@ def send_confirm_email(email):
 def send_course_email(email, course_name, role):
     try:
         mail.send(Message(subject='[Pointer] Nowy kurs',
-                          sender=app.config['ADMINS'][0],
+                          sender=app.config['MAIL_USERNAME'],
                           recipients=[email],
                           html=render_template('email/confirm_course.html', role=role, course_name=course_name)))
         db.session.commit()
@@ -56,7 +56,7 @@ def send_reset_password(email):
     try:
         token = get_reset_password_token(email)
         mail.send(Message(subject='[Pointer] Reset hasła',
-                          sender=current_app.config['ADMINS'][0],
+                          sender=current_app.config['MAIL_USERNAME'],
                           recipients=[email],
                           html=render_template('email/reset_password.html', token=token)))
         db.session.commit()

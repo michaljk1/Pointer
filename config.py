@@ -18,8 +18,7 @@ class Config(object):
     MAX_MEMORY_MB = 5000  # sample
 
     # POINTER EMAIL SENDER
-    MAIL_USERNAME = 'mail@gmail.com'
-    ADMINS = ['mail@gmail.com']  # equal to mail_username
+    MAIL_USERNAME = 'mail@mail.com'
     MAIL_PASSWORD = 'password'
 
     TOKEN_EXPIRES_IN = 600  # seconds
