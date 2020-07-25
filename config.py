@@ -18,11 +18,11 @@ class Config(object):
     MAX_MEMORY_MB = 5000  # sample
 
     # POINTER EMAIL SENDER
-    MAIL_USERNAME = 'pointerlicmail@gmail.com'
-    MAIL_PASSWORD = 'TeRmalica!1'
-    ADMINS = ['pointerlicmail@gmail.com']
+    MAIL_USERNAME = 'mail@gmail.com'
+    ADMINS = ['mail@gmail.com']  # equal to mail_username
+    MAIL_PASSWORD = 'password'
 
-    TOKEN_EXPIRES_IN = 600#seconds
+    TOKEN_EXPIRES_IN = 600  # seconds
 
     # MODERATOR CREDENTIALS
     MOD_EMAIL = 'moderator@admin.com'
