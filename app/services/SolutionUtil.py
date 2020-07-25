@@ -9,14 +9,14 @@ from app import db
 from app.services.DateUtil import get_current_date
 from app.models.exercise import Exercise
 from app.models.solution import Solution
-from app.models.usercourse import User
+from app.models.usercourse import UserCourse
 from app.services.FileUtil import unpack_file, create_directory
 
 RUN_SCRIPT_NAME = 'run.sh'
 COMPILE_SCRIPT_NAME = 'compile.sh'
 
 
-def add_solution(exercise: Exercise, current_user: User, file: FileStorage, ip_address: str, attempt_nr: int,
+def add_solution(exercise: Exercise, current_user: UserCourse, file: FileStorage, ip_address: str, attempt_nr: int,
                  os_info: str):
     filename = secure_filename(file.filename)
     solution = Solution(file_path=filename, ip_address=ip_address, send_date=get_current_date(),

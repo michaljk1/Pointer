@@ -94,7 +94,7 @@ def view_statistics():
     validate_role(current_user, User.Roles['STUDENT'])
     statistics_list = []
     for course in current_user.courses:
-        statistics_list.append(Statistics(course=course, user=current_user))
+        statistics_list.append(Statistics(course=course, student=current_user))
     return render_template('student/statistics.html', statisticsList=statistics_list)
 
 
