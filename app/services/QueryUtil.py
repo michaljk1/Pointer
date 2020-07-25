@@ -70,6 +70,7 @@ def exercise_student_query(form, student_id, courses):
     query = query.filter(Exercise.is_published == True)
     return query
 
+
 def exercise_query(form, courses=None):
     query = db.session.query(Solution).select_from(Solution, User, Course, Lesson, Exercise). \
         join(User, User.id == Solution.user_id). \
@@ -108,8 +109,6 @@ def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
 
     if form.email.data != 'ALL':
         query = query.filter(User.email == form.email.data)
-    elif user_role == User.Roles['MODERATOR']:
-        query = query.filter(User.role == User.Roles['ADMIN'])
     elif user_role == User.Roles['ADMIN']:
         if members_ids is None or len(members_ids) == 0:
             query = query.filter(1 == 0)

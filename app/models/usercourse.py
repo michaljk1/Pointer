@@ -75,14 +75,17 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False)
     is_confirmed = db.Column(db.Boolean, default=False)
-    solutions = db.relationship('Solution', backref='author', lazy='dynamic')
-    courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
     history_logins = db.relationship('LoginInfo', backref='user', lazy='dynamic')
     Roles = {
         'ADMIN': 'ADMIN',
         'STUDENT': 'STUDENT',
         'MODERATOR': 'MODERATOR'
+    }
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'employee',
+        "polymorphic_on": role
     }
 
     def __repr__(self):
@@ -102,17 +105,6 @@ class User(UserMixin, db.Model):
 
     def is_student(self):
         return self.role == User.Roles['STUDENT']
-
-    def get_course_names(self):
-        course_names = []
-        for course in self.courses:
-            course_names.append(course.name)
-        return course_names
-
-    def get_directory(self):
-        if self.role == self.Roles['ADMIN']:
-            return os.path.join(current_app.config['INSTANCE_DIR'], 'admins', self.index)
-        return None
 
     @staticmethod
     def verify_confirm_email_token(token):
@@ -147,6 +139,41 @@ class User(UserMixin, db.Model):
         db.session.add(task)
         db.session.commit()
         return task
+
+
+class Moderator(User):
+    __mapper_args__ = {
+        'polymorphic_identity': 'MODERATOR'
+    }
+
+
+class UserCourse(User):
+    solutions = db.relationship('Solution', backref='author', lazy='dynamic')
+    courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
+
+    def get_course_names(self):
+        course_names = []
+        for course in self.courses:
+            course_names.append(course.name)
+        return course_names
+
+    def get_directory(self):
+        if self.role == self.Roles['ADMIN']:
+            return os.path.join(current_app.config['INSTANCE_DIR'], 'admins', self.index)
+        return None
+
+
+class Admin(UserCourse):
+    exports = db.relationship('Export', backref='user', lazy='dynamic')
+    __mapper_args__ = {
+        'polymorphic_identity': 'ADMIN',
+    }
+
+
+class Student(UserCourse):
+    __mapper_args__ = {
+        'polymorphic_identity': 'STUDENT',
+    }
 
 
 @login.user_loader

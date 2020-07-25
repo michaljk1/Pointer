@@ -7,7 +7,7 @@ from app.admin.AdminUtil import get_students_ids_emails, get_statistics
 from app.admin.admin_forms import StatisticsForm
 from app.mod.mod_forms import LoginInfoForm
 from app.models.test import Test
-from app.models.usercourse import Course, User
+from app.models.usercourse import Course, User, Student
 from app.models.export import Export
 from app.models.lesson import Lesson
 from app.models.solution import Solution
@@ -37,9 +37,9 @@ def view_statistics():
     form.email.choices += ((email, email) for email in get_students_ids_emails(current_user.courses)[1])
     statistics_list, statistics_info = [], []
     if request.method == 'POST' and form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        student = Student.query.filter_by(email=form.email.data).first()
         course = Course.query.filter_by(name=form.course.data).first()
-        statistics_list, statistics_info = get_statistics(user, course, current_user.courses)
+        statistics_list, statistics_info = get_statistics(student, course, current_user.courses)
     return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_info=statistics_info,
                            form=form)
 

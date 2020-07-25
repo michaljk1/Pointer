@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 from app.admin import bp
 from app.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
 from werkzeug.utils import redirect
-from app.models.usercourse import Course, User
+from app.models.usercourse import Course, User, UserCourse, Student
 from app import db
 from app.services.FileUtil import create_directory
 from app.services.ValidationUtil import validate_course, validate_role
@@ -36,12 +36,12 @@ def add_student(course_name):
     course = Course.query.filter_by(name=course_name).first()
     validate_course(current_user, User.Roles['ADMIN'], course)
     form = AddStudentForm()
-    for user in User.query.filter(~User.courses.any(name=course.name)).filter(User.role == User.Roles['STUDENT']).all():
-        form.email.choices.append((user.email, user.email))
+    for student in Student.query.filter(~Student.courses.any(name=course.name)).all():
+        form.email.choices.append((student.email, student.email))
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        user.courses.append(course)
-        user.launch_course_email(course_name)
+        student = Student.query.filter_by(email=form.email.data).first()
+        student.courses.append(course)
+        student.launch_course_email(course_name)
         db.session.commit()
         flash('Dodano studenta', 'message')
         return redirect(url_for('admin.add_student', course_name=course.name))
@@ -57,8 +57,8 @@ def delete_student(course_name):
     for student in course.get_students():
         form.email.choices.append((student.email, student.email))
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        user.courses.remove(course)
+        student = Student.query.filter_by(email=form.email.data).first()
+        student.courses.remove(course)
         db.session.commit()
         flash('Usunięto studenta', 'message')
         return redirect(url_for('admin.delete_student', course_name=course.name))

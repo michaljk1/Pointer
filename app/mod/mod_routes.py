@@ -7,7 +7,7 @@ from app import db
 from app.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm, DomainForm
 from app.mod import bp
 from app.models.domain import Domain
-from app.models.usercourse import User
+from app.models.usercourse import User, Student, UserCourse, Admin
 from app.services.FileUtil import create_directory
 from app.services.QueryUtil import login_query
 from app.services.ValidationUtil import validate_role
@@ -40,10 +40,10 @@ def add_domain():
 def admin_roles():
     validate_role(current_user, User.Roles['MODERATOR'])
     admin_form = RoleAdminForm()
-    for user in User.query.filter(User.role == User.Roles['STUDENT']).all():
-        admin_form.email.choices.append((user.email, user.email))
+    for student in Student.query.all():
+        admin_form.email.choices.append((student.email, student.email))
     if request.method == 'POST' and admin_form.validate_on_submit():
-        user = User.query.filter_by(email=admin_form.email.data).first()
+        user = UserCourse.query.filter_by(email=admin_form.email.data).first()
         user.role = User.Roles['ADMIN']
         directory = user.get_directory()
         if directory is not None:
@@ -59,10 +59,10 @@ def admin_roles():
 def student_roles():
     validate_role(current_user, User.Roles['MODERATOR'])
     student_form = RoleStudentForm()
-    for user in User.query.filter(User.role == User.Roles['ADMIN']).all():
-        student_form.email.choices.append((user.email, user.email))
+    for admin in Admin.query.all():
+        student_form.email.choices.append((admin.email, admin.email))
     if request.method == 'POST' and student_form.validate_on_submit():
-        user = User.query.filter_by(email=student_form.email.data).first()
+        user = UserCourse.query.filter_by(email=student_form.email.data).first()
         user.role = User.Roles['STUDENT']
         db.session.commit()
         flash('Nadano prawa studenta', 'message')
@@ -75,7 +75,7 @@ def student_roles():
 def view_logins():
     validate_role(current_user, User.Roles['MODERATOR'])
     form = LoginInfoForm()
-    for user in User.query.filter(User.role == User.Roles['ADMIN']).all():
+    for user in User.query.all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         logins = login_query(form, current_user.role).order_by(desc(User.email)).all()

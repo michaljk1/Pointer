@@ -16,8 +16,7 @@ from app.services.ValidationUtil import validate_role
 @login_required
 def export_solutions_csv():
     validate_role(current_user, User.Roles['ADMIN'])
-    ids = request.args.getlist('ids')
-    solutions = Solution.query.filter(Solution.id.in_(ids)).all()
+    solutions = Solution.query.filter(Solution.id.in_(request.args.getlist('ids'))).all()
     export = get_csv_solution_export(solutions, current_user)
     return redirect(url_for('admin.download', domain='export', id=export.id))
 
@@ -34,8 +33,7 @@ def export_statistics_csv():
 @login_required
 def export_solutions_pdf():
     validate_role(current_user, User.Roles['ADMIN'])
-    ids = request.args.getlist('ids')
-    solutions = Solution.query.filter(Solution.id.in_(ids)).all()
+    solutions = Solution.query.filter(Solution.id.in_(request.args.getlist('ids'))).all()
     export = get_pdf_solution_export(solutions, current_user)
     return redirect(url_for('admin.download', domain='export', id=export.id))
 
@@ -52,5 +50,5 @@ def export_statistics_pdf():
 @login_required
 def view_exports():
     validate_role(current_user, User.Roles['ADMIN'])
-    exports = Export.query.filter_by(user_id=current_user.id).order_by(desc(Export.id)).all()
+    exports = sorted(current_user.exports, key=lambda export: export.id, reverse=True)
     return render_template('admin/exports.html', exports=exports)
