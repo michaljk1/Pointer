@@ -84,7 +84,7 @@ class User(UserMixin, db.Model):
     }
 
     __mapper_args__ = {
-        'polymorphic_identity': 'employee',
+        'polymorphic_identity': 'user',
         "polymorphic_on": role
     }
 
