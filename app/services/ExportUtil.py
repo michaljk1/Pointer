@@ -13,7 +13,7 @@ from app.services.PDFUtil import create_statistic_pdf, create_solutions_pdf
 
 def get_csv_solution_export(solutions: List[Solution], current_user: User) -> Export:
     current_date = get_current_date()
-    filename = ('rozwiazaniaCSV' + str(current_date) + '.csv').replace(" ", "_")
+    filename = ('rozwiazaniaCSV' + str(current_date).split('.')[0] + '.csv').replace(" ", "_")
     with open(os.path.join(current_user.get_directory(), filename), 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter='|', quoting=csv.QUOTE_MINIMAL)
         for solution in solutions:
@@ -28,7 +28,7 @@ def get_csv_solution_export(solutions: List[Solution], current_user: User) -> Ex
 
 def get_csv_statistics_export(statistics_info, current_user: User) -> Export:
     current_date = get_current_date()
-    filename = ('statystykiCSV' + str(current_date) + '.csv').replace(" ", "_")
+    filename = ('statystykiCSV' + str(current_date).split('.')[0] + '.csv').replace(" ", "_")
     with open(os.path.join(current_user.get_directory(), filename), 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter='|', quoting=csv.QUOTE_MINIMAL)
         statistics: List[Statistics] = Statistics.get_statistics_by_ids(statistics_info)
@@ -50,7 +50,7 @@ def get_csv_statistics_export(statistics_info, current_user: User) -> Export:
 
 def get_pdf_solution_export(solutions: List[Solution], current_user: User) -> Export:
     current_date = get_current_date()
-    filename = ('rozwiazaniaPDF' + str(current_date) + '.pdf').replace(" ", "_")
+    filename = ('rozwiazaniaPDF' + str(current_date).split('.')[0] + '.pdf').replace(" ", "_")
     global_filename = os.path.join(current_user.get_directory(), filename)
     create_solutions_pdf(solutions, global_filename)
     export = Export(user_id=current_user.id, file_name=filename, generation_date=current_date, type=Export.types['PDF'],
@@ -62,7 +62,7 @@ def get_pdf_solution_export(solutions: List[Solution], current_user: User) -> Ex
 
 def get_pdf_statistics_export(statistics_info, current_user: User) -> Export:
     current_date = get_current_date()
-    filename = ('statystykiPDF' + str(current_date) + '.pdf').replace(" ", "_")
+    filename = ('statystykiPDF' + str(current_date).split('.')[0] + '.pdf').replace(" ", "_")
     global_filename = os.path.join(current_user.get_directory(), filename)
     create_statistic_pdf(statistics_info, global_filename)
     export = Export(user_id=current_user.id, file_name=filename, generation_date=current_date, type=Export.types['PDF'],
