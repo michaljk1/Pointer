@@ -132,14 +132,6 @@ class User(UserMixin, db.Model):
         db.session.commit()
         return task
 
-    def launch_course_email(self, course):
-        rq_job = current_app.email_queue.enqueue('app.redis_tasks.send_course_email', self.email, course, self.role)
-        task = Task(id=rq_job.get_id(), name='send_course_email', description='append course',
-                    task_type=Task.Type['EMAIL'], user=self)
-        db.session.add(task)
-        db.session.commit()
-        return task
-
 
 class Moderator(User):
     __mapper_args__ = {
@@ -162,6 +154,13 @@ class UserCourse(User):
             return os.path.join(current_app.config['INSTANCE_DIR'], 'admins', self.index)
         return None
 
+    def launch_course_email(self, course):
+        rq_job = current_app.email_queue.enqueue('app.redis_tasks.send_course_email', self.email, course, self.role)
+        task = Task(id=rq_job.get_id(), name='send_course_email', description='append course',
+                    task_type=Task.Type['EMAIL'], user=self)
+        db.session.add(task)
+        db.session.commit()
+        return task
 
 class Admin(UserCourse):
     exports = db.relationship('Export', backref='user', lazy='dynamic')

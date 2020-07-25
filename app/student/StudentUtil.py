@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from typing import List
+from app.models.exercise import Exercise
 from app.services.DateUtil import get_current_date, get_offset_aware
 from app.models.solution import Solution
 
 
-def can_send_solution(sorted_solutions: List[Solution]) -> bool:
+def can_send_solution(exercise: Exercise, sorted_solutions: List[Solution]) -> bool:
     solutions_amount = len(sorted_solutions)
+    if exercise.is_finished() or solutions_amount >= exercise.max_attempts:
+        return False
     if solutions_amount == 0:
         return True
     else:

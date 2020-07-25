@@ -18,8 +18,8 @@ def get_statistics(student: Student, course: Course, admin_courses: List[Course]
         # statistics for all students in all admin courses
         if student is None:
             for course in admin_courses:
-                for member in course.get_students():
-                    statistics_list.append(Statistics(course=course, user=member, for_admin=True))
+                for student in course.get_students():
+                    statistics_list.append(Statistics(course=course, student=student, for_admin=True))
         # statistics for student in intersection of user and admin courses
         else:
             statistics_list = Statistics.prepare_statistics([student], list(set(admin_courses).intersection(set(student.courses))))
@@ -28,7 +28,7 @@ def get_statistics(student: Student, course: Course, admin_courses: List[Course]
             statistics_list = Statistics.prepare_statistics(course.get_students(), [course])
         else:
             if course in student.courses:
-                statistics_list = [Statistics(course=course, user=student, for_admin=True)]
+                statistics_list = [Statistics(course=course, student=student, for_admin=True)]
     # fill info about course and user id needed for regenerating during export
     for statistics in statistics_list:
         statistics_info.append([statistics.course_id, statistics.user_id])

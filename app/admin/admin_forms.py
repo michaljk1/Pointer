@@ -88,7 +88,7 @@ class TestForm(FlaskForm):
 
 
 class EmailForm(FlaskForm):
-    email = SelectField('Użytkownik', choices=[])
+    email = SelectField('Email', choices=[])
 
 
 class AddStudentForm(EmailForm):

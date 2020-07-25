@@ -36,10 +36,10 @@ def get_csv_statistics_export(statistics_info, current_user: User) -> Export:
             csv_writer.writerow(
                 [statistic.user_index] + [statistic.course_name] + [statistic.user_points] +
                 [statistic.course_points] + [str(statistic.get_percent_value()) + '%'])
-            for user_exercise in statistic.user_exercises:
+            for student_exercise in statistic.student_exercises:
                 csv_writer.writerow(
-                    [user_exercise.exercise.lesson.name] + [user_exercise.exercise.name] + [user_exercise.points] +
-                    [user_exercise.max_points] + [str(user_exercise.get_percent_value()) + '%'])
+                    [student_exercise.exercise.lesson.name] + [student_exercise.exercise.name] + [student_exercise.points] +
+                    [student_exercise.max_points] + [str(student_exercise.get_percent_value()) + '%'])
             csv_writer.writerow('')
     export = Export(user_id=current_user.id, file_name=filename, generation_date=current_date, type=Export.types['CSV'],
                     format=Export.formats['STATISTICS'])

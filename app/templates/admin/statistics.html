@@ -39,16 +39,16 @@
                         </button>
                     </td>
                 </tr>
-                {% for user_exercise in statistics.user_exercises %}
+                {% for student_exercise in statistics.student_exercises %}
                     <tr class='{{ idx }}details'
                         style="display:none; background-color: #FFEBCD">
-                        <td><a href="{{ url_for('admin.view_lesson', lesson_id=user_exercise.exercise.lesson.id) }}">
-                            {{ user_exercise.exercise.lesson.name }}</a></td>
-                        <td><a href="{{ url_for('admin.view_exercise', exercise_id=user_exercise.exercise.id) }}">
-                            {{ user_exercise.exercise.name }}</a></td>
-                        <td>{{ user_exercise.points }}</td>
-                        <td>{{ user_exercise.max_points }}</td>
-                        <td>{{ user_exercise.get_percent_value() }}%</td>
+                        <td><a href="{{ url_for('admin.view_lesson', lesson_id=student_exercise.exercise.lesson.id) }}">
+                            {{ student_exercise.exercise.lesson.name }}</a></td>
+                        <td><a href="{{ url_for('admin.view_exercise', exercise_id=student_exercise.exercise.id) }}">
+                            {{ student_exercise.exercise.name }}</a></td>
+                        <td>{{ student_exercise.points }}</td>
+                        <td>{{ student_exercise.max_points }}</td>
+                        <td>{{ student_exercise.get_percent_value() }}%</td>
                         <td></td>
                     </tr>
                 {% endfor %}

@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 from werkzeug.urls import url_parse
 from app.services.DateUtil import get_current_date
 from app.models.logininfo import LoginInfo
-from app.models.usercourse import User, Course
+from app.models.usercourse import User, Course, Student
 from app import db
 from app.services.ValidationUtil import validate_exists
 
@@ -31,11 +31,11 @@ def logout():
 def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = User(email=form.email.data, name=form.name.data, surname=form.surname.data,
-                    role=User.Roles['STUDENT'], index=form.index.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        user.launch_email('send_confirm_email', 'confirm email')
+        student = Student(email=form.email.data, name=form.name.data, surname=form.surname.data,
+                          role=User.Roles['STUDENT'], index=form.index.data)
+        student.set_password(form.password.data)
+        db.session.add(student)
+        student.launch_email('send_confirm_email', 'confirm email')
         db.session.commit()
         flash('Rejestracja zakończona, potwierdź adres email', 'message')
         return redirect(url_for('auth.login'))

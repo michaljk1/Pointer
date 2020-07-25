@@ -50,10 +50,10 @@ def set_style_for_statistics_table(table, data):
 def get_pdf_statistics_data(statistics: Statistics):
     data = [[statistics.user_index, statistics.course_name, statistics.user_points,
              statistics.course_points, (str(statistics.get_percent_value()) + '%')]]
-    for user_exercise in statistics.user_exercises:
+    for student_exercise in statistics.student_exercises:
         data.append(
-            [user_exercise.exercise.lesson.name, user_exercise.exercise.name, user_exercise.points,
-             user_exercise.max_points, (str(user_exercise.get_percent_value()) + '%')])
+            [student_exercise.exercise.lesson.name, student_exercise.exercise.name, student_exercise.points,
+             student_exercise.max_points, (str(student_exercise.get_percent_value()) + '%')])
     return data
 
 

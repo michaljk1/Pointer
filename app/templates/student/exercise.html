@@ -18,7 +18,7 @@
     <h1>Termin przesłania zadania: {{ exercise.end_date }}</h1>
     <h1>Odstęp pomiędzy wysyłaniem zadań: {{ exercise.interval }}s</h1>
     <hr>
-    {% if solutions|length < exercise.max_attempts and not exercise.is_finished() and send_solution%}
+    {% if send_solution %}
         <div class="row">
             <div class="col-md-4">
                 {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}

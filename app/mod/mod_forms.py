@@ -26,7 +26,7 @@ class RoleAdminForm(FlaskForm):
 
 
 class LoginInfoForm(FlaskForm):
-    email = SelectField('Użytkownik', choices=[['ALL', 'Dowolny']])
+    email = SelectField('Email', choices=[['ALL', 'Dowolny']])
     status = SelectField('Status', choices=[[LoginInfo.Status['ALL'], LoginInfo.Status['ALL']],
                                             [LoginInfo.Status['ERROR'], LoginInfo.Status['ERROR']],
                                             [LoginInfo.Status['SUCCESS'], LoginInfo.Status['SUCCESS']]])

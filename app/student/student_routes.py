@@ -63,7 +63,7 @@ def view_exercise(exercise_id):
     exercise = Exercise.query.filter_by(id=exercise_id).first()
     validate_exercise_student(current_user, User.Roles['STUDENT'], exercise)
     solutions = sorted(exercise.get_user_solutions(current_user.id), key=lambda sol: sol.send_date, reverse=True)
-    send_solution = can_send_solution(solutions)
+    send_solution = can_send_solution(exercise, solutions)
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
         add_solution(exercise=exercise, current_user=current_user, file=request.files['file'],

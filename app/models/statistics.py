@@ -2,22 +2,22 @@
 from typing import List
 
 from app.models.exercise import Exercise
-from app.models.usercourse import Course, User
+from app.models.usercourse import Course, User, Student
 
 
 # Statistics for given course and user
 # statistics for admin includes points from exercises which haven't finished
 # student should not be able to see these values
 class Statistics:
-    def __init__(self, course: Course, user: User, for_admin=False):
+    def __init__(self, course: Course, student: Student, for_admin=False):
         if for_admin:
-            self.user_exercises, self.user_points = UserExercise.get_user_exercises_for_admin(user, course)
+            self.student_exercises, self.user_points = StudentExercise.get_student_exercises_for_admin(student, course)
         else:
-            self.user_exercises, self.user_points = UserExercise.get_user_exercises_for_student(user, course)
+            self.student_exercises, self.user_points = StudentExercise.get_student_exercises_for_student(student, course)
         self.course_points = course.get_course_points()
-        self.user_email = user.email
-        self.user_index = user.index
-        self.user_id = user.id
+        self.user_email = student.email
+        self.user_index = student.index
+        self.user_id = student.id
         self.course_name = course.name
         self.course_id = course.id
 
@@ -28,11 +28,11 @@ class Statistics:
             return float(0)
 
     @staticmethod
-    def prepare_statistics(users: List[User], courses: List[Course]):
+    def prepare_statistics(students: List[Student], courses: List[Course]):
         statistics_list = []
         for course in courses:
-            for user in users:
-                statistics_list.append(Statistics(course=course, user=user, for_admin=True))
+            for student in students:
+                statistics_list.append(Statistics(course=course, student=student, for_admin=True))
         return statistics_list
 
     # method used in export
@@ -42,14 +42,14 @@ class Statistics:
     def get_statistics_by_ids(infos):
         statistics = []
         for info in infos:
-            course_id, user_id = info.strip('()').strip('[]').split(',')
+            course_id, student_id = info.strip('()').strip('[]').split(',')
             course = Course.query.filter_by(id=course_id).first()
-            user = User.query.filter_by(id=user_id).first()
-            statistics.append(Statistics(course, user, True))
+            student = Student.query.filter_by(id=student_id).first()
+            statistics.append(Statistics(course, student, True))
         return statistics
 
 
-class UserExercise:
+class StudentExercise:
     def __init__(self, exercise: Exercise, points: float):
         self.exercise = exercise
         self.points = points
@@ -65,25 +65,25 @@ class UserExercise:
 
     # includes only exercises which finished
     @staticmethod
-    def get_user_exercises_for_student(user: User, course: Course):
-        user_points, user_exercises = 0.0, []
+    def get_student_exercises_for_student(user: User, course: Course):
+        user_points, student_exercises = 0.0, []
         for exercise in course.get_exercises():
             user_solution = exercise.get_user_active_solution(user_id=user.id)
             if user_solution is not None and exercise.is_finished():
-                user_exercises.append(UserExercise(exercise=exercise, points=user_solution.points))
+                student_exercises.append(StudentExercise(exercise=exercise, points=user_solution.points))
                 user_points += user_solution.points
             else:
-                user_exercises.append(UserExercise(exercise=exercise, points=0.0))
-        return user_exercises, user_points
+                student_exercises.append(StudentExercise(exercise=exercise, points=0.0))
+        return student_exercises, user_points
 
     @staticmethod
-    def get_user_exercises_for_admin(user: User, course: Course):
-        user_points, user_exercises = 0.0, []
+    def get_student_exercises_for_admin(user: User, course: Course):
+        user_points, student_exercises = 0.0, []
         for exercise in course.get_exercises():
             user_solution = exercise.get_user_active_solution(user_id=user.id)
             if user_solution is not None:
-                user_exercises.append(UserExercise(exercise=exercise, points=user_solution.points))
+                student_exercises.append(StudentExercise(exercise=exercise, points=user_solution.points))
                 user_points += user_solution.points
             else:
-                user_exercises.append(UserExercise(exercise=exercise, points=0.0))
-        return user_exercises, user_points
+                student_exercises.append(StudentExercise(exercise=exercise, points=0.0))
+        return student_exercises, user_points
