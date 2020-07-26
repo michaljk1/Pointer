@@ -52,6 +52,14 @@ class RegistrationForm(PasswordForm):
     surname = StringField('Nazwisko', validators=[DataRequired(), Length(min=1, max=40)])
     submit = SubmitField('Zarejestruj się')
 
+    def validate_name(self, name):
+        if not name.data.isalpha():
+            raise ValidationError('Wprowadzono niepoprawne znaki.')
+
+    def validate_surname(self, surname):
+        if not surname.data.isalpha():
+            raise ValidationError('Wprowadzono niepoprawne znaki.')
+
     def validate_email(self, email):
         user = User.query.filter(func.lower(User.email) == func.lower(email.data)).first()
         if user is not None:
