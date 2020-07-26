@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
-from sqlalchemy import desc
 
 from app.admin import bp
 from app.admin.AdminUtil import get_students_ids_emails, get_statistics
@@ -24,7 +23,7 @@ def view_logins():
     member_ids, emails = get_students_ids_emails(current_user.courses)
     form.email.choices += ((email, email) for email in emails)
     if form.validate_on_submit():
-        logins = login_query(form, current_user.role, member_ids).order_by(desc(User.email)).all()
+        logins = login_query(form, current_user.role, member_ids).all()
     return render_template('adminmod/logins.html', form=form, logins=logins)
 
 

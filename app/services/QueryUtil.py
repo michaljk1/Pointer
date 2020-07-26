@@ -116,4 +116,4 @@ def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
             query = query.filter(1 == 0)
         else:
             query = query.filter(User.id.in_(members_ids))
-    return query
+    return query.order_by(desc(LoginInfo.login_date))

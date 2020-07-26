@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required
-from sqlalchemy import desc
 
 from app import db
 from app.mod import bp
@@ -63,6 +62,6 @@ def view_logins():
     for user in User.query.all():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
-        logins = login_query(form, current_user.role).order_by(desc(User.email)).all()
+        logins = login_query(form, current_user.role).all()
         return render_template('adminmod/logins.html', form=form, logins=logins)
     return render_template('adminmod/logins.html', form=form, logins=[])
