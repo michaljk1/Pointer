@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, url_for, request
 from flask_login import login_required, current_user
-from sqlalchemy import desc
-from app.admin import bp
 from werkzeug.utils import redirect
-from app.models.usercourse import User
-from app.models.export import Export
+
+from app.admin import bp
 from app.models.solution import Solution
+from app.models.usercourse import User
 from app.services.ExportUtil import get_csv_solution_export, get_csv_statistics_export, get_pdf_solution_export, \
     get_pdf_statistics_export
 from app.services.ValidationUtil import validate_role

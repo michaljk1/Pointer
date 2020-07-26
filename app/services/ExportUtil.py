@@ -2,12 +2,13 @@
 import csv
 import os
 from typing import List
+
 from app import db
-from app.services.DateUtil import get_current_date
-from app.models.solution import Solution
 from app.models.export import Export
+from app.models.solution import Solution
 from app.models.statistics import Statistics
 from app.models.usercourse import User
+from app.services.DateUtil import get_current_date
 from app.services.PDFUtil import create_statistic_pdf, create_solutions_pdf
 
 

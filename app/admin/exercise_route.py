@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import shutil
+
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
+from werkzeug.utils import redirect
+
+from app import db
 from app.admin import bp
 from app.admin.admin_forms import ExerciseForm, TestForm, ExerciseEditForm
-from werkzeug.utils import redirect
+from app.models.exercise import Exercise
+from app.models.lesson import Lesson
 from app.models.test import Test
 from app.models.usercourse import User
-from app.models.lesson import Lesson
-from app.models.exercise import Exercise
-from app import db
 from app.services.SolutionUtil import add_solution
 from app.services.ValidationUtil import validate_exercise_admin, validate_test, validate_lesson
 from app.student.student_forms import UploadForm

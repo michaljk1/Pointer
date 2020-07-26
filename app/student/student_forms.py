@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import SubmitField, SelectField, StringField, TextAreaField, FloatField, IntegerField
 from wtforms.validators import DataRequired
+
 from app.models.solution import Solution
 
 

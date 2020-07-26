@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
-import subprocess
 import resource
+import subprocess
+
 from flask import current_app
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+
 from app import db
-from app.services.DateUtil import get_current_date
 from app.models.exercise import Exercise
 from app.models.solution import Solution
 from app.models.usercourse import UserCourse
+from app.services.DateUtil import get_current_date
 from app.services.FileUtil import unpack_file, create_directory
 
 RUN_SCRIPT_NAME = 'run.sh'

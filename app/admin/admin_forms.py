@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from flask_wtf.file import FileField
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
     ValidationError, TextAreaField
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired, Length, Optional
+
 from app.models.usercourse import Course
 from app.student.student_forms import SolutionStudentSearchForm
 

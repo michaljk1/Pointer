@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 import sys
-import jwt
-from rq import get_current_job
-from flask import render_template
-from app import mail
-from flask_mail import Message
-from flask import current_app
 from time import time
+
+import jwt
+from flask import current_app
+from flask import render_template
+from flask_mail import Message
+from rq import get_current_job
+
 from app import create_app, db
+from app import mail
 from app.models.task import Task
 from app.services.SolutionUtil import execute_solution
 

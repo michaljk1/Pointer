@@ -1,4 +1,5 @@
 from typing import List
+
 from app.models.statistics import Statistics
 from app.models.usercourse import Course, Student
 

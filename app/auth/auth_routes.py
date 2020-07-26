@@ -2,16 +2,16 @@
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import func
+from werkzeug.urls import url_parse
+from werkzeug.utils import redirect
 
+from app import db
 from app.auth import bp
 from app.auth.AuthUtil import redirect_for_index_by_role
 from app.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
-from werkzeug.utils import redirect
-from werkzeug.urls import url_parse
-from app.services.DateUtil import get_current_date
 from app.models.logininfo import LoginInfo
 from app.models.usercourse import User, Course, Student
-from app import db
+from app.services.DateUtil import get_current_date
 from app.services.ValidationUtil import validate_exists
 
 

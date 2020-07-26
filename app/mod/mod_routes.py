@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-import os
 from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required
 from sqlalchemy import desc
+
 from app import db
-from app.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm
 from app.mod import bp
+from app.mod.mod_forms import LoginInfoForm, RoleStudentForm, RoleAdminForm
 from app.models.usercourse import User, Student, UserCourse, Admin
 from app.services.FileUtil import create_directory
 from app.services.QueryUtil import login_query

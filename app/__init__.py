@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from flask import Flask
-from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
-from flask_bootstrap import Bootstrap
-from flask_mail import Mail
-from redis import Redis
 import rq
+from flask import Flask
+from flask_bootstrap import Bootstrap
+from flask_login import LoginManager
+from flask_mail import Mail
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from redis import Redis
+
+from config import Config
 
 migrate = Migrate()
 login = LoginManager()

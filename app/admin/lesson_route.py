@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
+from werkzeug.utils import redirect
+
+from app import db
 from app.admin import bp
 from app.admin.admin_forms import LessonForm, EditLessonForm
-from werkzeug.utils import redirect, secure_filename
-from app.models.usercourse import Course, User
 from app.models.lesson import Lesson
-from app import db
+from app.models.usercourse import Course, User
 from app.services.ValidationUtil import validate_course, validate_lesson
 
 

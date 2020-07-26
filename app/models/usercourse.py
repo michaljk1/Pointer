@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
+
 import jwt
 from flask import current_app
+from flask_login import UserMixin
 from werkzeug.datastructures import FileStorage
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import UserMixin
 from werkzeug.utils import secure_filename
 
 from app import db, login

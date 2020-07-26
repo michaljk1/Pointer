@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from typing import List
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from app.models.statistics import Statistics
-from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Paragraph
-from reportlab.lib import colors
+
+from app.models.statistics import Statistics
 
 
 def create_statistic_pdf(statistics_info, global_filename):

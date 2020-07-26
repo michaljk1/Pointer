@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
+
 from flask import current_app
 from sqlalchemy import TEXT
+
 from app import db
 from app.models.task import Task
 

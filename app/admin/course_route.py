@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import os
-import string
 import random
+import string
+
 from flask import render_template, url_for, flash, request
 from flask_login import login_required, current_user
+from werkzeug.utils import redirect
+
+from app import db
 from app.admin import bp
 from app.admin.admin_forms import CourseForm, DeleteStudentForm, AddStudentForm
-from werkzeug.utils import redirect
-from app.models.usercourse import Course, User, UserCourse, Student
-from app import db
+from app.models.usercourse import Course, User, Student
 from app.services.FileUtil import create_directory
 from app.services.ValidationUtil import validate_course, validate_role
 

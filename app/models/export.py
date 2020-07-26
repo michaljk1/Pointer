@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
-from flask import current_app
+
 from app import db
-from app.models.usercourse import User, UserCourse
 
 
 class Export(db.Model):

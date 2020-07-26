@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from typing import List
+
 from app.models.exercise import Exercise
-from app.services.DateUtil import get_current_date, get_offset_aware
 from app.models.solution import Solution
+from app.services.DateUtil import get_current_date, get_offset_aware
 
 
 def can_send_solution(exercise: Exercise, sorted_solutions: List[Solution]) -> bool:

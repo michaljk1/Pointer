@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+
 from sqlalchemy import TEXT
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+
 from app import db
 from app.models.exercise import Exercise
 from app.services.FileUtil import create_directory

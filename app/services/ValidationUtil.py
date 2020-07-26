@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import abort
+
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.solution import Solution

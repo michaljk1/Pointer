@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from typing import List
+
 from sqlalchemy import desc
+
 from app import db
 from app.mod.mod_forms import LoginInfoForm
+from app.models.exercise import Exercise
+from app.models.lesson import Lesson
 from app.models.logininfo import LoginInfo
 from app.models.solution import Solution
 from app.models.usercourse import User, Course
-from app.models.lesson import Lesson
-from app.models.exercise import Exercise
 
 
 # student shouldn't be able to view approved or refused status if exercise is not finished
