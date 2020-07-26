@@ -17,6 +17,8 @@ class Config(object):
     INSTANCE_DIR = '/home/michal/PycharmProjects/Pointer/instance'
     MAX_MEMORY_MB = 5000  # sample
 
+    ALLOWED_DOMAINS = ['mail.com', 'gmail.com']
+
     # POINTER EMAIL SENDER
     MAIL_USERNAME = 'mail@mail.com'
     MAIL_PASSWORD = 'password'

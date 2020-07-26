@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
+from sqlalchemy import func
+
 from app.auth import bp
 from app.auth.AuthUtil import redirect_for_index_by_role
 from app.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, ChangePasswordForm, ResetPasswordForm
@@ -48,7 +50,7 @@ def login():
         return redirect(url_for('auth.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter(func.lower(User.email) == func.lower(form.email.data)).first()
         if user is None:
             flash('Nieprawidłowe dane', 'message')
             return redirect(url_for('auth.login'))

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from flask import current_app
 from flask_wtf import FlaskForm
+from sqlalchemy import func
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
-from app.models.domain import Domain
 from app.models.usercourse import User
 
 
@@ -52,19 +53,18 @@ class RegistrationForm(PasswordForm):
     submit = SubmitField('Zarejestruj się')
 
     def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+        user = User.query.filter(func.lower(User.email) == func.lower(email.data)).first()
         if user is not None:
             raise ValidationError('Podany adres email jest zajęty.')
         if '@' in email.data:
             email_domain = email.data.split('@')[1]
-            domains = Domain.query.all()
             is_proper = False
-            for domain in domains:
-                if email_domain == domain.name:
+            for domain in current_app.config['ALLOWED_DOMAINS']:
+                if email_domain == domain:
                     is_proper = True
+                    break
             if not is_proper:
                 raise ValidationError('Rejestracja dla danej domeny nie jest możliwa.')
-
 
     def validate_index(self, index):
         user = User.query.filter_by(index=index.data).first()
