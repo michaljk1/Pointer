@@ -163,6 +163,7 @@ class UserCourse(User):
         db.session.commit()
         return task
 
+
 class Admin(UserCourse):
     exports = db.relationship('Export', backref='user', lazy='dynamic')
     __mapper_args__ = {

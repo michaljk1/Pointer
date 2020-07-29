@@ -25,8 +25,3 @@ class Config(object):
 
     TOKEN_EXPIRES_IN = 600  # seconds
 
-    # MODERATOR CREDENTIALS
-    MOD_EMAIL = 'moderator@admin.com'
-    MOD_NAME = 'modname'
-    MOD_SURNAME = 'modsurname'
-    MOD_PASSWORD = 'Admin123'

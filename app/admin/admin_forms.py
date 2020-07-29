@@ -12,7 +12,7 @@ from app.student.student_forms import SolutionStudentSearchForm
 
 class CourseForm(FlaskForm):
     name = StringField('Nazwa kursu', validators=[Length(min=1, message="Wprowadź nazwę")])
-    submit_button = SubmitField('Dodaj kurs')
+    submit_button = SubmitField('Zapisz')
 
     def validate_name(self, name):
         courses = Course.query.all()
