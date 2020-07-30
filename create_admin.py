@@ -8,7 +8,7 @@ with app.app_context():
 
     admins = User.query.filter_by(role='ADMIN').all()
     user = User(email=sys.argv[1], name=sys.argv[2],
-                surname=sys.argv[3], role='MODERATOR', is_confirmed=True, index=str(len(admins)+1))
+                surname=sys.argv[3], role='TEACHER', is_confirmed=True, index=str(len(admins)+1))
     user.set_password(sys.argv[4])
     db.session.add(user)
     db.session.commit()

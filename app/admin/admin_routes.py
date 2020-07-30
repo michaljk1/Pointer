@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 
 from app import db
 from app.admin import bp
-from app.admin.teacher_forms import LoginInfoForm, RoleStudentForm, RoleTeacherForm
+from app.admin.admin_forms import LoginInfoForm, RoleStudentForm, RoleTeacherForm
 from app.models.usercourse import User, Student, UserCourse, Teacher
 from app.services.FileUtil import create_directory
 from app.services.QueryUtil import login_query
@@ -35,7 +35,7 @@ def teacher_roles():
         db.session.commit()
         flash('Nadano prawa teacheristratora', 'message')
         return redirect(url_for('admin.teacher_roles'))
-    return render_template('mod/teacher_roles.html', teacher_form=teacher_form)
+    return render_template('admin/teacher_roles.html', teacher_form=teacher_form)
 
 
 @bp.route('/student_roles', methods=['GET', 'POST'])
@@ -51,7 +51,7 @@ def student_roles():
         db.session.commit()
         flash('Nadano prawa studenta', 'message')
         return redirect(url_for('admin.student_roles'))
-    return render_template('mod/student_roles.html', student_form=student_form)
+    return render_template('admin/student_roles.html', student_form=student_form)
 
 
 @bp.route('/logins', methods=['GET', 'POST'])
@@ -63,5 +63,5 @@ def view_logins():
         form.email.choices.append((user.email, user.email))
     if form.validate_on_submit():
         logins = login_query(form, current_user.role).all()
-        return render_template('teachermod/logins.html', form=form, logins=logins)
-    return render_template('teachermod/logins.html', form=form, logins=[])
+        return render_template('teacheradmin/logins.html', form=form, logins=logins)
+    return render_template('teacheradmin/logins.html', form=form, logins=[])

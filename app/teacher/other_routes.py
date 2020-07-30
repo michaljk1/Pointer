@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from app.teacher import bp
 from app.teacher.TeacherUtil import get_students_ids_emails, get_statistics
 from app.teacher.teacher_forms import StatisticsForm
-from app.admin.teacher_forms import LoginInfoForm
+from app.admin.admin_forms import LoginInfoForm
 from app.models.export import Export
 from app.models.lesson import Lesson
 from app.models.solution import Solution
@@ -24,7 +24,7 @@ def view_logins():
     form.email.choices += ((email, email) for email in emails)
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, member_ids).all()
-    return render_template('teachermod/logins.html', form=form, logins=logins)
+    return render_template('teacheradmin/logins.html', form=form, logins=logins)
 
 
 @bp.route('/statistics', methods=['GET', 'POST'])

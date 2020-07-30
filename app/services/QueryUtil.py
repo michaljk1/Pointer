@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy import desc, func
 
 from app import db
-from app.admin.teacher_forms import LoginInfoForm
+from app.admin.admin_forms import LoginInfoForm
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.logininfo import LoginInfo
