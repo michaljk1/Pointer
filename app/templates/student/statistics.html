@@ -6,11 +6,12 @@
     </a>
 {% endblock %}
 {% block app_content %}
+    {% if statisticsList|length > 0%}
     <table class="table">
         <thead>
         <th>Kurs</th>
         <th>Punkty</th>
-        <th>Możliwe punkty</th>
+        <th>Maksymalna ilość punków</th>
         <th>Procentowo</th>
         <th></th>
         </thead>
@@ -45,5 +46,8 @@
         {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        <h2>Brak statystyk</h2>
+    {% endif %}
     <script src="{{ url_for('static', filename='js/statistic_details.js') }}"></script>
 {% endblock %}
