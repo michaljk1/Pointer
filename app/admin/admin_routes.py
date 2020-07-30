@@ -3,7 +3,7 @@ from flask import url_for, flash, render_template, redirect, request
 from flask_login import current_user, login_required
 
 from app import db
-from app.mod import bp
+from app.admin import bp
 from app.admin.teacher_forms import LoginInfoForm, RoleStudentForm, RoleTeacherForm
 from app.models.usercourse import User, Student, UserCourse, Teacher
 from app.services.FileUtil import create_directory
