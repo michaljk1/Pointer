@@ -24,11 +24,11 @@
                 <tr>
             {% endif %}
         <td><p>{{ solution.author.email }}</p></td>
-        <td><p><a href="{{ url_for('admin.view_course', course_name=solution.get_course().name) }}"
+        <td><p><a href="{{ url_for('teacher.view_course', course_name=solution.get_course().name) }}"
                   target="_blank">{{ solution.get_course().name }}</a></p></td>
-        <td><p><a href="{{ url_for('admin.view_lesson', lesson_id=solution.exercise.lesson.id) }}"
+        <td><p><a href="{{ url_for('teacher.view_lesson', lesson_id=solution.exercise.lesson.id) }}"
                   target="_blank">{{ solution.exercise.lesson.name }}</a></p></td>
-        <td><p><a href="{{ url_for('admin.view_exercise', exercise_id=solution.exercise.id) }}"
+        <td><p><a href="{{ url_for('teacher.view_exercise', exercise_id=solution.exercise.id) }}"
                   target="_blank">{{ solution.exercise.name }}</a></p></td>
         <td><p>{{ solution.get_str_send_date() }}</p></td>
         <td><p>{{ solution.points }}</p></td>
@@ -36,7 +36,7 @@
         <td><p>{{ solution.status }}</p></td>
         <td>
             <a type="button"
-               href='{{ url_for('admin.view_solution', solution_id = solution.id) }}'
+               href='{{ url_for('teacher.view_solution', solution_id = solution.id) }}'
                target="_blank"
                class="btn btn-success btn-sm">+
             </a>
@@ -46,11 +46,11 @@
         </tbody>
     </table>
     <button type="button"
-            onclick="window.location.href='{{ url_for('admin.export_solutions_csv', ids=solution_ids) }}'"
+            onclick="window.location.href='{{ url_for('teacher.export_solutions_csv', ids=solution_ids) }}'"
             class="btn btn-primary">Export CSV
     </button>
     <a type="button"
-       href='{{ url_for('admin.export_solutions_pdf',  ids=solution_ids) }}'
+       href='{{ url_for('teacher.export_solutions_pdf',  ids=solution_ids) }}'
        target="_blank"
        class="btn btn-info">Export PDF
     </a>

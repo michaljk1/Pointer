@@ -108,7 +108,7 @@ class SolutionForm(FlaskForm):
     error_msg = TextAreaField('Szczegóły błędu', render_kw={'rows': '10'})
     points = FloatField('Punkty')
     status = StringField('Status')
-    admin_ref = BooleanField('Odrzuć zadanie')
+    teacher_ref = BooleanField('Odrzuć zadanie')
     file_path = StringField('Plik', render_kw={'readonly': True})
     attempt = IntegerField('Próba', render_kw={'readonly': True})
     ip_address = StringField('ip address', render_kw={'readonly': True})
@@ -118,7 +118,7 @@ class SolutionForm(FlaskForm):
     submit_points = SubmitField('Zmień punktację')
 
 
-class SolutionAdminSearchForm(SolutionStudentSearchForm):
+class SolutionTeacherSearchForm(SolutionStudentSearchForm):
     is_published = BooleanField('Tylko opublikowane zadania', default=True)
     points_from = FloatField('Punkty od', [Optional()])
     points_to = FloatField('Punkty do', [Optional()])

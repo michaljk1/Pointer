@@ -1,14 +1,14 @@
 {% extends "my_base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}">
+    <a href="{{ url_for('teacher.view_courses') }}">
         <pb> Kursy</pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = lesson.course.name) }}">
+    <a href="{{ url_for('teacher.view_course', course_name = lesson.course.name) }}">
         <pb> {{ lesson.course.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_id = lesson.id) }}">
+    <a href="{{ url_for('teacher.view_lesson', lesson_id = lesson.id) }}">
         <pb> {{ lesson.name }} </pb>
     </a>
 {% endblock %}
@@ -20,23 +20,23 @@
     {% endif %}
     {% if lesson.content_pdf_path != None %}
         <div><h1><a
-                href="{{ url_for('admin.download',domain='lesson', id=lesson.id) }}"
+                href="{{ url_for('teacher.download',domain='lesson', id=lesson.id) }}"
                 target="_blank">{{ lesson.content_pdf_path }}</a>
         </h1></div>
     {% endif %}
     <ul>
     {% for exercise in lesson.exercises %}
         <li><h1><a
-                href="{{ url_for('admin.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
+                href="{{ url_for('teacher.view_exercise', exercise_id = exercise.id ) }}">{{ exercise.name }}</a>
         </h1></li>
     {% endfor %}
     </ul>
     <div class="bottom_div">
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.add_exercise', course_name = course.name, lesson_id = lesson.id ) }}'"
+                onclick="window.location.href='{{ url_for('teacher.add_exercise', course_name = course.name, lesson_id = lesson.id ) }}'"
                 class="btn btn-success btn-lg">Dodaj zadanie
         </button>
-        <button type="button" onclick="window.location.href='{{ url_for('admin.edit_lesson', lesson_id = lesson.id) }}'"
+        <button type="button" onclick="window.location.href='{{ url_for('teacher.edit_lesson', lesson_id = lesson.id) }}'"
                 class="btn btn-info btn-lg">Edytuj lekcję
         </button>
     </div>

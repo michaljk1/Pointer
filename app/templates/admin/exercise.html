@@ -1,19 +1,19 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}">
+    <a href="{{ url_for('teacher.view_courses') }}">
         <pb> Kursy</pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = exercise.lesson.course.name) }}">
+    <a href="{{ url_for('teacher.view_course', course_name = exercise.lesson.course.name) }}">
         <pb> {{ exercise.lesson.course.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_id = exercise.lesson.id) }}">
+    <a href="{{ url_for('teacher.view_lesson', lesson_id = exercise.lesson.id) }}">
         <pb> {{ exercise.lesson.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}">
+    <a href="{{ url_for('teacher.view_exercise', exercise_id = exercise.id) }}">
         <pb> {{ exercise.name }} </pb>
     </a>
 
@@ -34,32 +34,32 @@
                 {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
             </div>
         </div>
-        {% include "admin/solutionlist.html" %}
+        {% include "teacher/solutionlist.html" %}
 
     </div>
     <hr>
     <div class="bottom_div">
         {% if exercise.is_published %}
             <button type="button"
-                    onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+                    onclick="window.location.href='{{ url_for('teacher.activate_exercise', exercise_id = exercise.id ) }}'"
                     class="btn btn-dark btn-lg">Dezaktywuj
             </button>
         {% else %}
             <button type="button"
-                    onclick="window.location.href='{{ url_for('admin.activate_exercise', exercise_id = exercise.id ) }}'"
+                    onclick="window.location.href='{{ url_for('teacher.activate_exercise', exercise_id = exercise.id ) }}'"
                     class="btn btn-success btn-lg">Opublikuj
             </button>
         {% endif %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.view_tests', exercise_id = exercise.id ) }}'"
+                onclick="window.location.href='{{ url_for('teacher.view_tests', exercise_id = exercise.id ) }}'"
                 class="btn btn-success btn-lg">Testy
         </button>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
+                onclick="window.location.href='{{ url_for('teacher.view_solutions', course = exercise.get_course().name, lesson = exercise.lesson.name, exercise=exercise.name) }}'"
                 class="btn btn-primary btn-lg">Rozwiązania
         </button>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.edit_exercise', exercise_id = exercise.id) }}'"
+                onclick="window.location.href='{{ url_for('teacher.edit_exercise', exercise_id = exercise.id) }}'"
                 class="btn btn-info btn-lg">Edytuj
         </button>
     </div>

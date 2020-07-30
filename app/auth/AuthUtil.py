@@ -8,9 +8,9 @@ from app.models.usercourse import User
 def redirect_for_index_by_role(user_role: str):
     if user_role == User.Roles['STUDENT']:
         return redirect(url_for('student.view_courses'))
+    elif user_role == User.Roles['TEACHER']:
+        return redirect(url_for('teacher.view_courses'))
     elif user_role == User.Roles['ADMIN']:
-        return redirect(url_for('admin.view_courses'))
-    elif user_role == User.Roles['MODERATOR']:
-        return redirect(url_for('mod.index'))
+        return redirect(url_for('admin.index'))
     else:
         return redirect(url_for('auth.login'))

@@ -81,7 +81,7 @@ class User(UserMixin, db.Model):
     Roles = {
         'ADMIN': 'ADMIN',
         'STUDENT': 'STUDENT',
-        'MODERATOR': 'MODERATOR'
+        'TEACHER': 'TEACHER'
     }
 
     __mapper_args__ = {
@@ -98,11 +98,11 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    def is_teacher(self):
+        return self.role == User.Roles['TEACHER']
+
     def is_admin(self):
         return self.role == User.Roles['ADMIN']
-
-    def is_moderator(self):
-        return self.role == User.Roles['MODERATOR']
 
     def is_student(self):
         return self.role == User.Roles['STUDENT']
@@ -134,9 +134,9 @@ class User(UserMixin, db.Model):
         return task
 
 
-class Moderator(User):
+class Admin(User):
     __mapper_args__ = {
-        'polymorphic_identity': 'MODERATOR'
+        'polymorphic_identity': 'ADMIN'
     }
 
 
@@ -152,7 +152,7 @@ class UserCourse(User):
 
     def get_directory(self):
         if self.role == self.Roles['ADMIN']:
-            return os.path.join(current_app.config['INSTANCE_DIR'], 'admins', self.index)
+            return os.path.join(current_app.config['INSTANCE_DIR'], 'teachers', self.index)
         return None
 
     def launch_course_email(self, course):
@@ -164,10 +164,10 @@ class UserCourse(User):
         return task
 
 
-class Admin(UserCourse):
+class Teacher(UserCourse):
     exports = db.relationship('Export', backref='user', lazy='dynamic')
     __mapper_args__ = {
-        'polymorphic_identity': 'ADMIN',
+        'polymorphic_identity': 'TEACHER',
     }
 
 

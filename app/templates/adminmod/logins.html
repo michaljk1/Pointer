@@ -1,10 +1,10 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    {% if current_user.is_admin() %}
+    {% if current_user.is_teacher() %}
+        <a href="{{ url_for('teacher.view_logins') }}"><pb> Logowania </pb></a>
+    {% elif current_user.is_admin() %}
         <a href="{{ url_for('admin.view_logins') }}"><pb> Logowania </pb></a>
-    {% elif current_user.is_moderator() %}
-        <a href="{{ url_for('mod.view_logins') }}"><pb> Logowania </pb></a>
     {% endif %}
 {% endblock %}
 {% block app_content %}

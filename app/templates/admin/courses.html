@@ -1,6 +1,6 @@
 {% extends "my_base.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}">
+    <a href="{{ url_for('teacher.view_courses') }}">
         <pb> Kursy</pb>
     </a>
 {% endblock %}
@@ -10,7 +10,7 @@
         <ul>
         {% for course in courses %}
             <li>
-                <h1><a href="{{ url_for('admin.view_course', course_name = course.name ) }}">{{ course.name }}</a>
+                <h1><a href="{{ url_for('teacher.view_course', course_name = course.name ) }}">{{ course.name }}</a>
                 </h1>
             </li>
         {% endfor %}
@@ -19,7 +19,7 @@
     <hr>
     {% endif %}
     <div class="bottom_div">
-        <button type="button" onclick="window.location.href='{{ url_for('admin.add_course') }}'"
+        <button type="button" onclick="window.location.href='{{ url_for('teacher.add_course') }}'"
                 class="btn btn-success btn-lg">Dodaj kurs
         </button>
     </div>

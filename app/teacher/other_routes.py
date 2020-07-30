@@ -2,10 +2,10 @@
 from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
 
-from app.admin import bp
-from app.admin.AdminUtil import get_students_ids_emails, get_statistics
-from app.admin.admin_forms import StatisticsForm
-from app.mod.mod_forms import LoginInfoForm
+from app.teacher import bp
+from app.teacher.TeacherUtil import get_students_ids_emails, get_statistics
+from app.teacher.teacher_forms import StatisticsForm
+from app.admin.teacher_forms import LoginInfoForm
 from app.models.export import Export
 from app.models.lesson import Lesson
 from app.models.solution import Solution
@@ -18,19 +18,19 @@ from app.services.ValidationUtil import validate_course, validate_role
 @bp.route('/logins', methods=['GET', 'POST'])
 @login_required
 def view_logins():
-    validate_role(current_user, User.Roles['ADMIN'])
+    validate_role(current_user, User.Roles['TEACHER'])
     form, logins = LoginInfoForm(), []
     member_ids, emails = get_students_ids_emails(current_user.courses)
     form.email.choices += ((email, email) for email in emails)
     if form.validate_on_submit():
         logins = login_query(form, current_user.role, member_ids).all()
-    return render_template('adminmod/logins.html', form=form, logins=logins)
+    return render_template('teachermod/logins.html', form=form, logins=logins)
 
 
 @bp.route('/statistics', methods=['GET', 'POST'])
 @login_required
 def view_statistics():
-    validate_role(current_user, User.Roles['ADMIN'])
+    validate_role(current_user, User.Roles['TEACHER'])
     form = StatisticsForm()
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
@@ -40,14 +40,14 @@ def view_statistics():
         student = Student.query.filter_by(email=form.email.data).first()
         course = Course.query.filter_by(name=form.course.data).first()
         statistics_list, statistics_info = get_statistics(student, course, current_user.courses)
-    return render_template('admin/statistics.html', statisticsList=statistics_list, statistics_info=statistics_info,
+    return render_template('teacher/statistics.html', statisticsList=statistics_list, statistics_info=statistics_info,
                            form=form)
 
 
 @bp.route('/download')
 @login_required
 def download():
-    validate_role(current_user, User.Roles['ADMIN'])
+    validate_role(current_user, User.Roles['TEACHER'])
     request_id = request.args.get('id')
     domain = request.args.get('domain')
     my_object, my_course, filename = None, None, None
@@ -76,5 +76,5 @@ def download():
         if my_object.user_id != current_user.id:
             abort(404)
     else:
-        validate_course(current_user, User.Roles['ADMIN'], my_course)
+        validate_course(current_user, User.Roles['TEACHER'], my_course)
     return send_from_directory(directory=my_object.get_directory(), filename=filename)

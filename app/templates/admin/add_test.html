@@ -1,13 +1,13 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}"><pb> Kursy </pb></a>
+    <a href="{{ url_for('teacher.view_courses') }}"><pb> Kursy </pb></a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = exercise.lesson.course.name) }}"><pb> {{ exercise.lesson.course.name }} </pb></a>
+    <a href="{{ url_for('teacher.view_course', course_name = exercise.lesson.course.name) }}"><pb> {{ exercise.lesson.course.name }} </pb></a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_id = exercise.lesson.id) }}"><pb> {{ exercise.lesson.name }} </pb></a>
+    <a href="{{ url_for('teacher.view_lesson', lesson_id = exercise.lesson.id) }}"><pb> {{ exercise.lesson.name }} </pb></a>
     /
-    <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}"><pb> {{ exercise.name }} </pb></a>
+    <a href="{{ url_for('teacher.view_exercise', exercise_id = exercise.id) }}"><pb> {{ exercise.name }} </pb></a>
 {% endblock %}
 {% block app_content %}
     <div class="row">

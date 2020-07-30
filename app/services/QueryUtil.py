@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy import desc, func
 
 from app import db
-from app.mod.mod_forms import LoginInfoForm
+from app.admin.teacher_forms import LoginInfoForm
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.logininfo import LoginInfo
@@ -34,7 +34,7 @@ def get_filtered_by_status(solutions: List[Solution], status: str) -> List[Solut
     return qualified_solutions
 
 
-def exercise_admin_query(form, courses=None):
+def exercise_teacher_query(form, courses=None):
     query = exercise_query(form, courses)
 
     if form.is_published.data:
@@ -99,7 +99,7 @@ def exercise_query(form, courses=None):
     return query
 
 
-# admin can see only his courses members login infos, ids = list ids of course members
+# teacher can see only his courses members login infos, ids = list ids of course members
 def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
     query = db.session.query(LoginInfo).select_from(LoginInfo).join(User, User.id == LoginInfo.user_id)
 
@@ -111,7 +111,7 @@ def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
 
     if form.email.data != 'ALL':
         query = query.filter(User.email == form.email.data)
-    elif user_role == User.Roles['ADMIN']:
+    elif user_role == User.Roles['TEACHER']:
         if members_ids is None or len(members_ids) == 0:
             query = query.filter(1 == 0)
         else:

@@ -1,23 +1,23 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}">
+    <a href="{{ url_for('teacher.view_courses') }}">
         <pb> Kursy</pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = exercise.lesson.course.name) }}">
+    <a href="{{ url_for('teacher.view_course', course_name = exercise.lesson.course.name) }}">
         <pb> {{ exercise.lesson.course.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_lesson', lesson_id = exercise.lesson.id) }}">
+    <a href="{{ url_for('teacher.view_lesson', lesson_id = exercise.lesson.id) }}">
         <pb> {{ exercise.lesson.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_exercise', exercise_id = exercise.id) }}">
+    <a href="{{ url_for('teacher.view_exercise', exercise_id = exercise.id) }}">
         <pb> {{ exercise.name }} </pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_tests', exercise_id = exercise.id) }}">
+    <a href="{{ url_for('teacher.view_tests', exercise_id = exercise.id) }}">
         <pb> Testy </pb>
     </a>
 {% endblock %}
@@ -27,21 +27,21 @@
     <h1>Maksymalna liczba punktów: {{ exercise.get_max_points() }}</h1>
     <hr>
     {% for test in exercise.tests %}
-        <p>Output: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.output_name) }}"
+        <p>Output: <a href="{{ url_for('teacher.download', id=test.id, domain='test', filename=test.output_name) }}"
                       target="_blank"> {{ test.output_name }}</a></p>
-        <p>Input: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.input_name) }}"
+        <p>Input: <a href="{{ url_for('teacher.download', id=test.id, domain='test', filename=test.input_name) }}"
                      target="_blank"> {{ test.input_name }}</a></p>
         <p>Punkty: {{ test.points }}</p>
         <p>Timeout: {{ test.timeout }}s</p>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.delete_test', test_id = test.id ) }}'"
+                onclick="window.location.href='{{ url_for('teacher.delete_test', test_id = test.id ) }}'"
                 class="btn btn-danger">Usuń test
         </button>
         <hr>
     {% endfor %}
     <div class="bottom_div">
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.add_test', exercise_id = exercise.id ) }}'"
+                onclick="window.location.href='{{ url_for('teacher.add_test', exercise_id = exercise.id ) }}'"
                 class="btn btn-primary btn-lg">Dodaj test
         </button>
     </div>

@@ -35,7 +35,7 @@ def validate_test(user: User, required_role: str, test: Test):
     validate_course(user, required_role, test.get_course())
 
 
-def validate_exercise_admin(user: User, required_role: str, exercise: Exercise):
+def validate_exercise_teacher(user: User, required_role: str, exercise: Exercise):
     validate_exists(exercise)
     validate_course(user, required_role, exercise.get_course())
 
@@ -54,7 +54,7 @@ def validate_solution_student(user: User, required_role: str, solution: Solution
         abort(404)
 
 
-def validate_solution_admin(user: User, required_role: str, solution: Solution):
+def validate_solution_teacher(user: User, required_role: str, solution: Solution):
     validate_exists(solution)
     validate_course(user, required_role, solution.get_course())
 

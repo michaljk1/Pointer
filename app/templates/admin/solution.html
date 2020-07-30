@@ -1,15 +1,15 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_solutions') }}">
+    <a href="{{ url_for('teacher.view_solutions') }}">
         <pb> Rozwiązania</pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_exercise', exercise_id = solution.exercise.id) }}">
+    <a href="{{ url_for('teacher.view_exercise', exercise_id = solution.exercise.id) }}">
         <pb> {{ solution.exercise.name }}</pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_solution', solution_id=solution.id) }}">
+    <a href="{{ url_for('teacher.view_solution', solution_id=solution.id) }}">
         <pb> {{ solution.author.email }} - {{ solution.attempt }}</pb>
     </a>
 {% endblock %}
@@ -17,10 +17,10 @@
     <form action="" method="post" class="form" role="form">
         {{ form.csrf_token() }}
         {{ wtf.form_field(form.email, class='form-control') }}
-        <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='solution') }}"
+        <h1><a href="{{ url_for('teacher.download', id=solution.id, domain='solution', type='solution') }}"
                target="_blank">{{ solution.file_path }}</a></h1>
         {% if solution.output_file != None %}
-            <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='output') }}"
+            <h1><a href="{{ url_for('teacher.download', id=solution.id, domain='solution', type='output') }}"
                    target="_blank">{{ solution.output_file }}</a></h1>
         {% endif %}
         <h1>Oddano: {{ solution.get_str_send_date() }}</h1>
@@ -41,19 +41,19 @@
     </form>
     {% if solution.status != solution.Status['APPROVED'] %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.approve_solution', solution_id = solution.id ) }}'"
+                onclick="window.location.href='{{ url_for('teacher.approve_solution', solution_id = solution.id ) }}'"
                 class="btn  btn-success">Zaakceptuj
         </button>
     {% endif %}
     {% if solution.status != solution.Status['REFUSED'] %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.decline_solution', solution_id = solution.id) }}'"
+                onclick="window.location.href='{{ url_for('teacher.decline_solution', solution_id = solution.id) }}'"
                 class="btn btn-danger">Odrzuć
         </button>
     {% endif %}
     {% if solution.tasks_finished() %}
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.reprocess_solution', solution_id = solution.id ) }}'"
+                onclick="window.location.href='{{ url_for('teacher.reprocess_solution', solution_id = solution.id ) }}'"
                 class="btn  btn-primary">Przetestuj ponownie
         </button>
     {% endif %}

@@ -1,7 +1,7 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_statistics') }}">
+    <a href="{{ url_for('teacher.view_statistics') }}">
         <pb> Statystki</pb>
     </a>
 {% endblock %}
@@ -27,7 +27,7 @@
                 <tr class='{{ idx }}' style="cursor: pointer">
                     <td><p>{{ statistics.user_email }}</p></td>
                     <td>
-                        <a href="{{ url_for('admin.view_course', course_name=statistics.course_name) }}">{{ statistics.course_name }}</a>
+                        <a href="{{ url_for('teacher.view_course', course_name=statistics.course_name) }}">{{ statistics.course_name }}</a>
                     </td>
                     <td><p>{{ statistics.user_points }}</p></td>
                     <td><p>{{ statistics.course_points }}</p></td>
@@ -42,9 +42,9 @@
                 {% for student_exercise in statistics.student_exercises %}
                     <tr class='{{ idx }}details'
                         style="display:none; background-color: #FFEBCD">
-                        <td><a href="{{ url_for('admin.view_lesson', lesson_id=student_exercise.exercise.lesson.id) }}">
+                        <td><a href="{{ url_for('teacher.view_lesson', lesson_id=student_exercise.exercise.lesson.id) }}">
                             {{ student_exercise.exercise.lesson.name }}</a></td>
-                        <td><a href="{{ url_for('admin.view_exercise', exercise_id=student_exercise.exercise.id) }}">
+                        <td><a href="{{ url_for('teacher.view_exercise', exercise_id=student_exercise.exercise.id) }}">
                             {{ student_exercise.exercise.name }}</a></td>
                         <td>{{ student_exercise.points }}</td>
                         <td>{{ student_exercise.max_points }}</td>
@@ -56,11 +56,11 @@
             </tbody>
         </table>
         <button type="button"
-                onclick="window.location.href='{{ url_for('admin.export_statistics_csv', statistics_info = statistics_info) }}'"
+                onclick="window.location.href='{{ url_for('teacher.export_statistics_csv', statistics_info = statistics_info) }}'"
                 class="btn btn-primary">Export CSV
         </button>
         <a type="button"
-           href='{{ url_for('admin.export_statistics_pdf', statistics_info = statistics_info) }}'
+           href='{{ url_for('teacher.export_statistics_pdf', statistics_info = statistics_info) }}'
            target="_blank"
            class="btn btn-info">Export PDF
         </a>

@@ -1,7 +1,7 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_solutions') }}">
+    <a href="{{ url_for('teacher.view_solutions') }}">
         <pb> Rozwiązania</pb>
     </a>
 {% endblock %}
@@ -22,6 +22,6 @@
         {{ wtf.form_field(form.ip_address, class='form-control') }}
         {{ wtf.form_field(form.submit, class='btn btn-primary') }}
     </form>
-    {% include "admin/solutionlist.html" %}
+    {% include "teacher/solutionlist.html" %}
 
 {% endblock %}

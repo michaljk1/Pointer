@@ -35,7 +35,7 @@ flask db upgrade,
 
 create moderator account
 --------------
-python3 create_mod.py 'moderator@email.com' 'moderatorName' 'moderatorSurname' 'moderatorPassword'
+python3 create_admin.py 'moderator@email.com' 'moderatorName' 'moderatorSurname' 'moderatorPassword'
 
 install redis:
 --------------

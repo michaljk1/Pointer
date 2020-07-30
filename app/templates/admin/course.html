@@ -1,11 +1,11 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin.view_courses') }}">
+    <a href="{{ url_for('teacher.view_courses') }}">
         <pb> Kursy</pb>
     </a>
     /
-    <a href="{{ url_for('admin.view_course', course_name = course.name) }}">
+    <a href="{{ url_for('teacher.view_course', course_name = course.name) }}">
         <pb> {{ course.name }} </pb>
     </a>
 {% endblock %}
@@ -16,7 +16,7 @@
         <ul>
             {% for lesson in course.lessons %}
                 <li><h1><a
-                        href="{{ url_for('admin.view_lesson',lesson_id = lesson.id) }}">{{ lesson.name }}</a>
+                        href="{{ url_for('teacher.view_lesson',lesson_id = lesson.id) }}">{{ lesson.name }}</a>
                 </h1></li>
             {% endfor %}
             {% if course.lessons.all()|length > 0 %}
@@ -29,26 +29,26 @@
         {% endif %}
         <div class="bottom_div">
             <button type="button"
-                    onclick="window.location.href='{{ url_for('admin.add_lesson', course_name = course.name ) }}'"
+                    onclick="window.location.href='{{ url_for('teacher.add_lesson', course_name = course.name ) }}'"
                     class="btn btn-success btn-lg">Dodaj lekcję
             </button>
             <button type="button"
-                    onclick="window.location.href='{{ url_for('admin.add_student', course_name = course.name ) }}'"
+                    onclick="window.location.href='{{ url_for('teacher.add_student', course_name = course.name ) }}'"
                     class="btn btn-primary btn-lg">Dodaj studenta
             </button>
             <button type="button"
-                    onclick="window.location.href='{{ url_for('admin.delete_student', course_name = course.name ) }}'"
+                    onclick="window.location.href='{{ url_for('teacher.delete_student', course_name = course.name ) }}'"
                     class="btn btn-info btn-lg">Usuń studenta
             </button>
 
             {% if course.is_open %}
                 <button type="button"
-                        onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"
+                        onclick="window.location.href='{{ url_for('teacher.change_open_course', course_id = course.id ) }}'"
                         class="btn btn-secondary btn-lg">Zablokuj zapis
                 </button>
             {% else %}
                 <button type="button"
-                        onclick="window.location.href='{{ url_for('admin.change_open_course', course_id = course.id ) }}'"
+                        onclick="window.location.href='{{ url_for('teacher.change_open_course', course_id = course.id ) }}'"
                         class="btn btn-secondary btn-lg">Aktywuj zapis
                 </button>
             {% endif %}
