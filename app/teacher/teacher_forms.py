@@ -6,6 +6,7 @@ from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatF
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired, Length, Optional
 
+from app.default.default_forms import EmailForm
 from app.models.usercourse import Course
 from app.student.student_forms import SolutionStudentSearchForm
 
@@ -84,9 +85,6 @@ class TestForm(FlaskForm):
         if output.data.filename.rsplit('.', 1)[1].lower() != 'txt':
             raise ValidationError('Oczekiwany format - .txt')
 
-
-class EmailForm(FlaskForm):
-    email = SelectField('Email', choices=[])
 
 
 class AddStudentForm(EmailForm):

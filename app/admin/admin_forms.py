@@ -2,16 +2,15 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, StringField
 
+from app.default.default_forms import EmailForm
 from app.models.logininfo import LoginInfo
 
 
-class RoleStudentForm(FlaskForm):
-    email = SelectField('User', choices=[])
-    submit_button = SubmitField('Nadaj uprawnienia studenta')
+class RoleStudentForm(EmailForm):
+    submit_button = SubmitField('Odbierz uprawnienia nauczyciela')
 
 
-class RoleTeacherForm(FlaskForm):
-    email = SelectField('User', choices=[])
+class RoleTeacherForm(EmailForm):
     submit_button = SubmitField('Nadaj uprawnienia nauczyciela')
 
 

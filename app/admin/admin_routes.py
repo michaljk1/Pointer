@@ -33,7 +33,7 @@ def teacher_roles():
         if directory is not None:
             create_directory(directory)
         db.session.commit()
-        flash('Nadano prawa teacheristratora', 'message')
+        flash('Nadano prawa nauczyciela', 'message')
         return redirect(url_for('admin.teacher_roles'))
     return render_template('admin/teacher_roles.html', teacher_form=teacher_form)
 
