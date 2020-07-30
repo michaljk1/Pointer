@@ -1,5 +1,3 @@
-ensure python 3.8 is installed
-
 download project
 --------------
 sudo apt install git,
@@ -57,5 +55,5 @@ flask run
 
 email info
 --------------
-Only users with confirmed emails are able to use pointer. When application is running not at production server there will can be issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their email confirmed can be omitted -   
+Only users with confirmed emails are able to use pointer. When application is running not at production server there is an issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their email confirmed can be omitted -   
 comment lines from 62-65 in app/auth/auth_routes.py file
