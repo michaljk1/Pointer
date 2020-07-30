@@ -1,0 +1,27 @@
+{% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('teacher.view_solutions') }}">
+        <pb> Rozwiązania</pb>
+    </a>
+{% endblock %}
+{% block app_content %}
+    <form action="" method="post" class="form" role="form">
+        {{ form.csrf_token() }}
+        {{ wtf.form_field(form.course, class='form-control') }}
+        {{ wtf.form_field(form.lesson, class='form-control') }}
+        {{ wtf.form_field(form.exercise, class='form-control') }}
+        {{ wtf.form_field(form.is_published, class='form-control') }}
+        {{ wtf.form_field(form.status, class='form-control') }}
+        {{ wtf.form_field(form.email, class='form-control') }}
+        {{ wtf.form_field(form.index, class='form-control') }}
+        {{ wtf.form_field(form.name, class='form-control') }}
+        {{ wtf.form_field(form.surname, class='form-control') }}
+        {{ wtf.form_field(form.points_from, class='form-control') }}
+        {{ wtf.form_field(form.points_to, class='form-control') }}
+        {{ wtf.form_field(form.ip_address, class='form-control') }}
+        {{ wtf.form_field(form.submit, class='btn btn-primary') }}
+    </form>
+    {% include "teacher/solutionlist.html" %}
+
+{% endblock %}

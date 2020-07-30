@@ -1,0 +1,39 @@
+{% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    {% if current_user.is_teacher() %}
+        <a href="{{ url_for('teacher.view_logins') }}"><pb> Logowania </pb></a>
+    {% elif current_user.is_admin() %}
+        <a href="{{ url_for('admin.view_logins') }}"><pb> Logowania </pb></a>
+    {% endif %}
+{% endblock %}
+{% block app_content %}
+
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
+        </div>
+    </div>
+    <hr>
+    {% if logins|length > 0 %}
+    <table id="paginatedTable" class="display" style="width:100%">
+            <thead>
+            <th>Użytkownik</th>
+            <th>IP</th>
+            <th>Data</th>
+            <th>Status</th>
+            </thead>
+            <tbody>
+            {% for login in logins %}
+                <tr>
+                    <td><p>{{ login.user.email }}</p></td>
+                    <td><p>{{ login.ip_address }}</p></td>
+                    <td><p>{{ login.get_str_login_date()  }}</p></td>
+                    <td><p>{{ login.status }}</p></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+     <script src="{{ url_for('static', filename='js/paginated_table.js') }}"></script>
+{% endblock %}

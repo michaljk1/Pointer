@@ -1,0 +1,29 @@
+{% extends "my_base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block breadcrumb %}
+    <a href="{{ url_for('teacher.view_courses') }}">
+        <pb> Kursy</pb>
+    </a>
+    /
+    <a href="{{ url_for('teacher.view_course', course_name = lesson.course.name) }}">
+        <pb> {{ lesson.course.name }} </pb>
+    </a>
+    /
+    <a href="{{ url_for('teacher.view_lesson', lesson_id = lesson.id) }}">
+        <pb> {{ lesson.name }} </pb>
+    </a>
+    /
+    <a href="{{ url_for('teacher.edit_lesson', lesson_id = lesson.id) }}">
+        <pb>Edytuj lekcję</pb>
+    </a>
+{% endblock %}
+{% block app_content %}
+    <form action="" method="post" enctype="multipart/form-data" class="form" role="form">
+        {{ form.csrf_token() }}
+        <textarea id="summernote" name="editordata">{{ lesson.content_text }}</textarea>
+        {{ form.pdf_content() }}
+        <hr>
+        {{ wtf.form_field(form.submit_button, class='btn btn-success') }}
+    </form>
+    <script src="{{ url_for('static', filename='js/load_summernote.js') }}"></script>
+{% endblock %}

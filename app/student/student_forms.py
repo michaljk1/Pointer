@@ -9,7 +9,7 @@ from app.models.solution import Solution
 
 class UploadForm(FlaskForm):
     file = FileField('Wybierz plik', validators=[DataRequired()])
-    submit_button = SubmitField('Zapisz')
+    submit_button = SubmitField('Wyślij rozwiązanie')
 
 
 class SolutionStudentSearchForm(FlaskForm):

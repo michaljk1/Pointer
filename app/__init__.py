@@ -37,11 +37,11 @@ def create_app():
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
-    from app.mod import bp as mod_bp
-    app.register_blueprint(mod_bp, url_prefix='/mod')
+    from app.admin import bp as mod_bp
+    app.register_blueprint(mod_bp, url_prefix='/admin')
 
-    from app.admin import bp as main_bp
-    app.register_blueprint(main_bp, url_prefix='/admin')
+    from app.teacher import bp as main_bp
+    app.register_blueprint(main_bp, url_prefix='/teacher')
 
     from app.student import bp as student_bp
     app.register_blueprint(student_bp, url_prefix='/student')

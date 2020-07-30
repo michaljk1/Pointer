@@ -6,12 +6,12 @@ from app.models.usercourse import Course, User, Student
 
 
 # Statistics for given course and user
-# statistics for admin includes points from exercises which haven't finished
+# statistics for teacher includes points from exercises which haven't finished
 # student should not be able to see these values
 class Statistics:
-    def __init__(self, course: Course, student: Student, for_admin=False):
-        if for_admin:
-            self.student_exercises, self.user_points = StudentExercise.get_student_exercises_for_admin(student, course)
+    def __init__(self, course: Course, student: Student, for_teacher=False):
+        if for_teacher:
+            self.student_exercises, self.user_points = StudentExercise.get_student_exercises_for_teacher(student, course)
         else:
             self.student_exercises, self.user_points = StudentExercise.get_student_exercises_for_student(student, course)
         self.course_points = course.get_course_points()
@@ -32,7 +32,7 @@ class Statistics:
         statistics_list = []
         for course in courses:
             for student in students:
-                statistics_list.append(Statistics(course=course, student=student, for_admin=True))
+                statistics_list.append(Statistics(course=course, student=student, for_teacher=True))
         return statistics_list
 
     # method used in export
@@ -77,7 +77,7 @@ class StudentExercise:
         return student_exercises, user_points
 
     @staticmethod
-    def get_student_exercises_for_admin(user: User, course: Course):
+    def get_student_exercises_for_teacher(user: User, course: Course):
         user_points, student_exercises = 0.0, []
         for exercise in course.get_exercises():
             user_solution = exercise.get_user_active_solution(user_id=user.id)
