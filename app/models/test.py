@@ -9,6 +9,7 @@ class Test(db.Model):
     exercise_id = db.Column(db.ForeignKey('exercise.id'))
     output_name = db.Column(db.String(100))
     input_name = db.Column(db.String(100))
+    timeout = db.Column(db.Integer, nullable=False)
     points = db.Column(db.Float)
     create_date = db.Column(db.DateTime, nullable=False)
 

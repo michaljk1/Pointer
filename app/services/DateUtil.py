@@ -14,3 +14,7 @@ def get_offset_aware(my_datetime: datetime) -> datetime:
                             tzinfo=get_current_date().tzinfo)
     return end_datetime
 
+
+def get_formatted_date(my_datetime: datetime) -> str:
+    return str(my_datetime).split('.')[0]
+

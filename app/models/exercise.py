@@ -22,7 +22,6 @@ class Exercise(db.Model):
     compile_command = db.Column(db.String(100))
     run_command = db.Column(db.String(100), nullable=False)
     is_published = db.Column(db.Boolean, default=False)
-    timeout = db.Column(db.Integer, nullable=False)
     interval = db.Column(db.Integer, nullable=False)
     solutions = db.relationship('Solution', backref='exercise', lazy='dynamic')
     tests = db.relationship('Test', backref='executor', lazy='dynamic')
@@ -48,10 +47,10 @@ class Exercise(db.Model):
                 return solution
         return None
 
-    def create_test(self, input_file, output_file, points):
+    def create_test(self, input_file, output_file, timeout, points):
         input_name, output_name = secure_filename(input_file.filename), secure_filename(output_file.filename)
         test = Test(points=points, input_name=input_name, output_name=output_name, exercise_id=self.id,
-                    create_date=get_current_date())
+                    timeout=timeout, create_date=get_current_date())
         self.tests.append(test)
         db.session.commit()
         test_directory = test.get_directory()
@@ -74,6 +73,5 @@ class Exercise(db.Model):
         self.end_date = end_datetime
         self.run_command = form.run_command.data
         self.program_name = form.program_name.data
-        self.timeout = form.timeout.data
         self.interval = form.interval.data
         self.content = content

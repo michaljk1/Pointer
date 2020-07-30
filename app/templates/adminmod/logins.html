@@ -28,7 +28,7 @@
                 <tr>
                     <td><p>{{ login.user.email }}</p></td>
                     <td><p>{{ login.ip_address }}</p></td>
-                    <td><p>{{ login.login_date.strftime('%Y-%m-%d %H:%M:%S')  }}</p></td>
+                    <td><p>{{ login.get_str_login_date()  }}</p></td>
                     <td><p>{{ login.status }}</p></td>
                 </tr>
             {% endfor %}

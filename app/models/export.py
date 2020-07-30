@@ -2,6 +2,7 @@
 import os
 
 from app import db
+from app.services.DateUtil import get_formatted_date
 
 
 class Export(db.Model):
@@ -25,3 +26,6 @@ class Export(db.Model):
 
     def get_directory(self):
         return os.path.join(self.user.get_directory())
+
+    def get_str_generation_date(self):
+        return get_formatted_date(self.generation_date)

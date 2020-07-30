@@ -63,7 +63,7 @@ def create_solutions_pdf(solutions, global_filename):
     data, elements = [], []
     for solution in solutions:
         data.append([solution.author.index, solution.get_course().name, solution.get_lesson().name,
-                     solution.exercise.name, solution.send_date, solution.points, solution.status])
+                     solution.exercise.name, solution.get_str_send_date(), solution.points, solution.status])
     table = Table(data, rowHeights=25,
                   colWidths=[0.7 * inch, 1 * inch, 1.5 * inch, 1.5 * inch, 2 * inch, 0.4 * inch, 1.2 * inch])
     table.setStyle(TableStyle(

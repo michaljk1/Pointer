@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 
 from app import db
 from app.mod.mod_forms import LoginInfoForm
@@ -44,16 +44,16 @@ def exercise_admin_query(form, courses=None):
         query = query.filter(Solution.status == form.status.data)
 
     if form.surname.data is not None and len(form.surname.data) > 0:
-        query = query.filter(User.surname == form.surname.data)
+        query = query.filter(func.lower(User.surname) == func.lower(form.surname.data))
 
     if form.name.data is not None and len(form.name.data) > 0:
-        query = query.filter(User.name == form.name.data)
+        query = query.filter(func.lower(User.name) == func.lower(form.name.data))
 
     if form.index.data is not None and len(form.index.data) > 0:
         query = query.filter(User.index == form.index.data)
 
     if form.email.data is not None and len(form.email.data) > 0:
-        query = query.filter(User.email == form.email.data)
+        query = query.filter(func.lower(User.email) == func.lower(form.email.data))
 
     if form.ip_address.data is not None and len(form.ip_address.data) > 0:
         query = query.filter(Solution.ip_address == form.ip_address.data)
@@ -91,10 +91,10 @@ def exercise_query(form, courses=None):
             query = query.filter(Course.name.in_(courses))
 
     if not len(form.lesson.data) == 0:
-        query = query.filter(Lesson.name == form.lesson.data)
+        query = query.filter(func.lower(Lesson.name) == func.lower(form.lesson.data))
 
     if not len(form.exercise.data) == 0:
-        query = query.filter(Exercise.name == form.exercise.data)
+        query = query.filter(func.lower(Exercise.name) == func.lower(form.exercise.data))
 
     return query
 

@@ -6,6 +6,7 @@ from sqlalchemy import TEXT
 
 from app import db
 from app.models.task import Task
+from app.services.DateUtil import get_formatted_date
 
 
 class Solution(db.Model):
@@ -51,10 +52,13 @@ class Solution(db.Model):
         return self.exercise.lesson
 
     def get_course(self):
-        return self.exercise.lesson.course
+        return self.exercise.get_course()
 
     def get_directory(self):
         return os.path.join(self.exercise.get_directory(), self.author.index, str(self.attempt))
+
+    def get_str_send_date(self):
+        return get_formatted_date(self.send_date)
 
     def tasks_finished(self):
         for task in self.tasks:

@@ -31,7 +31,8 @@
                       target="_blank"> {{ test.output_name }}</a></p>
         <p>Input: <a href="{{ url_for('admin.download', id=test.id, domain='test', filename=test.input_name) }}"
                      target="_blank"> {{ test.input_name }}</a></p>
-        <div><p>Punkty: {{ test.points }}</p></div>
+        <p>Punkty: {{ test.points }}</p>
+        <p>Timeout: {{ test.timeout }}s</p>
         <button type="button"
                 onclick="window.location.href='{{ url_for('admin.delete_test', test_id = test.id ) }}'"
                 class="btn btn-danger">Usuń test

@@ -28,7 +28,7 @@ class CourseForm(FlaskForm):
 
 class EditLessonForm(FlaskForm):
     pdf_content = FileField('Wybierz plik')
-    submit_button = SubmitField('Zapisz')
+    submit_button = SubmitField('Zapisz zmiany')
 
 
 class LessonForm(FlaskForm):
@@ -48,17 +48,13 @@ class ExerciseEditForm(FlaskForm):
     compile_command = StringField('Kompilacja')
     run_command = StringField('Uruchamianie', validators=[DataRequired()])
     program_name = StringField('Nazwa testowanego pliku', validators=[DataRequired()])
-    timeout = IntegerField('Timeout(sekundy)')
     interval = IntegerField('Przerwa pomiędzy wysłaniem zadań(sekundy)')
-    submit_button = SubmitField('Zapisz')
+    submit_button = SubmitField('Zapisz zmiany')
 
 
 class ExerciseForm(ExerciseEditForm):
     name = StringField('Nazwa', validators=[DataRequired()])
-    output = FileField('Output', validators=[DataRequired()])
-    input = FileField('Input', validators=[DataRequired()])
-    max_points = FloatField('Liczba punktów', validators=[DataRequired()])
-    submit_button = SubmitField('Dodaj ćwiczenie')
+    submit_button = SubmitField('Dodaj zadanie')
 
     def validate_name(self, name):
         if '/' in name.data:
@@ -75,6 +71,7 @@ class ExerciseForm(ExerciseEditForm):
 
 class TestForm(FlaskForm):
     max_points = FloatField('Liczba punktów', validators=[DataRequired()])
+    timeout = IntegerField('Timeout(sekundy)')
     output = FileField('Output', validators=[DataRequired()])
     input = FileField('Input', validators=[DataRequired()])
     submit_button = SubmitField('Dodaj test')

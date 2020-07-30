@@ -27,7 +27,7 @@
         {{ form.csrf_token() }}
         <h1><a href="{{ url_for('student.download_solution', solution_id=solution.id) }}"
                target="_blank">{{ solution.file_path }}</a></h1>
-        <h1>Oddano: {{ solution.send_date.strftime('%Y-%m-%d %H:%M:%S') }}</h1>
+        <h1>Oddano: {{ solution.get_str_send_date() }}</h1>
         {{ wtf.form_field(form.student_points, class='form-control') }}
         <p>Maksymalna ilość punktów: {{ solution.exercise.get_max_points() }}</p>
         {{ wtf.form_field(form.student_status, class='form-control') }}

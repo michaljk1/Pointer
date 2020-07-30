@@ -17,7 +17,7 @@
             <tr style="cursor: pointer">
                 <td><p><a href="{{ url_for('admin.download', id=export.id, domain = 'export') }}"
                           target="_blank">{{ export.file_name }}</a></p></td>
-                <td><p>{{ export.generation_date.strftime('%Y-%m-%d %H:%M:%S') }}</p></td>
+                <td><p>{{ export.get_str_generation_date() }}</p></td>
                 <td><p>{{ export.type }}</p></td>
             </tr>
         {% endfor %}

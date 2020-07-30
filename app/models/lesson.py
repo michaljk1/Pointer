@@ -36,7 +36,6 @@ class Lesson(db.Model):
         exercise.values_by_form(form, content)
         self.exercises.append(exercise)
         create_directory(exercise.get_directory())
-        return exercise
 
     def get_course(self):
         return self.course

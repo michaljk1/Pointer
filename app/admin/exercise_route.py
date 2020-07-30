@@ -49,7 +49,8 @@ def add_test(exercise_id):
     validate_exercise_admin(current_user, User.Roles['ADMIN'], exercise)
     form = TestForm()
     if request.method == 'POST' and form.validate_on_submit():
-        exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
+        exercise.create_test(request.files['input'], request.files['output'], form.timeout.data, form.max_points.data)
+        db.session.commit()
         flash('Dodano test', 'message')
         return redirect(url_for('admin.view_tests', exercise_id=exercise.id))
     return render_template('admin/add_test.html', exercise=exercise, form=form)
@@ -78,8 +79,8 @@ def add_exercise(course_name, lesson_id):
         if not lesson.is_exercise_name_proper(form.name.data):
             flash('Wprowadź inną nazwę lekcji', 'error')
             return render_template('admin/add_exercise.html', form=form, lesson=lesson)
-        exercise = lesson.create_exercise(form, request.form.get('editordata'))
-        exercise.create_test(request.files['input'], request.files['output'], form.max_points.data)
+        lesson.create_exercise(form, request.form.get('editordata'))
+        db.session.commit()
         return redirect(url_for('admin.view_lesson', lesson_id=lesson.id))
     return render_template('admin/add_exercise.html', form=form, lesson=lesson)
 

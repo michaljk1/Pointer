@@ -23,7 +23,7 @@
             <h1><a href="{{ url_for('admin.download', id=solution.id, domain='solution', type='output') }}"
                    target="_blank">{{ solution.output_file }}</a></h1>
         {% endif %}
-        <h1>Oddano: {{ solution.send_date.strftime('%Y-%m-%d %H:%M:%S') }}</h1>
+        <h1>Oddano: {{ solution.get_str_send_date() }}</h1>
         <div style="width: 10%; display: inline-block">
             {{ wtf.form_field(form.points, class='form-control') }}
         </div>

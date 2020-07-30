@@ -20,7 +20,7 @@ def get_csv_solution_export(solutions: List[Solution], current_user: User) -> Ex
         for solution in solutions:
             csv_writer.writerow(
                 [solution.author.index] + [solution.get_course().name] + [solution.get_lesson().name] +
-                [solution.exercise.name] + [solution.send_date] + [solution.points] + [solution.status])
+                [solution.exercise.name] + [solution.get_str_send_date()] + [solution.points] + [solution.status])
     export = Export(user_id=current_user.id, file_name=filename, generation_date=current_date, type=Export.types['CSV'], format=Export.formats['SOLUTION'])
     db.session.add(export)
     db.session.commit()
