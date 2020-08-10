@@ -7,7 +7,7 @@ from app import db
 from app.models.export import Export
 from app.models.solution import Solution
 from app.models.statistics import Statistics
-from app.models.usercourse import User
+from app.models.usercourse import User, Teacher
 from app.services.DateUtil import get_current_date
 from app.services.PDFUtil import create_statistic_pdf, create_solutions_pdf
 
@@ -61,7 +61,7 @@ def get_pdf_solution_export(solutions: List[Solution], current_user: User) -> Ex
     return export
 
 
-def get_pdf_statistics_export(statistics_info, current_user: User) -> Export:
+def get_pdf_statistics_export(statistics_info, current_user: Teacher) -> Export:
     current_date = get_current_date()
     filename = ('statystykiPDF' + str(current_date).split('.')[0] + '.pdf').replace(" ", "_")
     global_filename = os.path.join(current_user.get_directory(), filename)

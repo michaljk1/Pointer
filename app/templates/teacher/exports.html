@@ -6,6 +6,7 @@
     </a>
 {% endblock %}
 {% block app_content %}
+    {% if exports|length > 0 %}
     <table id="paginatedTable" class="display" style="width:100%">
         <thead>
         <th>Plik</th>
@@ -23,5 +24,8 @@
         {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <h2>Brak wyeksportowanych plików</h2>
+    {% endif %}
     <script src="{{ url_for('static', filename='js/paginated_table.js') }}"></script>
 {% endblock %}

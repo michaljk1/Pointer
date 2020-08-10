@@ -29,9 +29,7 @@ def teacher_roles():
     if request.method == 'POST' and teacher_form.validate_on_submit():
         user = UserCourse.query.filter_by(email=teacher_form.email.data).first()
         user.role = User.Roles['TEACHER']
-        directory = user.get_directory()
-        if directory is not None:
-            create_directory(directory)
+        create_directory(user.get_directory())
         db.session.commit()
         flash('Nadano prawa nauczyciela', 'message')
         return redirect(url_for('admin.teacher_roles'))

@@ -31,7 +31,7 @@ class Solution(db.Model):
         'APPROVED': 'Zaakceptowano',
         'COMPILE_ERROR': 'Error - kompilacja',
         'TEST_ERROR': 'Error - testowanie',
-        'ERROR': 'Error',
+        'TIMEOUT_ERROR': 'Error - timeout',
         'NOT_ACTIVE': 'Nieaktywne'
     }
 

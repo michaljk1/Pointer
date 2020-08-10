@@ -100,7 +100,7 @@ def grade(solution: Solution):
         except subprocess.TimeoutExpired:
             process.kill()
             solution.error_msg = 'Przekroczono limit czasu podczas testowania'
-            solution.status = solution.Status['ERROR']
+            solution.status = solution.Status['TIMEOUT_ERROR']
             break
 
 

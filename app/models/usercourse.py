@@ -151,9 +151,7 @@ class UserCourse(User):
         return course_names
 
     def get_directory(self):
-        if self.role == self.Roles['ADMIN']:
-            return os.path.join(current_app.config['INSTANCE_DIR'], 'teachers', self.index)
-        return None
+        return os.path.join(current_app.config['INSTANCE_DIR'], 'teachers', self.index)
 
     def launch_course_email(self, course):
         rq_job = current_app.email_queue.enqueue('app.redis_tasks.send_course_email', self.email, course, self.role)

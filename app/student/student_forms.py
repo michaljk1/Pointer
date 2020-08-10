@@ -21,7 +21,7 @@ class SolutionStudentSearchForm(FlaskForm):
                                             [Solution.Status['SEND'], Solution.Status['SEND']],
                                             [Solution.Status['COMPILE_ERROR'], Solution.Status['COMPILE_ERROR']],
                                             [Solution.Status['TEST_ERROR'], Solution.Status['TEST_ERROR']],
-                                            [Solution.Status['ERROR'], Solution.Status['ERROR']]])
+                                            [Solution.Status['TIMEOUT_ERROR'], Solution.Status['TIMEOUT_ERROR']]])
     lesson = StringField('Lekcja')
     exercise = StringField('Zadanie')
     submit = SubmitField('Wyszukaj')

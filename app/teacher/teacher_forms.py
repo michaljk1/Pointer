@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask import flash
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatField, SelectField, \
@@ -31,10 +32,14 @@ class EditLessonForm(FlaskForm):
     pdf_content = FileField('Wybierz plik')
     submit_button = SubmitField('Zapisz zmiany')
 
+    def validate_pdf_content(self, pdf_content):
+        if pdf_content.data.filename.rsplit('.', 1)[1].lower() != 'pdf':
+            flash('Oczekiwany format pliku - .pdf', 'error')
+            raise ValidationError('Oczekiwany format - .pdf')
 
-class LessonForm(FlaskForm):
+
+class LessonForm(EditLessonForm):
     name = StringField('Nazwa lekcji', validators=[DataRequired()])
-    pdf_content = FileField('Wybierz plik')
     submit_button = SubmitField('Dodaj lekcję')
 
     def validate_name(self, name):
@@ -60,14 +65,6 @@ class ExerciseForm(ExerciseEditForm):
     def validate_name(self, name):
         if '/' in name.data:
             raise ValidationError('Wprowadzono niepoprawny znak - /.')
-
-    def validate_input(self, input):
-        if input.data.filename.rsplit('.', 1)[1].lower() != 'txt':
-            raise ValidationError('Oczekiwany format - .txt')
-
-    def validate_output(self, output):
-        if output.data.filename.rsplit('.', 1)[1].lower() != 'txt':
-            raise ValidationError('Oczekiwany format - .txt')
 
 
 class TestForm(FlaskForm):
@@ -109,8 +106,8 @@ class SolutionForm(FlaskForm):
     teacher_ref = BooleanField('Odrzuć zadanie')
     file_path = StringField('Plik', render_kw={'readonly': True})
     attempt = IntegerField('Próba', render_kw={'readonly': True})
-    ip_address = StringField('ip address', render_kw={'readonly': True})
-    os_info = StringField('os info', render_kw={'readonly': True})
+    ip_address = StringField('Adres IP', render_kw={'readonly': True})
+    os_info = StringField('Przeglądarka', render_kw={'readonly': True})
     comment = TextAreaField('Komentarz', render_kw={'rows': '5'})
     submit_comment = SubmitField('Dodaj komentarz')
     submit_points = SubmitField('Zmień punktację')
