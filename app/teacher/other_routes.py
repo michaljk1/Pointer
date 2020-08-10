@@ -3,7 +3,7 @@ from flask import render_template, request, send_from_directory, abort
 from flask_login import login_required, current_user
 
 from app.teacher import bp
-from app.teacher.TeacherUtil import get_students_ids_emails, get_statistics
+from app.teacher.TeacherUtil import get_statistics, get_students_emails_from_courses
 from app.teacher.teacher_forms import StatisticsForm
 from app.admin.admin_forms import LoginInfoForm
 from app.models.export import Export
@@ -20,10 +20,11 @@ from app.services.ValidationUtil import validate_course, validate_role
 def view_logins():
     validate_role(current_user, User.Roles['TEACHER'])
     form, logins = LoginInfoForm(), []
-    member_ids, emails = get_students_ids_emails(current_user.courses)
+    emails = get_students_emails_from_courses(current_user.courses)
+    emails.append(current_user.email)
     form.email.choices += ((email, email) for email in emails)
     if form.validate_on_submit():
-        logins = login_query(form, current_user.role, member_ids).all()
+        logins = login_query(form, current_user.role, emails).all()
     return render_template('teacheradmin/logins.html', form=form, logins=logins)
 
 
@@ -34,7 +35,7 @@ def view_statistics():
     form = StatisticsForm()
     for course in current_user.courses:
         form.course.choices.append((course.name, course.name))
-    form.email.choices += ((email, email) for email in get_students_ids_emails(current_user.courses)[1])
+    form.email.choices += ((email, email) for email in get_students_emails_from_courses(current_user.courses))
     statistics_list, statistics_info = [], []
     if request.method == 'POST' and form.validate_on_submit():
         student = Student.query.filter_by(email=form.email.data).first()

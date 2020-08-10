@@ -99,8 +99,8 @@ def exercise_query(form, courses=None):
     return query
 
 
-# teacher can see only his courses members login infos, ids = list ids of course members
-def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
+# teacher can see only his own and his courses members login infos
+def login_query(form: LoginInfoForm, user_role: str, member_emails=None):
     query = db.session.query(LoginInfo).select_from(LoginInfo).join(User, User.id == LoginInfo.user_id)
 
     if form.status.data != LoginInfo.Status['ALL']:
@@ -112,8 +112,8 @@ def login_query(form: LoginInfoForm, user_role: str, members_ids=None):
     if form.email.data != 'ALL':
         query = query.filter(User.email == form.email.data)
     elif user_role == User.Roles['TEACHER']:
-        if members_ids is None or len(members_ids) == 0:
+        if member_emails is None or len(member_emails) == 0:
             query = query.filter(1 == 0)
         else:
-            query = query.filter(User.id.in_(members_ids))
+            query = query.filter(User.email.in_(member_emails))
     return query.order_by(desc(LoginInfo.login_date))

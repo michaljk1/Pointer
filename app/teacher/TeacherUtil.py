@@ -4,13 +4,12 @@ from app.models.statistics import Statistics
 from app.models.usercourse import Course, Student
 
 
-def get_students_ids_emails(courses: List[Course]) -> (List[int], List[str]):
-    student_ids, emails = [], []
-    for course in courses:
+def get_students_emails_from_courses(teacher_courses: List[Course]) -> (List[int], List[str]):
+    emails = []
+    for course in teacher_courses:
         for student in course.get_students():
-            student_ids.append(student.id)
             emails.append(student.email)
-    return list(set(student_ids)), list(set(emails))
+    return list(set(emails))
 
 
 def get_statistics(student: Student, course: Course, teacher_courses: List[Course]) -> (List[object], List[List[int]]):
