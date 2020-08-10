@@ -33,7 +33,7 @@ flask db upgrade,
 
 create moderator account
 --------------
-python3 create_admin.py 'moderator@email.com' 'moderatorName' 'moderatorSurname' 'moderatorPassword'
+python3 create_admin.py 'admin@email.com' 'adminName' 'adminSurname' 'adminPassword'
 
 install redis:
 --------------
@@ -55,5 +55,5 @@ flask run
 
 email info
 --------------
-Only users with confirmed emails are able to use pointer. When application is running not at production server there is an issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their email confirmed can be omitted -   
+Only users with confirmed emails are able to use pointer. When application is running not at production server there is an issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their emails confirmed can be omitted -   
 comment lines from 62-65 in app/auth/auth_routes.py file
