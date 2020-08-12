@@ -70,7 +70,6 @@ class Course(db.Model):
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
-    index = db.Column(db.String(30), index=True, unique=True, nullable=False)
     name = db.Column(db.String(20), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(128), nullable=False)
@@ -141,6 +140,7 @@ class Admin(User):
 
 
 class UserCourse(User):
+    index = db.Column(db.String(30), index=True, unique=True)
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
 

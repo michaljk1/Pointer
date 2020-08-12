@@ -5,7 +5,7 @@ from sqlalchemy import func
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 
-from app.models.usercourse import User
+from app.models.usercourse import User, UserCourse
 
 
 class LoginForm(FlaskForm):
@@ -76,7 +76,7 @@ class RegistrationForm(PasswordForm):
                 raise ValidationError('Rejestracja dla danej domeny nie jest możliwa.')
 
     def validate_index(self, index):
-        user = User.query.filter_by(index=index.data).first()
+        user = UserCourse.query.filter_by(index=index.data).first()
         if user is not None:
             raise ValidationError('Podany indeks jest zajęty.')
         if not index.data.isdecimal():
