@@ -50,9 +50,10 @@ class LessonForm(EditLessonForm):
 
 
 class ExerciseEditForm(FlaskForm):
-    max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired()])
+    max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired(), NumberRange(min=0, max=100,
+                                                                                      message='Wartość musi znajdować się w przedziale od 0 do 100.')])
     end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()])
-    end_time = TimeField('Godzina')
+    end_time = TimeField('Godzina', validators=[DataRequired()])
     compile_command = StringField('Kompilacja', validators=[
         Length(max=100, message='Komenda kompilacji musi być krótsza niż 100 znaków.')])
     run_command = StringField('Uruchamianie', validators=[DataRequired(), Length(max=100,
