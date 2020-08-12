@@ -9,7 +9,7 @@ from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.logininfo import LoginInfo
 from app.models.solution import Solution
-from app.models.usercourse import User, Course
+from app.models.usercourse import User, Course, Student
 
 
 # student shouldn't be able to view approved or refused status if exercise is not finished
@@ -43,19 +43,19 @@ def exercise_teacher_query(form, courses=None):
     if form.status.data != Solution.Status['ALL'] and form.status.data != 'None':
         query = query.filter(Solution.status == form.status.data)
 
-    if form.surname.data is not None and len(form.surname.data) > 0:
-        query = query.filter(func.lower(User.surname) == func.lower(form.surname.data))
+    if not is_string_empty(form.surname.data):
+        query = query.filter(func.lower(Student.surname) == func.lower(form.surname.data))
 
-    if form.name.data is not None and len(form.name.data) > 0:
-        query = query.filter(func.lower(User.name) == func.lower(form.name.data))
+    if not is_string_empty(form.name.data):
+        query = query.filter(func.lower(Student.name) == func.lower(form.name.data))
 
-    if form.index.data is not None and len(form.index.data) > 0:
-        query = query.filter(User.index == form.index.data)
+    if not is_string_empty(form.index.data):
+        query = query.filter(Student.index == form.index.data)
 
-    if form.email.data is not None and len(form.email.data) > 0:
-        query = query.filter(func.lower(User.email) == func.lower(form.email.data))
+    if not is_string_empty(form.email.data):
+        query = query.filter(func.lower(Student.email) == func.lower(form.email.data))
 
-    if form.ip_address.data is not None and len(form.ip_address.data) > 0:
+    if not is_string_empty(form.ip_address.data):
         query = query.filter(Solution.ip_address == form.ip_address.data)
 
     if form.points_from.data is not None:
@@ -74,7 +74,7 @@ def exercise_student_query(form, student_id, courses):
 
 
 def exercise_query(form, courses=None):
-    query = db.session.query(Solution).select_from(Solution, User, Course, Lesson, Exercise). \
+    query = db.session.query(Solution).select_from(Solution, Student, Course, Lesson, Exercise). \
         join(User, User.id == Solution.user_id). \
         join(Exercise, Solution.exercise_id == Exercise.id). \
         join(Lesson, Lesson.id == Exercise.lesson_id). \
@@ -106,7 +106,7 @@ def login_query(form: LoginInfoForm, user_role: str, member_emails=None):
     if form.status.data != LoginInfo.Status['ALL']:
         query = query.filter(LoginInfo.status == form.status.data)
 
-    if form.ip_address.data != '':
+    if not is_string_empty(form.ip_address.data):
         query = query.filter(LoginInfo.ip_address == form.ip_address.data)
 
     if form.email.data != 'ALL':
@@ -117,3 +117,7 @@ def login_query(form: LoginInfoForm, user_role: str, member_emails=None):
         else:
             query = query.filter(User.email.in_(member_emails))
     return query.order_by(desc(LoginInfo.login_date))
+
+
+def is_string_empty(my_string: str) -> bool:
+    return my_string is None or len(my_string) == 0

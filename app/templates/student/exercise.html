@@ -13,7 +13,7 @@
 {% block app_content %}
     <h2>{{ exercise.name }}</h2>
     <hr>
-    <h1>{{ exercise.content|safe }}</h1>
+    {{ exercise.content|safe }}
     <h1>Maksymalna liczba prób: {{ exercise.max_attempts }}</h1>
     <h1>Termin przesłania zadania: {{ exercise.end_date }}</h1>
     <h1>Odstęp pomiędzy wysyłaniem zadań: {{ exercise.interval }}s</h1>

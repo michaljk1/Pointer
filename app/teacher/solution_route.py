@@ -27,6 +27,8 @@ def view_solutions():
         form.course.choices.append((course.name, course.name))
     if request.method == 'POST' and form.validate_on_submit():
         solutions = exercise_teacher_query(form=form, courses=current_user.get_course_names()).all()
+        if len(solutions) == 0:
+            flash('Brak rozwiązań odpowiadających danym kryteriom', 'message')
     return render_template('teacher/solutions.html', form=form, solutions=solutions)
 
 
@@ -64,17 +66,15 @@ def decline_solution(solution_id):
     return redirect(url_for('teacher.view_solution', solution_id=solution.id))
 
 
-@bp.route('/approve_solution/<int:solution_id>', methods=['GET', 'POST'])
+@bp.route('/approve_solution/<int:solution_id>', methods=['GET', 'POST', 'UPDATE'])
 @login_required
 def approve_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_teacher(current_user, User.Roles['TEACHER'], solution)
+    prev_active_solution = solution.exercise.get_user_active_solution(user_id=solution.author.id)
+    if prev_active_solution is not None:
+        prev_active_solution.status = Solution.Status['NOT_ACTIVE']
     solution.status = solution.Status['APPROVED']
-    user_solutions = solution.exercise.get_user_solutions(solution.user_id)
-    user_solutions.remove(solution)
-    for user_solution in user_solutions:
-        if user_solution.status == Solution.Status['APPROVED']:
-            user_solution.status = Solution.Status['NOT_ACTIVE']
     db.session.commit()
     flash('Zaakceptowano zadanie', 'message')
     return redirect(url_for('teacher.view_solution', solution_id=solution.id))

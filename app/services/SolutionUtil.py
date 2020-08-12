@@ -77,7 +77,7 @@ def grade(solution: Solution):
     for test in sorted_tests:
         name = 'error_test_run' + str(test.id) + '.txt'
         error_file = open(os.path.join(solution.get_directory(), name), 'w+')
-        output_file_name = program_name + "_output.txt"
+        output_file_name = program_name + '_output.txt'
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())

@@ -69,9 +69,9 @@ class Exercise(db.Model):
         end_datetime = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=end_time.hour,
                                 minute=end_time.minute, second=end_time.second)
         self.max_attempts = form.max_attempts.data
-        self.compile_command = form.compile_command.data
+        self.compile_command = form.compile_command.data.strip()
         self.end_date = end_datetime
-        self.run_command = form.run_command.data
-        self.program_name = form.program_name.data
+        self.run_command = form.run_command.data.strip()
+        self.program_name = form.program_name.data.strip()
         self.interval = form.interval.data
         self.content = content

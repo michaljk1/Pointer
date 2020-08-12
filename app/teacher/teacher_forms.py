@@ -50,7 +50,7 @@ class LessonForm(EditLessonForm):
 
 
 class ExerciseEditForm(FlaskForm):
-    max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired(), NumberRange(min=0, max=100,
+    max_attempts = IntegerField('Liczba prób', default=3, validators=[DataRequired(), NumberRange(min=1, max=100,
                                                                                       message='Wartość musi znajdować się w przedziale od 0 do 100.')])
     end_date = DateField('Data końcowa', format='%Y-%m-%d', validators=[DataRequired()])
     end_time = TimeField('Godzina', validators=[DataRequired()])
@@ -77,9 +77,9 @@ class ExerciseForm(ExerciseEditForm):
 
 
 class TestForm(FlaskForm):
-    max_points = FloatField('Liczba punktów', validators=[DataRequired(), NumberRange(min=0, max=100000,
-                                                                                      message='Wartość musi znajdować się w przedziale od 0 do 100000.')])
-    timeout = IntegerField('Timeout(sekundy)', default=600, validators=[DataRequired(), NumberRange(min=0, max=86400,
+    max_points = FloatField('Liczba punktów', validators=[DataRequired(), NumberRange(min=1, max=1000,
+                                                                                      message='Wartość musi znajdować się w przedziale od 1 do 1000.')])
+    timeout = IntegerField('Timeout(sekundy)', default=600, validators=[DataRequired(), NumberRange(min=1, max=86400,
                                                                                                     message='Wartość musi znajdować się w przedziale od 0 do 86400.')])
     output = FileField('Output', validators=[DataRequired()])
     input = FileField('Input', validators=[DataRequired()])
@@ -110,7 +110,7 @@ class StatisticsForm(FlaskForm):
 
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
-    error_msg = TextAreaField('Szczegóły błędu', render_kw={'rows': '10'})
+    error_msg = TextAreaField('Szczegóły błędu', render_kw={'rows': '3', 'readonly': True})
     points = FloatField('Punkty')
     status = StringField('Status')
     teacher_ref = BooleanField('Odrzuć zadanie')
@@ -131,4 +131,4 @@ class SolutionTeacherSearchForm(SolutionStudentSearchForm):
     index = StringField('Indeks')
     name = StringField('Imię')
     surname = StringField('Nazwisko')
-    ip_address = StringField('IP')
+    ip_address = StringField('Adres IP')

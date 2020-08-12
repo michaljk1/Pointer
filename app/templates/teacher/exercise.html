@@ -21,12 +21,16 @@
 {% block app_content %}
     <h2>{{ exercise.name }}</h2>
     <hr>
-    <h1>{{ exercise.content|safe }}</h1>
+    {{ exercise.content|safe }}
+    <hr>
     <h1>Termin: {{ exercise.end_date }}</h1>
     <h1>Maksymalna liczba punktów: {{ exercise.get_max_points() }}</h1>
     <h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1>
+    {% if exercise.compile_command|length > 1 %}}
     <h1>Kompilacja: {{ exercise.compile_command }}</h1>
+    {% endif %}
     <h1>Uruchamianie: {{ exercise.run_command }}</h1>
+    <hr>
     <button onclick="toggleExerciseDiv()" class="btn btn-info">Moje rozwiązania</button>
     <div id="toggle_div">
         <div class="row">
@@ -37,7 +41,7 @@
         {% include "teacher/solutionlist.html" %}
 
     </div>
-    <hr>
+    <br>
     <div class="bottom_div">
         {% if exercise.is_published %}
             <button type="button"
