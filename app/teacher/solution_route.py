@@ -89,5 +89,5 @@ def reprocess_solution(solution_id):
         solution.launch_execute('point_solution', 'Pointing solution')
         flash('Uruchomiono ponowne ocenianie', 'message')
     else:
-        flash('Ćwiczenie jest już oceniane', 'error')
+        flash('Program jest już oceniany', 'error')
     return redirect(url_for('teacher.view_solution', solution_id=solution.id))

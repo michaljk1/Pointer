@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from datetime import datetime
 
 from app import db
 
@@ -14,7 +15,7 @@ class Test(db.Model):
     create_date = db.Column(db.DateTime, nullable=False)
 
     def get_directory(self):
-        return os.path.join(self.executor.get_directory(), 'tests', 'test'+str(self.id))
+        return os.path.join(self.executor.get_directory(), 'tests', 'test' + str(datetime.timestamp(self.create_date)))
 
     def get_course(self):
         return self.executor.get_course()

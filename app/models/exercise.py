@@ -33,7 +33,7 @@ class Exercise(db.Model):
         return os.path.join(self.lesson.get_directory(), self.name.replace(" ", "_"))
 
     def get_max_points(self):
-        max_points = 0
+        max_points = 0.0
         for test in self.tests:
             max_points += test.points
         return max_points

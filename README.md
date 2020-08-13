@@ -56,4 +56,4 @@ flask run
 email info
 --------------
 Only users with confirmed emails are able to use pointer. When application is running not at production server there is an issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their emails confirmed can be omitted -   
-comment lines from 62-65 in app/auth/auth_routes.py file
+comment lines from 65-69 in app/auth/auth_routes.py file

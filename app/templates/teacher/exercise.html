@@ -26,7 +26,7 @@
     <h1>Termin: {{ exercise.end_date }}</h1>
     <h1>Maksymalna liczba punktów: {{ exercise.get_max_points() }}</h1>
     <h1>Maksymalna liczba podejść: {{ exercise.max_attempts }}</h1>
-    {% if exercise.compile_command|length > 1 %}}
+    {% if exercise.compile_command|length > 1 %}
     <h1>Kompilacja: {{ exercise.compile_command }}</h1>
     {% endif %}
     <h1>Uruchamianie: {{ exercise.run_command }}</h1>
@@ -41,7 +41,7 @@
         {% include "teacher/solutionlist.html" %}
 
     </div>
-    <br>
+    <hr>
     <div class="bottom_div">
         {% if exercise.is_published %}
             <button type="button"
