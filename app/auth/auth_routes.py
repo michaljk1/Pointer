@@ -62,11 +62,11 @@ def login():
             flash('Niepoprawne dane', 'error')
             db.session.commit()
             return redirect(url_for('auth.login'))
-        # if not user.is_confirmed:
-        #     login_info.status = LoginInfo.Status['ERROR']
-        #     flash('Aktywuj swoje konto')
-        #     db.session.commit()
-        #     return redirect(url_for('auth.activate'))
+        if not user.is_confirmed:
+            login_info.status = LoginInfo.Status['ERROR']
+            flash('Aktywuj swoje konto')
+            db.session.commit()
+            return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
@@ -77,11 +77,16 @@ def login():
 
 @bp.route('/activate', methods=['GET', 'POST'])
 def activate():
+    if current_user.is_authenticated:
+        return redirect(url_for('auth.index'))
     form = ConfirmEmailForm()
     if request.method == 'POST' and form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        user.launch_email('send_confirm_email', 'confirm email')
-        flash('Wysłano link aktywacyjny', 'message')
+        if not user.is_confirmed:
+            user.launch_email('send_confirm_email', 'confirm email')
+            flash('Wysłano link aktywacyjny', 'message')
+        else:
+            flash('Adres e-mail jest już potwierdzony', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/activate.html', form=form)
 
