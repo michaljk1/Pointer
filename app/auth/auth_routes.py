@@ -132,7 +132,7 @@ def send_reset():
 def append_course(link):
     course_by_link = Course.query.filter_by(link=link).first()
     validate_exists(course_by_link)
-    if not course_by_link.is_open:
+    if not course_by_link.is_open or current_user.role != User.Roles['STUDENT']:
         flash('Przypisanie do kursu nie jest obecnie możliwe')
         return redirect(url_for('auth.index'))
     elif course_by_link not in current_user.courses:

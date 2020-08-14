@@ -37,8 +37,7 @@ def view_solutions():
 def view_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_teacher(current_user, User.Roles['TEACHER'], solution)
-    solution_form = SolutionForm(obj=solution, email=solution.author.email, points=solution.points,
-                                 teacher_ref=(solution.status == solution.Status['REFUSED']))
+    solution_form = SolutionForm(obj=solution, email=solution.author.email, points=solution.points)
     if request.method == 'POST' and solution_form.validate_on_submit():
         if solution_form.submit_points.data:
             form_points = solution_form.points.data
