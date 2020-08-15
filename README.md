@@ -42,17 +42,16 @@ sudo apt install python3-rq
 
 create queue for emails:
 --------------
-venv$ rq worker pointer-emails
+( venv$ ) rq worker pointer-emails
 
 (amount of queues is equal to amount of pointing jobs in the same time)
 create queues for solutions:
 --------------
-venv$ rq worker pointer-solutions
+( venv$ ) rq worker pointer-solutions
 
 email info
 --------------
-Only users with confirmed emails are able to use pointer. When application is running not at production server there is an issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their emails confirmed can be omitted -   
-comment lines from 65-69 in app/auth/auth_routes.py file
+Only users with confirmed emails are able to use pointer. When application is running not at production server there is an issue with handling emails - application will be treated as not secure. For development and test purposes demanding from users having their emails confirmed can be omitted - comment lines from 65-69 in app/auth/auth_routes.py file
 
 run application
 --------------
