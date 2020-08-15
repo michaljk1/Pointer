@@ -17,7 +17,7 @@ cd Pointer
 create venv
 --------------
 python3 -m venv venv\
-virtualenv -p python3.8 venv\
+virtualenv -p python3.8 venv (virtualenv -p python3.7 venv)\ 
 source venv/bin/activate\
 pip3 install -r requirements.txt
 
@@ -42,12 +42,12 @@ sudo apt install python3-rq
 
 create queue for emails:
 --------------
-rq worker pointer-emails
+(venv)$ rq worker pointer-emails
 
 (amount of queues is equal to amount of pointing jobs in the same time)
 create queues for solutions:
 --------------
-rq worker pointer-solutions
+(venv)$ rq worker pointer-solutions
 
 email info
 --------------
@@ -56,4 +56,4 @@ comment lines from 65-69 in app/auth/auth_routes.py file
 
 run application
 --------------
-flask run
+(venv)$ flask run
