@@ -42,12 +42,12 @@ sudo apt install python3-rq
 
 create queue for emails:
 --------------
-( venv$ ) rq worker pointer-emails
+(venv$) rq worker pointer-emails
 
 (amount of queues is equal to amount of pointing jobs in the same time)
 create queues for solutions:
 --------------
-( venv$ ) rq worker pointer-solutions
+(venv$) rq worker pointer-solutions
 
 email info
 --------------
