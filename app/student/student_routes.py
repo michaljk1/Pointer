@@ -99,7 +99,7 @@ def view_statistics():
     return render_template('student/statistics.html', statisticsList=statistics_list)
 
 
-@bp.route('/uploads/<int:lesson_id>/', methods=['GET', 'POST'])
+@bp.route('/uploads/<int:lesson_id>', methods=['GET', 'POST'])
 @login_required
 def download_content(lesson_id):
     lesson = Lesson.query.filter_by(id=lesson_id).first()
@@ -107,7 +107,7 @@ def download_content(lesson_id):
     return send_from_directory(directory=lesson.get_directory(), filename=lesson.content_pdf_path)
 
 
-@bp.route('/mysolution/<int:solution_id>/', methods=['GET', 'POST'])
+@bp.route('/mysolution/<int:solution_id>', methods=['GET', 'POST'])
 @login_required
 def download_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
