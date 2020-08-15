@@ -19,11 +19,11 @@
                         href="{{ url_for('teacher.view_lesson',lesson_id = lesson.id) }}">{{ lesson.name }}</a>
                 </h1></li>
             {% endfor %}
+        </ul>
+        {% if course.is_open %}
             {% if course.lessons.all()|length > 0 %}
                 <hr>
             {% endif %}
-        </ul>
-        {% if course.is_open %}
             <h1>Link do zapisu:</h1>
             <p>{{ url_for('auth.append_course', link = course.link, _external=True) }}</p>
         {% endif %}
