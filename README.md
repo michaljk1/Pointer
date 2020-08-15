@@ -19,21 +19,11 @@ create venv
 python3 -m venv venv\
 virtualenv -p python3.8 venv (virtualenv -p python3.7 venv)\ 
 source venv/bin/activate\
-pip3 install -r requirements.txt
+(venv$) pip3 install -r requirements.txt
 
 configure project
 --------------
 fill config data in config.py
-
-create database
---------------
-flask db init\
-flask db migrate\
-flask db upgrade
-
-create moderator account
---------------
-python3 create_admin.py 'admin@email.com' 'adminName' 'adminSurname' 'adminPassword'
 
 install redis:
 --------------
@@ -48,6 +38,16 @@ create queue for emails:
 create queues for solutions:
 --------------
 (venv$) rq worker pointer-solutions
+
+create database
+--------------
+(venv$) flask db init\
+(venv$) flask db migrate\
+(venv$) flask db upgrade
+
+create moderator account
+--------------
+(venv$) python3 create_admin.py 'admin@email.com' 'adminName' 'adminSurname' 'adminPassword'
 
 email info
 --------------
