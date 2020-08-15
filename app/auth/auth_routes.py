@@ -68,6 +68,7 @@ def login():
             db.session.commit()
             return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
+        db.session.commit()
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             return redirect(url_for('auth.index'))
