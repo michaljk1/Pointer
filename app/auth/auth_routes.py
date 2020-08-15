@@ -52,14 +52,14 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter(func.lower(User.email) == func.lower(form.email.data)).first()
         if user is None:
-            flash('Nieprawidłowe dane', 'message')
+            flash('Nieprawidłowe dane', 'error')
             return redirect(url_for('auth.login'))
         login_info = LoginInfo(ip_address=request.remote_addr, status=LoginInfo.Status['SUCCESS'], user_id=user.id,
                                login_date=get_current_date())
         db.session.add(login_info)
         if not user.check_password(form.password.data):
             login_info.status = LoginInfo.Status['ERROR']
-            flash('Niepoprawne dane', 'error')
+            flash('Nieprawidłowe dane', 'error')
             db.session.commit()
             return redirect(url_for('auth.login'))
         if not user.is_confirmed:
