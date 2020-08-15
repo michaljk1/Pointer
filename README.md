@@ -32,22 +32,22 @@ sudo apt install python3-rq
 
 create queue for emails:
 --------------
-(venv$) rq worker pointer-emails
+(venv)$ rq worker pointer-emails
 
 (amount of queues is equal to amount of pointing jobs in the same time)
 create queues for solutions:
 --------------
-(venv$) rq worker pointer-solutions
+(venv)$ rq worker pointer-solutions
 
 create database
 --------------
-(venv$) flask db init\
-(venv$) flask db migrate\
-(venv$) flask db upgrade
+(venv)$ flask db init\
+(venv)$ flask db migrate\
+(venv)$ flask db upgrade
 
 create moderator account
 --------------
-(venv$) python3 create_admin.py 'admin@email.com' 'adminName' 'adminSurname' 'adminPassword'
+(venv)$ python3 create_admin.py 'admin@email.com' 'adminName' 'adminSurname' 'adminPassword'
 
 email info
 --------------
