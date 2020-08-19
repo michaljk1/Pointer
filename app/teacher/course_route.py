@@ -23,7 +23,7 @@ def view_courses():
     return render_template('teacher/courses.html', courses=current_user.courses)
 
 
-@bp.route('/course/<string:course_name>', methods=['GET', 'POST'])
+@bp.route('/course/<string:course_name>', methods=['GET'])
 @login_required
 def view_course(course_name):
     course = Course.query.filter_by(name=course_name).first()
