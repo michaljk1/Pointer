@@ -17,7 +17,11 @@ cd Pointer
 create venv
 --------------
 python3 -m venv venv\
-virtualenv -p python3.8 venv (virtualenv -p python3.7 venv)\ 
+
+one of following, depend on python version:\
+virtualenv -p python3.8 venv\
+virtualenv -p python3.7 venv\
+
 source venv/bin/activate\
 (venv$) pip3 install -r requirements.txt
 
