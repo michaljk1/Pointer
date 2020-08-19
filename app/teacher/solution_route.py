@@ -85,7 +85,7 @@ def reprocess_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_teacher(current_user, User.Roles['TEACHER'], solution)
     if solution.tasks_finished():
-        solution.launch_execute('point_solution', 'Pointing solution')
+        solution.enqueue_execution()
         flash('Uruchomiono ponowne ocenianie', 'message')
     else:
         flash('Program jest już oceniany', 'error')

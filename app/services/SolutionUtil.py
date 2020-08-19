@@ -30,7 +30,7 @@ def add_solution(exercise: Exercise, current_user: UserCourse, file: FileStorage
     file.save(os.path.join(solution_directory, solution.file_path))
     unpack_file(solution.file_path, solution_directory)
     db.session.commit()
-    solution.launch_execute('point_solution', 'Pointing solution')
+    solution.enqueue_execution()
 
 
 def execute_solution(solution_id):
