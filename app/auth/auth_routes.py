@@ -62,11 +62,11 @@ def login():
             flash('Nieprawidłowe dane', 'error')
             db.session.commit()
             return redirect(url_for('auth.login'))
-        # if not user.is_confirmed:
-        #     login_info.status = LoginInfo.Status['ERROR']
-        #     flash('Aktywuj swoje konto')
-        #     db.session.commit()
-        #     return redirect(url_for('auth.activate'))
+        if not user.is_confirmed:
+            login_info.status = LoginInfo.Status['ERROR']
+            flash('Aktywuj swoje konto')
+            db.session.commit()
+            return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
         db.session.commit()
         next_page = request.args.get('next')
