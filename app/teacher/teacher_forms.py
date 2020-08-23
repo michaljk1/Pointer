@@ -7,7 +7,7 @@ from wtforms import StringField, BooleanField, SubmitField, IntegerField, FloatF
 from wtforms.fields.html5 import DateField, TimeField
 from wtforms.validators import DataRequired, Length, Optional, NumberRange
 
-from app.default.default_forms import EmailForm
+from app.admin.admin_forms import EmailForm
 from app.models.usercourse import Course
 from app.student.student_forms import SolutionStudentSearchForm
 

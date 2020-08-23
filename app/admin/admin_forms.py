@@ -2,8 +2,11 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, StringField
 
-from app.default.default_forms import EmailForm
 from app.models.logininfo import LoginInfo
+
+
+class EmailForm(FlaskForm):
+    email = SelectField('Email', choices=[])
 
 
 class RoleStudentForm(EmailForm):

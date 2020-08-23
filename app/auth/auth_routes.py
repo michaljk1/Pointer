@@ -62,11 +62,11 @@ def login():
             flash('Nieprawidłowe dane', 'error')
             db.session.commit()
             return redirect(url_for('auth.login'))
-        if not user.is_confirmed:
-            login_info.status = LoginInfo.Status['ERROR']
-            flash('Aktywuj swoje konto')
-            db.session.commit()
-            return redirect(url_for('auth.activate'))
+        # if not user.is_confirmed:
+        #     login_info.status = LoginInfo.Status['ERROR']
+        #     flash('Aktywuj swoje konto')
+        #     db.session.commit()
+        #     return redirect(url_for('auth.activate'))
         login_user(user, remember=form.remember_me.data)
         db.session.commit()
         next_page = request.args.get('next')
@@ -131,23 +131,6 @@ def send_reset():
         flash('Wysłano wiadomość', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
-
-
-@bp.route('link/<string:link>')
-@login_required
-def append_course(link):
-    course_by_link = Course.query.filter_by(link=link).first()
-    validate_exists(course_by_link)
-    if not course_by_link.is_open or current_user.role != User.Roles['STUDENT']:
-        flash('Przypisanie do kursu nie jest obecnie możliwe')
-        return redirect(url_for('auth.index'))
-    elif course_by_link not in current_user.courses:
-        current_user.courses.append(course_by_link)
-        db.session.commit()
-        flash('Przypisano do kursu')
-    else:
-        flash('Użytkownik przypisany do kursu')
-    return redirect(url_for('auth.index'))
 
 
 @bp.route('/confirm_email/<token>', methods=['GET', 'POST'])

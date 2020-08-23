@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, url_for, request, send_from_directory
+from flask import render_template, url_for, request, send_from_directory, flash, abort
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
+from app import db
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.solution import Solution
@@ -113,3 +114,22 @@ def download_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_student(current_user, User.Roles['STUDENT'], solution)
     return send_from_directory(directory=solution.get_directory(), filename=solution.file_path)
+
+
+@bp.route('link/<string:link>')
+@login_required
+def append_course(link):
+    validate_role(current_user, User.Roles['STUDENT'])
+    course_by_link = Course.query.filter_by(link=link).first()
+    if course_by_link is None:
+        abort(404)
+    if not course_by_link.is_open:
+        flash('Przypisanie do kursu nie jest obecnie możliwe')
+        return redirect(url_for('student.index'))
+    elif course_by_link not in current_user.courses:
+        current_user.courses.append(course_by_link)
+        db.session.commit()
+        flash('Przypisano do kursu')
+    else:
+        flash('Użytkownik przypisany do kursu')
+    return redirect(url_for('student.index'))
