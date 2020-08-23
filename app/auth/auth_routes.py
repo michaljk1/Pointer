@@ -12,7 +12,6 @@ from app.auth.auth_forms import LoginForm, RegistrationForm, ConfirmEmailForm, C
 from app.models.logininfo import LoginInfo
 from app.models.usercourse import User, Course, Student
 from app.services.DateUtil import get_current_date
-from app.services.ValidationUtil import validate_exists
 
 
 @bp.route('/')

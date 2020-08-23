@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, url_for, request, send_from_directory, flash, abort
+from flask import render_template, url_for, request, send_from_directory, flash
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
@@ -12,7 +12,7 @@ from app.models.usercourse import Course, User
 from app.services.QueryUtil import get_filtered_by_status, exercise_student_query
 from app.services.SolutionUtil import add_solution
 from app.services.ValidationUtil import validate_role, validate_course, validate_solution_student, \
-    validate_exercise_student, validate_lesson
+    validate_exercise_student, validate_lesson, validate_exists
 from app.student import bp
 from app.student.StudentUtil import can_send_solution
 from app.student.student_forms import UploadForm, SolutionStudentSearchForm, StudentSolutionForm
@@ -119,10 +119,9 @@ def download_solution(solution_id):
 @bp.route('link/<string:link>')
 @login_required
 def append_course(link):
-    validate_role(current_user, User.Roles['STUDENT'])
     course_by_link = Course.query.filter_by(link=link).first()
-    if course_by_link is None:
-        abort(404)
+    validate_role(current_user, User.Roles['STUDENT'])
+    validate_exists(course_by_link)
     if not course_by_link.is_open:
         flash('Przypisanie do kursu nie jest obecnie możliwe')
         return redirect(url_for('student.index'))

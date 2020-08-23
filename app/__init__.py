@@ -31,11 +31,8 @@ def create_app():
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
 
-    from app.default import bp as default_bp
-    app.register_blueprint(default_bp)
-
     from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(auth_bp, url_prefix='/')
 
     from app.admin import bp as mod_bp
     app.register_blueprint(mod_bp, url_prefix='/admin')
