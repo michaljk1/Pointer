@@ -13,11 +13,10 @@ from app.models.lesson import Lesson
 from app.models.task import Task
 from app.services.FileUtil import create_directory
 
-user_course_assoc = db.Table(
-    'user_courses',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
-)
+user_course_assoc = db.Table('user_courses',
+                             db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+                             db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
+                             )
 
 
 class Course(db.Model):
@@ -70,9 +69,9 @@ class Course(db.Model):
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(70), index=True, unique=True)
+    password = db.Column(db.String(512), nullable=False)
     name = db.Column(db.String(20), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
-    password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False)
     is_confirmed = db.Column(db.Boolean, default=False)
     tasks = db.relationship('Task', backref='user', lazy='dynamic')

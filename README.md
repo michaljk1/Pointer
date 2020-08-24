@@ -16,7 +16,7 @@ cd Pointer
 
 create venv
 --------------
-python3 -m venv venv\
+python3 -m venv venv
 
 one of following, depend on python version:\
 virtualenv -p python3.8 venv\

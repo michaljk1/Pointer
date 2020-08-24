@@ -26,7 +26,7 @@ class ConfirmEmailForm(FlaskForm):
 
 
 class PasswordForm(FlaskForm):
-    password = PasswordField('Hasło', validators=[DataRequired()])
+    password = PasswordField('Hasło', validators=[DataRequired(), Length(max=40)])
     password2 = PasswordField(
         'Wprowadź ponownie', validators=[DataRequired(), EqualTo('password', message='Wprowadzone hasła różnią się')])
 
