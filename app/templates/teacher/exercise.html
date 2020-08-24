@@ -1,5 +1,13 @@
 {% extends "my_base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
+{% block scripts %}
+    {{ super() }}
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+{% block styles %}
+    {{ super() }}
+    <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('teacher.view_courses') }}">
         <pb> Kursy</pb>
@@ -27,7 +35,7 @@
     <h1>Maksymalna liczba punktów: {{ exercise.get_max_points() }}</h1>
     <h1>Maksymalna liczba prób: {{ exercise.max_attempts }}</h1>
     {% if exercise.compile_command|length > 1 %}
-    <h1>Kompilacja: {{ exercise.compile_command }}</h1>
+        <h1>Kompilacja: {{ exercise.compile_command }}</h1>
     {% endif %}
     <h1>Uruchamianie: {{ exercise.run_command }}</h1>
     <hr>

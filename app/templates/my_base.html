@@ -4,16 +4,13 @@
     {{ super() }}
     {% block styles %}
         {{ super() }}
-        <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pointer_my_main.css') }}">
     {% endblock %}
 
     {% block scripts %}
         {{ super() }}
-        <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
     {% endblock %}
+
 {% endblock %}
 
 {% block title %}

@@ -12,7 +12,6 @@
 {% block app_content %}
     <h2>{{ course.name }}</h2>
     <hr>
-    <div class="container_content">
         <ul>
             {% for lesson in course.lessons %}
                 <li><h1><a
@@ -52,5 +51,4 @@
                         class="btn btn-secondary btn-lg">Aktywuj zapis
                 </button>
             {% endif %}
-        </div>
 {% endblock %}
