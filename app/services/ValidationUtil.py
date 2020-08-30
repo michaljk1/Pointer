@@ -50,7 +50,7 @@ def validate_exercise_student(member: Member, required_role: str, exercise: Exer
 def validate_solution_student(member: Member, required_role: str, solution: Solution):
     validate_exists(solution)
     validate_course(member, required_role, solution.get_course())
-    if solution.author.email != member.email:
+    if solution not in member.solutions:
         abort(404)
 
 
