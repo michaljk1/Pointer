@@ -11,9 +11,8 @@ $RUN_COMMAND ${PROG2TEST}  < ${INPUTFILE} > ${OUTPUT_STUDENT}
 SCORE=$(diff -B ${OUTPUT_ADMIN} ${OUTPUT_STUDENT})
 if ! [ -z "$SCORE" ]
 then
-	echo FAILED
+  exit 1
 else
-  echo PASSED
+  exit 0
 fi
-exit 0
 

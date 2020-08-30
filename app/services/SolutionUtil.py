@@ -16,6 +16,7 @@ from app.services.FileUtil import unpack_file, create_directory
 
 RUN_SCRIPT_NAME = 'run.sh'
 COMPILE_SCRIPT_NAME = 'compile.sh'
+SUCCESS_RETURN_CODE = 0
 
 
 def add_solution(exercise: Exercise, current_user: Member, file: FileStorage, ip_address: str, attempt_nr: int,
@@ -82,7 +83,7 @@ def grade(solution: Solution):
                    test.get_output_path(), run_command, output_file_name]
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
-            out_process = process.communicate(timeout=test.timeout)[0]
+            process.communicate(timeout=test.timeout)[0]
             error_file.close()
             if os.path.getsize(error_file.name) > 0:
                 solution.status = Solution.Status['TEST_ERROR']
@@ -91,7 +92,7 @@ def grade(solution: Solution):
                 break
             else:
                 os.remove(error_file.name)
-                if 'PASSED' in str(out_process):
+                if process.returncode == SUCCESS_RETURN_CODE:
                     solution.points += test.points
                     solution.output_file = None
                 else:
