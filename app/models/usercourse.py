@@ -138,7 +138,7 @@ class Admin(User):
     }
 
 
-class UserCourse(User):
+class Member(User):
     index = db.Column(db.String(30), index=True, unique=True)
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
@@ -161,14 +161,14 @@ class UserCourse(User):
         return task
 
 
-class Teacher(UserCourse):
+class Teacher(Member):
     exports = db.relationship('Export', backref='user', lazy='dynamic')
     __mapper_args__ = {
         'polymorphic_identity': 'TEACHER',
     }
 
 
-class Student(UserCourse):
+class Student(Member):
     __mapper_args__ = {
         'polymorphic_identity': 'STUDENT',
     }

@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from app import db
 from app.admin import bp
 from app.admin.admin_forms import LoginInfoForm, RoleStudentForm, RoleTeacherForm
-from app.models.usercourse import User, Student, UserCourse, Teacher
+from app.models.usercourse import User, Student, Member, Teacher
 from app.services.FileUtil import create_directory
 from app.services.QueryUtil import login_query
 from app.services.ValidationUtil import validate_role
@@ -27,7 +27,7 @@ def teacher_roles():
     for student in Student.query.all():
         teacher_form.email.choices.append((student.email, student.email))
     if request.method == 'POST' and teacher_form.validate_on_submit():
-        user = UserCourse.query.filter_by(email=teacher_form.email.data).first()
+        user = Member.query.filter_by(email=teacher_form.email.data).first()
         user.role = User.Roles['TEACHER']
         create_directory(user.get_directory())
         db.session.commit()
@@ -44,7 +44,7 @@ def student_roles():
     for teacher in Teacher.query.all():
         student_form.email.choices.append((teacher.email, teacher.email))
     if request.method == 'POST' and student_form.validate_on_submit():
-        user = UserCourse.query.filter_by(email=student_form.email.data).first()
+        user = Member.query.filter_by(email=student_form.email.data).first()
         user.role = User.Roles['STUDENT']
         db.session.commit()
         flash('Nadano prawa studenta', 'message')
