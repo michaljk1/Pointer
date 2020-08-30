@@ -16,7 +16,7 @@ class Statistics:
             self.student_exercises, self.user_points = StudentExercise.get_student_exercises_for_student(student, course)
         self.course_points = course.get_course_points()
         self.user_email = student.email
-        self.user_index = student.index
+        self.university_id = student.university_id
         self.user_id = student.id
         self.course_name = course.name
         self.course_id = course.id

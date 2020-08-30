@@ -19,7 +19,7 @@ def get_csv_solution_export(solutions: List[Solution], current_user: User) -> Ex
         csv_writer = csv.writer(csv_file, delimiter='|', quoting=csv.QUOTE_MINIMAL)
         for solution in solutions:
             csv_writer.writerow(
-                [solution.author.index] + [solution.get_course().name] + [solution.get_lesson().name] +
+                [solution.author.university_id] + [solution.get_course().name] + [solution.get_lesson().name] +
                 [solution.exercise.name] + [solution.get_str_send_date()] + [solution.points] + [solution.status])
     export = Export(user_id=current_user.id, file_name=filename, generation_date=current_date, type=Export.types['CSV'], format=Export.formats['SOLUTION'])
     db.session.add(export)
@@ -35,7 +35,7 @@ def get_csv_statistics_export(statistics_info, current_user: User) -> Export:
         statistics: List[Statistics] = Statistics.get_statistics_by_ids(statistics_info)
         for statistic in statistics:
             csv_writer.writerow(
-                [statistic.user_index] + [statistic.course_name] + [statistic.user_points] +
+                [statistic.university_id] + [statistic.course_name] + [statistic.user_points] +
                 [statistic.course_points] + [str(statistic.get_percent_value()) + '%'])
             for student_exercise in statistic.student_exercises:
                 csv_writer.writerow(

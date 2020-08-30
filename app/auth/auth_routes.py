@@ -33,7 +33,7 @@ def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate_on_submit():
         student = Student(email=form.email.data, name=form.name.data, surname=form.surname.data,
-                          role=User.Roles['STUDENT'], index=form.index.data)
+                          role=User.Roles['STUDENT'], university_id=form.university_id.data)
         student.set_password(form.password.data)
         db.session.add(student)
         student.launch_email('send_confirm_email', 'confirm email')

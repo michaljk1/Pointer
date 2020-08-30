@@ -50,7 +50,7 @@ def set_style_for_statistics_table(table, data):
 
 
 def get_pdf_statistics_data(statistics: Statistics):
-    data = [[statistics.user_index, statistics.course_name, statistics.user_points,
+    data = [[statistics.university_id, statistics.course_name, statistics.user_points,
              statistics.course_points, (str(statistics.get_percent_value()) + '%')]]
     for student_exercise in statistics.student_exercises:
         data.append(
@@ -62,7 +62,7 @@ def get_pdf_statistics_data(statistics: Statistics):
 def create_solutions_pdf(solutions, global_filename):
     data, elements = [], []
     for solution in solutions:
-        data.append([solution.author.index, solution.get_course().name, solution.get_lesson().name,
+        data.append([solution.author.university_id, solution.get_course().name, solution.get_lesson().name,
                      solution.exercise.name, solution.get_str_send_date(), solution.points, solution.status])
     table = Table(data, rowHeights=25,
                   colWidths=[0.7 * inch, 1 * inch, 1.5 * inch, 1.5 * inch, 2 * inch, 0.4 * inch, 1.2 * inch])

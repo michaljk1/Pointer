@@ -55,7 +55,7 @@ class Solution(db.Model):
         return self.exercise.get_course()
 
     def get_directory(self):
-        return os.path.join(self.exercise.get_directory(), self.author.index, str(self.attempt))
+        return os.path.join(self.exercise.get_directory(), self.author.university_id, str(self.attempt))
 
     def get_str_send_date(self):
         return get_formatted_date(self.send_date)

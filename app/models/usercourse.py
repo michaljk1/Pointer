@@ -139,7 +139,7 @@ class Admin(User):
 
 
 class Member(User):
-    index = db.Column(db.String(30), index=True, unique=True)
+    university_id = db.Column(db.String(30), unique=True)
     solutions = db.relationship('Solution', backref='author', lazy='dynamic')
     courses = db.relationship('Course', secondary=user_course_assoc, backref='members')
 
@@ -150,7 +150,7 @@ class Member(User):
         return course_names
 
     def get_directory(self):
-        return os.path.join(current_app.config['INSTANCE_DIR'], 'teachers', self.index)
+        return os.path.join(current_app.config['INSTANCE_DIR'], 'teachers', self.university_id)
 
     def launch_course_email(self, course):
         rq_job = current_app.email_queue.enqueue('app.redis_tasks.send_course_email', self.email, course, self.role)

@@ -49,7 +49,7 @@ class ResetPasswordForm(PasswordForm):
 class RegistrationForm(PasswordForm):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(min=1, max=70)])
     name = StringField('Imię', validators=[DataRequired(), Length(min=1, max=20)])
-    index = StringField('Nr indeksu', validators=[DataRequired(), Length(min=1, max=30)])
+    university_id = StringField('Identyfikator', validators=[DataRequired(), Length(min=1, max=30)])
     surname = StringField('Nazwisko', validators=[DataRequired(), Length(min=1, max=40)])
     submit = SubmitField('Zarejestruj się')
 
@@ -75,9 +75,9 @@ class RegistrationForm(PasswordForm):
             if not is_proper:
                 raise ValidationError('Rejestracja dla danej domeny nie jest możliwa.')
 
-    def validate_index(self, index):
-        user = Member.query.filter_by(index=index.data).first()
-        if user is not None:
+    def validate_university_id(self, university_id):
+        member = Member.query.filter_by(university_id=university_id.data).first()
+        if member is not None:
             raise ValidationError('Podany indeks jest zajęty.')
-        if not index.data.isdecimal():
+        if not university_id.data.isdecimal():
             raise ValidationError('Wprowadzono niepoprawne znaki')

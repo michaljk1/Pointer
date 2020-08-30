@@ -49,8 +49,8 @@ def exercise_teacher_query(form, courses=None):
     if not is_string_empty(form.name.data):
         query = query.filter(func.lower(Student.name) == func.lower(form.name.data))
 
-    if not is_string_empty(form.index.data):
-        query = query.filter(Student.index == form.index.data)
+    if not is_string_empty(form.university_id.data):
+        query = query.filter(Student.university_id == form.university_id.data)
 
     if not is_string_empty(form.email.data):
         query = query.filter(func.lower(Student.email) == func.lower(form.email.data))
