@@ -1,6 +1,2 @@
 Zostałeś przypisany do kursu:
-{% if role == 'ADMIN' %}
-    {{ url_for('teacher.view_course', course_name=course_name, _external=True) }}
-{% else %}
-    {{ url_for('student.view_course', course_name=course_name, _external=True) }}
-{% endif %}
+{{ url_for('student.view_course', course_name=course_name, _external=True) }}
