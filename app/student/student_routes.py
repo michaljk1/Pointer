@@ -113,7 +113,7 @@ def download_content(lesson_id):
 def download_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
     validate_solution_student(current_user, User.Roles['STUDENT'], solution)
-    return send_from_directory(directory=solution.get_directory(), filename=solution.file_path)
+    return send_from_directory(directory=solution.get_directory(), filename=solution.filename)
 
 
 @bp.route('link/<string:link>')

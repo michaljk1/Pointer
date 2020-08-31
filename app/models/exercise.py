@@ -24,7 +24,7 @@ class Exercise(db.Model):
     is_published = db.Column(db.Boolean, default=False)
     interval = db.Column(db.Integer, nullable=False)
     solutions = db.relationship('Solution', backref='exercise', lazy='dynamic')
-    tests = db.relationship('Test', backref='executor', lazy='dynamic')
+    tests = db.relationship('Test', backref='solution', lazy='dynamic')
 
     def get_course(self):
         return self.lesson.course
