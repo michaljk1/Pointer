@@ -90,7 +90,8 @@ def grade(solution: Solution):
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
         try:
-            bash_code = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory()).wait(timeout=test.timeout)
+            bash_code = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory()).wait(
+                timeout=test.timeout)
             error_file.close()
             if error_occurred(error_file):
                 handle_test_error(solution, error_file)
