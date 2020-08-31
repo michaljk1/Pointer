@@ -4,6 +4,7 @@ import resource
 import subprocess
 from os import listdir
 from os.path import isfile, join
+import signal, psutil
 
 from flask import current_app
 from werkzeug.datastructures import FileStorage
@@ -24,13 +25,13 @@ OUTPUT_FILE_SUFFIX = '_output.txt'
 SUCCESS_RETURN_CODE = 0
 
 
-def add_solution(exercise: Exercise, current_user: Member, file: FileStorage, ip_address: str, attempt_nr: int,
+def add_solution(exercise: Exercise, member: Member, file: FileStorage, ip_address: str, attempt_nr: int,
                  os_info: str):
     filename = secure_filename(file.filename)
     solution = Solution(filename=filename, ip_address=ip_address, send_date=get_current_date(),
                         os_info=os_info, attempt=attempt_nr)
     exercise.solutions.append(solution)
-    current_user.solutions.append(solution)
+    member.solutions.append(solution)
     solution_directory = solution.get_directory()
     create_directory(solution_directory)
     file.save(os.path.join(solution_directory, solution.filename))
@@ -89,22 +90,33 @@ def grade(solution: Solution):
         output_file_name = program_name + OUTPUT_FILE_SUFFIX
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
+        process = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory())
         try:
-            bash_code = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory()).wait(
-                timeout=test.timeout)
+            process.communicate(timeout=test.timeout)
             error_file.close()
             if error_occurred(error_file):
                 handle_test_error(solution, error_file)
                 break
             else:
-                if bash_code == SUCCESS_RETURN_CODE:
+                if process.returncode == SUCCESS_RETURN_CODE:
                     solution.test_passed(test.points)
                 else:
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
+            kill_child_processes(process.pid)
             solution.timeout_occurred()
             break
+
+
+def kill_child_processes(parent_pid):
+    try:
+        parent = psutil.Process(parent_pid)
+    except psutil.NoSuchProcess:
+        return
+    children = parent.children(recursive=True)
+    for process in children:
+        process.send_signal(signal.SIGTERM)
 
 
 def error_occurred(error_file) -> bool:

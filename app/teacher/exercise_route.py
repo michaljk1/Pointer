@@ -25,7 +25,7 @@ def view_exercise(exercise_id):
     solutions = sorted(exercise.get_user_solutions(current_user.id), key=lambda sol: sol.send_date, reverse=True)
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
-        add_solution(exercise=exercise, current_user=current_user, file=request.files['file'],
+        add_solution(exercise=exercise, member=current_user, file=request.files['file'],
                      ip_address=request.remote_addr, attempt_nr=(1+len(solutions)), os_info=str(request.user_agent))
         return redirect(url_for('teacher.view_exercise', exercise_id=exercise.id))
     return render_template('teacher/exercise.html', exercise=exercise, form=form, solutions=solutions)

@@ -68,7 +68,7 @@ def view_exercise(exercise_id):
     send_solution = can_send_solution(exercise, solutions)
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
-        add_solution(exercise=exercise, current_user=current_user, file=request.files['file'],
+        add_solution(exercise=exercise, member=current_user, file=request.files['file'],
                      ip_address=request.remote_addr, attempt_nr=(1+len(solutions)), os_info=str(request.user_agent))
         return redirect(url_for('student.view_exercise', exercise_id=exercise.id))
     return render_template('student/exercise.html', exercise=exercise, form=form, send_solution=send_solution,
