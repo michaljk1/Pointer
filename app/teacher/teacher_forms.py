@@ -110,7 +110,7 @@ class StatisticsForm(FlaskForm):
 
 class SolutionForm(FlaskForm):
     email = StringField('Student', render_kw={'readonly': True})
-    error_msg = TextAreaField('Szczegóły błędu', render_kw={'rows': '3', 'readonly': True})
+    error_msg = TextAreaField('Szczegóły błędu', render_kw={'rows': '5', 'readonly': True})
     points = FloatField('Punkty')
     status = StringField('Status', render_kw={'readonly': True})
     file_path = StringField('Plik', render_kw={'readonly': True})

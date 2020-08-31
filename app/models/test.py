@@ -15,10 +15,10 @@ class Test(db.Model):
     create_date = db.Column(db.DateTime, nullable=False)
 
     def get_directory(self):
-        return os.path.join(self.executor.get_directory(), 'tests', 'test' + str(datetime.timestamp(self.create_date)))
+        return os.path.join(self.solution.get_directory(), 'tests', 'test' + str(datetime.timestamp(self.create_date)))
 
     def get_course(self):
-        return self.executor.get_course()
+        return self.solution.get_course()
 
     def get_input_path(self):
         return os.path.join(self.get_directory(), self.input_name)

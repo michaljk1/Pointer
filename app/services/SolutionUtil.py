@@ -16,6 +16,9 @@ from app.services.FileUtil import unpack_file, create_directory
 
 RUN_SCRIPT_NAME = 'run.sh'
 COMPILE_SCRIPT_NAME = 'compile.sh'
+COMPILE_ERROR_FILENAME = 'compile_error.txt'
+ERROR_TEST_FILENAME = 'error_test_run.txt'
+OUTPUT_FILE_SUFFIX = '_output.txt'
 SUCCESS_RETURN_CODE = 0
 
 
@@ -55,19 +58,17 @@ def prepare_compilation(solution) -> bool:
 
 def execute_compilation(solution: Solution, compile_command: str) -> bool:
     script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), COMPILE_SCRIPT_NAME)
-    error_file = open(os.path.join(solution.get_directory(), 'compile_error.txt'), 'w+')
+    error_file = open(os.path.join(solution.get_directory(), COMPILE_ERROR_FILENAME), 'w+')
     bash_command = [script_path, solution.get_directory(), compile_command]
-    process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file)
-    process.wait()
+    subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file).wait()
     error_file.close()
-    if os.path.getsize(error_file.name) > 0:
+    if error_occured(error_file):
         with open(error_file.name) as f:
             solution.error_msg = clear_error_msg(f.read(), COMPILE_SCRIPT_NAME)
         solution.status = Solution.Status['COMPILE_ERROR']
         return False
-    else:
-        os.remove(error_file.name)
-        return True
+    os.remove(error_file.name)
+    return True
 
 
 def grade(solution: Solution):
@@ -76,33 +77,38 @@ def grade(solution: Solution):
     script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), RUN_SCRIPT_NAME)
     sorted_tests = sorted(exercise.tests.all(), key=lambda t: t.create_date)
     for test in sorted_tests:
-        name = 'error_test_run' + str(test.id) + '.txt'
-        error_file = open(os.path.join(solution.get_directory(), name), 'w+')
-        output_file_name = program_name + '_output.txt'
+        error_file = open(os.path.join(solution.get_directory(), ERROR_TEST_FILENAME), 'w+')
+        output_file_name = program_name + OUTPUT_FILE_SUFFIX
+        output_path = os.path.join(solution.get_directory(), output_file_name)
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
-            process.communicate(timeout=test.timeout)[0]
+            bash_code = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file,
+                                         preexec_fn=limit_memory()).wait(test.timeout)
             error_file.close()
-            if os.path.getsize(error_file.name) > 0:
+            if error_occured(error_file):
                 solution.status = Solution.Status['TEST_ERROR']
                 with open(error_file.name) as f:
                     solution.error_msg = clear_error_msg(f.read(), RUN_SCRIPT_NAME)
+                os.remove(output_path)
                 break
             else:
                 os.remove(error_file.name)
-                if process.returncode == SUCCESS_RETURN_CODE:
+                if bash_code == SUCCESS_RETURN_CODE:
                     solution.points += test.points
                     solution.output_file = None
+                    os.remove(output_path)
                 else:
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
-            process.kill()
             solution.error_msg = 'Przekroczono limit czasu podczas testowania'
             solution.status = solution.Status['TIMEOUT_ERROR']
             break
+
+
+def error_occured(error_file) -> bool:
+    return os.path.getsize(error_file.name) > 0
 
 
 # user should not see directory in error message
