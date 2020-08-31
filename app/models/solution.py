@@ -87,6 +87,3 @@ class Solution(db.Model):
     def timeout_occurred(self):
         self.error_msg = 'Przekroczono limit czasu podczas testowania'
         self.status = self.Status['TIMEOUT_ERROR']
-
-    def passed_all_tests(self):
-        return self.points == self.exercise.get_max_points()

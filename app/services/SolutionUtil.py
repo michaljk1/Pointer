@@ -44,9 +44,8 @@ def clear_directory(solution: Solution):
     files = [f for f in listdir(solution_dir) if isfile(join(solution_dir, f))]
     for file in files:
         if file != solution.filename:
-            if file.endswith(OUTPUT_FILE_SUFFIX) and not solution.passed_all_tests():
-                pass
-            else:
+            if not file.endswith(OUTPUT_FILE_SUFFIX) or \
+                    (file.endswith(OUTPUT_FILE_SUFFIX) and solution.output_file is None):
                 os.remove(os.path.join(solution_dir, file))
 
 
@@ -72,12 +71,11 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
     script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), COMPILE_SCRIPT_NAME)
     error_file = open(os.path.join(solution.get_directory(), COMPILE_ERROR_FILENAME), 'w+')
     bash_command = [script_path, solution.get_directory(), compile_command]
-    subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file).wait()
+    subprocess.Popen(bash_command, stderr=error_file).wait()
     error_file.close()
     if error_occurred(error_file):
         handle_compile_error(solution, error_file)
         return False
-    os.remove(error_file.name)
     return True
 
 
@@ -91,21 +89,19 @@ def grade(solution: Solution):
         output_file_name = program_name + OUTPUT_FILE_SUFFIX
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
-            process.communicate(timeout=test.timeout)
+            bash_code = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory()).wait(timeout=test.timeout)
             error_file.close()
             if error_occurred(error_file):
                 handle_test_error(solution, error_file)
                 break
             else:
-                if process.returncode == SUCCESS_RETURN_CODE:
+                if bash_code == SUCCESS_RETURN_CODE:
                     solution.test_passed(test.points)
                 else:
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
-            process.kill()
             solution.timeout_occurred()
             break
 
