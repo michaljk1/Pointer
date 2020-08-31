@@ -2,6 +2,8 @@
 import os
 import resource
 import subprocess
+from os import listdir
+from os.path import isfile, join
 
 from flask import current_app
 from werkzeug.datastructures import FileStorage
@@ -25,27 +27,37 @@ SUCCESS_RETURN_CODE = 0
 def add_solution(exercise: Exercise, current_user: Member, file: FileStorage, ip_address: str, attempt_nr: int,
                  os_info: str):
     filename = secure_filename(file.filename)
-    solution = Solution(file_path=filename, ip_address=ip_address, send_date=get_current_date(),
+    solution = Solution(filename=filename, ip_address=ip_address, send_date=get_current_date(),
                         os_info=os_info, attempt=attempt_nr)
     exercise.solutions.append(solution)
     current_user.solutions.append(solution)
     solution_directory = solution.get_directory()
     create_directory(solution_directory)
-    file.save(os.path.join(solution_directory, solution.file_path))
-    unpack_file(solution.file_path, solution_directory)
+    file.save(os.path.join(solution_directory, solution.filename))
+    unpack_file(solution.filename, solution_directory)
     db.session.commit()
     solution.enqueue_execution()
 
 
+def clear_directory(solution: Solution):
+    solution_dir = solution.get_directory()
+    files = [f for f in listdir(solution_dir) if isfile(join(solution_dir, f))]
+    for file in files:
+        if file != solution.filename:
+            if file.endswith(OUTPUT_FILE_SUFFIX) and not solution.passed_all_tests():
+                pass
+            else:
+                os.remove(os.path.join(solution_dir, file))
+
+
 def execute_solution(solution_id):
     solution = Solution.query.filter_by(id=solution_id).first()
-    solution.points = 0
-    solution.status = Solution.Status['SEND']
-    solution.output_file, solution.error_msg = None, None
+    solution.init_pointing()
     if prepare_compilation(solution):
         grade(solution)
     if solution.status == Solution.Status['SEND']:
         solution.status = Solution.Status['NOT_ACTIVE']
+    clear_directory(solution)
 
 
 def prepare_compilation(solution) -> bool:
@@ -62,10 +74,8 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
     bash_command = [script_path, solution.get_directory(), compile_command]
     subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=error_file).wait()
     error_file.close()
-    if error_occured(error_file):
-        with open(error_file.name) as f:
-            solution.error_msg = clear_error_msg(f.read(), COMPILE_SCRIPT_NAME)
-        solution.status = Solution.Status['COMPILE_ERROR']
+    if error_occurred(error_file):
+        handle_compile_error(solution, error_file)
         return False
     os.remove(error_file.name)
     return True
@@ -79,36 +89,41 @@ def grade(solution: Solution):
     for test in sorted_tests:
         error_file = open(os.path.join(solution.get_directory(), ERROR_TEST_FILENAME), 'w+')
         output_file_name = program_name + OUTPUT_FILE_SUFFIX
-        output_path = os.path.join(solution.get_directory(), output_file_name)
         command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file, preexec_fn=limit_memory())
         try:
-            bash_code = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=error_file,
-                                         preexec_fn=limit_memory()).wait(test.timeout)
+            process.communicate(timeout=test.timeout)
             error_file.close()
-            if error_occured(error_file):
-                solution.status = Solution.Status['TEST_ERROR']
-                with open(error_file.name) as f:
-                    solution.error_msg = clear_error_msg(f.read(), RUN_SCRIPT_NAME)
-                os.remove(output_path)
+            if error_occurred(error_file):
+                handle_test_error(solution, error_file)
                 break
             else:
-                os.remove(error_file.name)
-                if bash_code == SUCCESS_RETURN_CODE:
-                    solution.points += test.points
-                    solution.output_file = None
-                    os.remove(output_path)
+                if process.returncode == SUCCESS_RETURN_CODE:
+                    solution.test_passed(test.points)
                 else:
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
-            solution.error_msg = 'Przekroczono limit czasu podczas testowania'
-            solution.status = solution.Status['TIMEOUT_ERROR']
+            process.kill()
+            solution.timeout_occurred()
             break
 
 
-def error_occured(error_file) -> bool:
+def error_occurred(error_file) -> bool:
     return os.path.getsize(error_file.name) > 0
+
+
+def handle_compile_error(solution: Solution, error_file):
+    solution.status = Solution.Status['COMPILE_ERROR']
+    with open(error_file.name) as f:
+        solution.error_msg = clear_error_msg(f.read(), COMPILE_SCRIPT_NAME)
+
+
+def handle_test_error(solution: Solution, error_file):
+    solution.status = Solution.Status['TEST_ERROR']
+    with open(error_file.name) as f:
+        solution.error_msg = clear_error_msg(f.read(), RUN_SCRIPT_NAME)
 
 
 # user should not see directory in error message

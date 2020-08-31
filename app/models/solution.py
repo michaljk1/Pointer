@@ -15,7 +15,7 @@ class Solution(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     send_date = db.Column(db.DateTime, nullable=False)
     points = db.Column(db.Float, nullable=False, default=0)
-    file_path = db.Column(db.String(100), nullable=False)
+    filename = db.Column(db.String(100), nullable=False)
     output_file = db.Column(db.String(100))
     attempt = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(20), nullable=False)
@@ -74,3 +74,19 @@ class Solution(db.Model):
         db.session.add(task)
         db.session.commit()
         return task
+
+    def test_passed(self, test_points: float):
+        self.points += test_points
+        self.output_file = None
+
+    def init_pointing(self):
+        self.points = 0
+        self.status = Solution.Status['SEND']
+        self.output_file, self.error_msg = None, None
+
+    def timeout_occurred(self):
+        self.error_msg = 'Przekroczono limit czasu podczas testowania'
+        self.status = self.Status['TIMEOUT_ERROR']
+
+    def passed_all_tests(self):
+        return self.points == self.exercise.get_max_points()

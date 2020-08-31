@@ -62,7 +62,7 @@ def download():
         if my_type == 'output':
             filename = my_object.output_file
         else:
-            filename = my_object.file_path
+            filename = my_object.filename
         my_course = my_object.get_course()
     elif domain == 'export':
         my_object = Export.query.filter_by(id=request_id).first()
