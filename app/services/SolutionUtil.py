@@ -104,19 +104,20 @@ def grade(solution: Solution):
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
-            kill_child_processes(process.pid)
+            kill_processes(process.pid)
             solution.timeout_occurred()
             break
 
 
-def kill_child_processes(parent_pid):
+def kill_processes(parent_pid):
     try:
         parent = psutil.Process(parent_pid)
     except psutil.NoSuchProcess:
         return
     children = parent.children(recursive=True)
-    for process in children:
-        process.send_signal(signal.SIGTERM)
+    for child in children:
+        child.kill()
+    parent.kill()
 
 
 def error_occurred(error_file) -> bool:
