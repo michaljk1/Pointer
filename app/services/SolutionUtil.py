@@ -3,8 +3,8 @@ import os
 import resource
 import subprocess
 from os import listdir
-from os.path import isfile, join
-import signal, psutil
+from os.path import isfile, join, dirname, realpath
+import psutil
 
 from flask import current_app
 from werkzeug.datastructures import FileStorage
@@ -23,6 +23,8 @@ COMPILE_ERROR_FILENAME = 'compile_error.txt'
 ERROR_TEST_FILENAME = 'error_test_run.txt'
 OUTPUT_FILE_SUFFIX = '_output.txt'
 SUCCESS_RETURN_CODE = 0
+COMPILE_SCRIPT_PATH = join(dirname(realpath(__file__)), COMPILE_SCRIPT_NAME)
+RUN_SCRIPT_PATH = join(dirname(realpath(__file__)), RUN_SCRIPT_NAME)
 
 
 def add_solution(exercise: Exercise, member: Member, file: FileStorage, ip_address: str, attempt_nr: int,
@@ -34,7 +36,7 @@ def add_solution(exercise: Exercise, member: Member, file: FileStorage, ip_addre
     member.solutions.append(solution)
     solution_directory = solution.get_directory()
     create_directory(solution_directory)
-    file.save(os.path.join(solution_directory, solution.filename))
+    file.save(join(solution_directory, solution.filename))
     unpack_file(solution.filename, solution_directory)
     db.session.commit()
     solution.enqueue_execution()
@@ -47,7 +49,7 @@ def clear_directory(solution: Solution):
         if file != solution.filename:
             if not file.endswith(OUTPUT_FILE_SUFFIX) or \
                     (file.endswith(OUTPUT_FILE_SUFFIX) and solution.output_file is None):
-                os.remove(os.path.join(solution_dir, file))
+                os.remove(join(solution_dir, file))
 
 
 def execute_solution(solution_id):
@@ -69,9 +71,8 @@ def prepare_compilation(solution) -> bool:
 
 
 def execute_compilation(solution: Solution, compile_command: str) -> bool:
-    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), COMPILE_SCRIPT_NAME)
-    error_file = open(os.path.join(solution.get_directory(), COMPILE_ERROR_FILENAME), 'w+')
-    bash_command = [script_path, solution.get_directory(), compile_command]
+    error_file = open(join(solution.get_directory(), COMPILE_ERROR_FILENAME), 'w+')
+    bash_command = [COMPILE_SCRIPT_PATH, solution.get_directory(), compile_command]
     subprocess.Popen(bash_command, stderr=error_file).wait()
     error_file.close()
     if error_occurred(error_file):
@@ -83,12 +84,10 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
 def grade(solution: Solution):
     exercise = solution.exercise
     program_name, run_command = exercise.program_name, exercise.run_command
-    script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), RUN_SCRIPT_NAME)
-    sorted_tests = sorted(exercise.tests.all(), key=lambda t: t.create_date)
-    for test in sorted_tests:
-        error_file = open(os.path.join(solution.get_directory(), ERROR_TEST_FILENAME), 'w+')
-        output_file_name = program_name + OUTPUT_FILE_SUFFIX
-        command = [script_path, solution.get_directory(), program_name, test.get_input_path(),
+    output_file_name = program_name + OUTPUT_FILE_SUFFIX
+    for test in exercise.get_sorted_tests():
+        error_file = open(join(solution.get_directory(), ERROR_TEST_FILENAME), 'w+')
+        command = [RUN_SCRIPT_PATH, solution.get_directory(), program_name, test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
         process = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory())
         try:
@@ -104,9 +103,10 @@ def grade(solution: Solution):
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
-            kill_processes(process.pid)
             solution.timeout_occurred()
             break
+        finally:
+            kill_processes(process.pid)
 
 
 def kill_processes(parent_pid):

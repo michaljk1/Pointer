@@ -75,3 +75,6 @@ class Exercise(db.Model):
         self.program_name = form.program_name.data.strip()
         self.interval = form.interval.data
         self.content = content
+
+    def get_sorted_tests(self):
+        return sorted(self.tests.all(), key=lambda t: t.create_date)
