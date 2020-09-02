@@ -5,6 +5,7 @@ git clone https://github.com/michaljk1/Pointer.git
 
 install packages
 --------------
+sudo apt-get install python3.8-dev\
 sudo apt install python3-pip\
 sudo apt install python3-venv\
 sudo apt install python3-virtualenv\
@@ -17,11 +18,7 @@ cd Pointer
 create venv
 --------------
 python3 -m venv venv
-
-one of following, depend on python version:\
 virtualenv -p python3.8 venv\
-virtualenv -p python3.7 venv
-
 source venv/bin/activate\
 (venv$) pip3 install -r requirements.txt
 
