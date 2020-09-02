@@ -83,11 +83,11 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
 
 def grade(solution: Solution):
     exercise = solution.exercise
-    program_name, run_command = exercise.program_name, exercise.run_command
-    output_file_name = program_name + OUTPUT_FILE_SUFFIX
+    run_command = exercise.run_command
+    output_file_name = exercise.program_name + OUTPUT_FILE_SUFFIX
     for test in exercise.get_sorted_tests():
         error_file = open(join(solution.get_directory(), ERROR_TEST_FILENAME), 'w+')
-        command = [RUN_SCRIPT_PATH, solution.get_directory(), program_name, test.get_input_path(),
+        command = [RUN_SCRIPT_PATH, solution.get_directory(), test.get_input_path(),
                    test.get_output_path(), run_command, output_file_name]
         process = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory())
         try:
