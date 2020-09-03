@@ -74,7 +74,6 @@ def execute_compilation(solution: Solution, compile_command: str) -> bool:
     error_file = open(join(solution.get_directory(), COMPILE_ERROR_FILENAME), 'w+')
     bash_command = [COMPILE_SCRIPT_PATH, solution.get_directory(), compile_command]
     subprocess.Popen(bash_command, stderr=error_file).wait()
-    error_file.close()
     if error_occurred(error_file):
         handle_compile_error(solution, error_file)
         return False
@@ -92,7 +91,6 @@ def grade(solution: Solution):
         process = subprocess.Popen(command, stderr=error_file, preexec_fn=limit_memory())
         try:
             process.communicate(timeout=test.timeout)
-            error_file.close()
             if error_occurred(error_file):
                 handle_test_error(solution, error_file)
                 break
@@ -103,6 +101,7 @@ def grade(solution: Solution):
                     solution.output_file = output_file_name
                     break
         except subprocess.TimeoutExpired:
+            error_file.close()
             solution.timeout_occurred()
             break
         finally:
@@ -121,6 +120,7 @@ def kill_processes(parent_pid):
 
 
 def error_occurred(error_file) -> bool:
+    error_file.close()
     return os.path.getsize(error_file.name) > 0
 
 
