@@ -7,7 +7,7 @@ OUTPUT_STUDENT=$5
 cd $DIRECTORY
 $RUN_COMMAND < ${INPUTFILE} > ${OUTPUT_STUDENT}
 # -B - ignore empty lines
-SCORE=$(diff -B ${OUTPUT_TEACHER} ${OUTPUT_STUDENT})
+SCORE=$(diff -B -Z ${OUTPUT_TEACHER} ${OUTPUT_STUDENT})
 if ! [ -z "$SCORE" ]
 then
   exit 1
