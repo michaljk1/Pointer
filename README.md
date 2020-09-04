@@ -1,6 +1,6 @@
 download project
 --------------
-sudo apt install git,
+sudo apt install git\
 git clone https://github.com/michaljk1/Pointer.git
 
 install packages
@@ -57,3 +57,9 @@ Only users with confirmed emails are able to use pointer. When application is ru
 run application
 --------------
 (venv)$ flask run
+
+backup
+--------------
+open copyfiles.sh and specify target dir, instance and db paths, next run\
+./copyfiles.sh &
+
