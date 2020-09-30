@@ -1,3 +1,7 @@
+Pointer - web application for automatic grading of programming tasks (Jagiellonian University - Bachelor thesis)
+----------------
+The subject of this thesis is a web application for automatic grading of programming tasks, in which academic teachers can create courses, lessons and exercises. The program is evaluated by running it against the specified arguments and then comparing its results with the template output file provided by the teacher. The platform has been implemented in the Python programming language using the Flask framework and the SQLite database engine.
+
 download project
 --------------
 sudo apt install git\
